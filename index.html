@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CX Survey Calls Portal | Mindmatrix</title>
   
-  <!-- Telnyx WebRTC SDK & Google SSO -->
-  <script src="https://cdn.jsdelivr.net/npm/@telnyx/webrtc@latest"></script>
+  <!-- Google SSO -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -189,12 +188,15 @@
     
     .form-overlay { position: absolute; inset: 0; background: rgba(11, 15, 25, 0.75); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 50; border-radius: 12px; display: none; align-items: flex-start; justify-content: center; padding-top: 5rem; }
     .form-overlay-card { background: var(--modal-bg); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: sticky; top: 5rem; width: 85%; max-width: 400px; }
+
+    /* RECORDING BAR STYLING */
+    .rec-bar { display: flex; align-items: center; gap: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
+    .rec-indicator { width: 12px; height: 12px; border-radius: 50%; background: var(--danger-color); }
+    .rec-indicator.active { animation: blink 1s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
 <body>
-
-  <!-- Invisible Audio Element for Telnyx SDK -->
-  <audio id="remoteMedia" autoplay></audio>
 
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -322,8 +324,16 @@
 
           <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
             <span>Call Script</span>
-            <button class="btn-primary" id="callActionBtn" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" onclick="initiateCall(document.getElementById('ws-phone').value, document.getElementById('ws-client-display').value)">📞 Call Now</button>
+            <button class="btn-primary" id="callActionBtn" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" onclick="handleCallNowClick()">📞 Call Now</button>
           </h2>
+
+          <!-- RECORDING CONTROL BAR -->
+          <div class="rec-bar">
+            <div class="rec-indicator" id="recIndicator"></div>
+            <span id="recTimerText" style="font-size: 0.85rem; font-weight: 600; font-family: monospace; flex: 1;">Recording Standby</span>
+            <button class="btn-outline" id="recToggleBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="toggleRecordingPause()">⏸️ Pause</button>
+            <button class="btn-outline" id="recStopBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-color: var(--danger-color); color: var(--danger-color);" onclick="stopRecordingAndUpload()">🛑 Stop & Save</button>
+          </div>
           
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap;">
              <span style="color: var(--text-muted); font-size: 0.95rem;">
@@ -409,23 +419,21 @@
           
           <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Feedback & Call Log</h2>
           
-          <!-- Hidden form inputs mapped to Google Form -->
+          <!-- Hidden form inputs -->
           <input type="hidden" id="ws-row-id">
-          <input type="hidden" id="ws-phone">
+          <input type="hidden" id="ws-phone-work">
+          <input type="hidden" id="ws-phone-mobile">
           <input type="hidden" id="ws-client-display"> 
           <input type="hidden" id="ws-client" name="entry.944856988">
           <input type="hidden" id="ws-exec" name="entry.1071857762">
           <input type="hidden" id="ws-poc" name="entry.2115264353">
           <input type="hidden" id="ws-email-val" name="emailAddress">
-          
-          <!-- Also hidden fields for persisting edits -->
           <input type="hidden" id="ws-timezone-val">
           <input type="hidden" id="ws-customnote-val">
 
           <!-- THE UNBREAKABLE FORM WRAPPER -->
           <div style="position: relative;" id="survey-form-container">
             
-            <!-- The Perfect Overlay -->
             <div id="form-overlay" class="form-overlay">
               <div class="form-overlay-card">
                 <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🎙️</span>
@@ -456,16 +464,8 @@
             </div>
 
             <!-- Rating Containers -->
-            <div class="form-group">
-              <label class="form-group-label">Rate the features you use (1-10)</label>
-              <div class="rating-container" id="rating-1"></div>
-            </div>
-            
-            <div class="form-group">
-              <label class="form-group-label">Rate the look and ease of use (1-10)</label>
-              <div class="rating-container" id="rating-2"></div>
-            </div>
-
+            <div class="form-group"><label class="form-group-label">Rate the features you use (1-10)</label><div class="rating-container" id="rating-1"></div></div>
+            <div class="form-group"><label class="form-group-label">Rate the look and ease of use (1-10)</label><div class="rating-container" id="rating-2"></div></div>
             <div class="form-group">
               <label class="form-group-label">Enhancements or new features you’d like to see?</label>
               <div style="position: relative;">
@@ -474,11 +474,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-group-label">Rate the support provided by our team (1-10)</label>
-              <div class="rating-container" id="rating-3"></div>
-            </div>
-            
+            <div class="form-group"><label class="form-group-label">Rate the support provided by our team (1-10)</label><div class="rating-container" id="rating-3"></div></div>
             <div class="form-group">
               <label class="form-group-label">Suggestions to help Support improve?</label>
               <div style="position: relative;">
@@ -487,11 +483,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-group-label">Rate your monthly calls with your consultant (1-10)</label>
-              <div class="rating-container" id="rating-4"></div>
-            </div>
-
+            <div class="form-group"><label class="form-group-label">Rate your monthly calls with your consultant (1-10)</label><div class="rating-container" id="rating-4"></div></div>
             <div class="form-group">
               <label class="form-group-label">Suggestions to improve monthly meetings?</label>
               <div style="position: relative;">
@@ -500,11 +492,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-group-label">Rate the timelines for escalated production tickets (1-10)</label>
-              <div class="rating-container" id="rating-5"></div>
-            </div>
-
+            <div class="form-group"><label class="form-group-label">Rate the timelines for escalated production tickets (1-10)</label><div class="rating-container" id="rating-5"></div></div>
             <div class="form-group">
               <label class="form-group-label">Additional feedback regarding production timelines?</label>
               <div style="position: relative;">
@@ -518,11 +506,7 @@
               <input type="text" class="modal-input" name="entry.38474104" placeholder="Ticket numbers or details...">
             </div>
 
-            <div class="form-group">
-              <label class="form-group-label">Rate your overall experience with Mindmatrix Bridge (1-10)</label>
-              <div class="rating-container" id="rating-6"></div>
-            </div>
-
+            <div class="form-group"><label class="form-group-label">Rate your overall experience with Mindmatrix Bridge (1-10)</label><div class="rating-container" id="rating-6"></div></div>
             <div class="form-group">
               <label class="form-group-label">Any final thoughts or suggestions?</label>
               <div style="position: relative;">
@@ -531,13 +515,12 @@
               </div>
             </div>
 
-          </div> <!-- END SURVEY FORM CONTAINER -->
+          </div>
 
           <!-- CALL LOGGING SECTION -->
           <div class="form-group" style="border: 2px solid var(--accent-primary); background: var(--bg-color); margin-top: 2rem;" id="ws-outcome-section">
             <h3 style="margin-top:0; color: var(--accent-primary); margin-bottom: 1rem;">📝 Log Call Outcome</h3>
             
-            <!-- Custom Attempt Dropdown -->
             <label class="input-label">Call Attempt</label>
             <div class="custom-select" id="attempt-dropdown" style="margin-bottom: 1.25rem;">
                <div class="select-trigger" onclick="toggleDropdown('attempt-dropdown')">
@@ -558,7 +541,6 @@
               <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Internal Notes')">⤢</button>
             </div>
             
-            <!-- Custom Call Status Dropdown -->
             <label class="input-label">Call Status</label>
             <div class="custom-select" id="status-dropdown">
                <div class="select-trigger" onclick="toggleDropdown('status-dropdown')">
@@ -579,6 +561,23 @@
 
         </div>
       </div>
+  </div>
+
+  <!-- SELECT PHONE MODAL -->
+  <div class="modal-overlay" id="selectPhoneModal" onclick="closeOnBackgroundClick(event, 'selectPhoneModal')">
+    <div class="modal-content" style="max-width: 420px;">
+      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Choose Phone Number</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select which line you would like to dial via ITC Cloud.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <button class="btn-primary" id="btnDialWork" style="justify-content: center; padding: 1rem;" onclick="executeDial('work')">🏢 Dial Work: <span id="lblWorkNum"></span></button>
+        <button class="btn-primary" id="btnDialMobile" style="justify-content: center; padding: 1rem; background: var(--safe-color);" onclick="executeDial('mobile')">📱 Dial Mobile: <span id="lblMobileNum"></span></button>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <button class="btn-outline" onclick="closeModal('selectPhoneModal')">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <!-- MODALS -->
@@ -668,6 +667,12 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbx9CElrTL_8oYs_CTmCf6LOap7-FQP6y4SYeDmb8dBdpZ2jprZ7XvX-AGW7814m6ekdOw/exec"; 
     const GOOGLE_CLIENT_ID = "992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"; 
 
+    // AUDIO RECORDING GLOBALS
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recSeconds = 0;
+    let recTimerInterval = null;
+
     // System Logs Shortcut (Shift + L)
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
@@ -676,7 +681,6 @@
         }
     });
 
-    // Custom API Fetcher to communicate with Google securely
     async function callGoogleAPI(action, payload = {}) {
         payload.action = action;
         try {
@@ -707,11 +711,6 @@
     let activeKpiFilter = null;
     let appLogs = [];
     let clockInterval;
-
-    let telnyxClient = null;
-    let activeCall = null;
-    let isTelnyxReady = false;
-    let telnyxCallerId = '';
 
     const tzList = [
       { label: "US Eastern (EST/EDT)", iana: "America/New_York" }, { label: "US Central (CST/CDT)", iana: "America/Chicago" },
@@ -827,18 +826,6 @@
        });
     }
 
-    document.addEventListener('click', function(e) {
-       if(e.target && e.target.type === 'radio' && e.target.closest('.rating-container')) {
-           if(e.target.dataset.wasChecked === 'true') {
-               e.target.checked = false;
-               e.target.dataset.wasChecked = 'false';
-           } else {
-               document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false');
-               e.target.dataset.wasChecked = 'true';
-           }
-       }
-    });
-
     function showToast(msg, type) {
       const existing = document.getElementById('mm-toast-alert');
       if (existing) existing.remove();
@@ -847,23 +834,17 @@
       toast.id = 'mm-toast-alert';
       toast.innerText = msg;
       
-      // Inline styling to guarantee it renders everywhere
       toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600; font-size: 0.95rem; z-index: 999999; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.2); pointer-events: none; text-align: center; max-width: 80%;';
       
       if (type === 'success') toast.style.backgroundColor = '#10b981';
       else if (type === 'warning') toast.style.backgroundColor = '#f59e0b';
-      else toast.style.backgroundColor = '#ef4444'; // danger
+      else toast.style.backgroundColor = '#ef4444'; 
       
       document.body.appendChild(toast);
       
+      setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
       setTimeout(() => { 
-          toast.style.opacity = '1'; 
-          toast.style.transform = 'translateX(-50%) translateY(0)'; 
-      }, 10);
-      
-      setTimeout(() => { 
-          toast.style.opacity = '0'; 
-          toast.style.transform = 'translateX(-50%) translateY(20px)';
+          toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)';
           setTimeout(() => toast.remove(), 400); 
       }, 3500);
     }
@@ -881,6 +862,138 @@
     }
     function openPinModal() { openModal('pinModal'); }
 
+    // ==========================================
+    // PHONE SELECTION & AUTOMATIC AUDIO RECORDING
+    // ==========================================
+    function handleCallNowClick() {
+      const workNum = document.getElementById('ws-phone-work').value;
+      const mobileNum = document.getElementById('ws-phone-mobile').value;
+
+      const validWork = workNum && !workNum.toLowerCase().includes('no phone');
+      const validMobile = mobileNum && !mobileNum.toLowerCase().includes('no mobile');
+
+      if (validWork && validMobile) {
+         document.getElementById('lblWorkNum').innerText = workNum;
+         document.getElementById('lblMobileNum').innerText = mobileNum;
+         openModal('selectPhoneModal');
+      } else if (validWork) {
+         executeDial('work');
+      } else if (validMobile) {
+         executeDial('mobile');
+      } else {
+         showToast('No valid phone number for this contact.', 'warning');
+      }
+    }
+
+    function executeDial(type) {
+      closeModal('selectPhoneModal');
+      const targetNum = type === 'work' ? document.getElementById('ws-phone-work').value : document.getElementById('ws-phone-mobile').value;
+      const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
+
+      addLog(`Dialing ${cleanPhone} via ITC Cloud...`);
+      showToast(`Launching ITC Cloud for ${cleanPhone}...`, 'success');
+
+      // 1. Trigger ITC Cloud / Desktop Handler
+      window.location.href = `tel:${cleanPhone}`;
+
+      // 2. Automatically start recording call audio
+      startAutoRecording();
+    }
+
+    async function startAutoRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = uploadRecordingToDrive;
+
+        mediaRecorder.start();
+        recSeconds = 0;
+        document.getElementById('recIndicator').classList.add('active');
+        document.getElementById('recTimerText').innerText = "REC 00:00";
+
+        if (recTimerInterval) clearInterval(recTimerInterval);
+        recTimerInterval = setInterval(() => {
+           recSeconds++;
+           const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+           const secs = String(recSeconds % 60).padStart(2, '0');
+           document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
+        }, 1000);
+
+        addLog("Microphone call recording started automatically.");
+        showToast("Call recording started automatically.", "safe");
+
+      } catch (err) {
+        addLog(`Microphone access error: ${err.message}`);
+        showToast("Microphone permission required for call recording.", "warning");
+      }
+    }
+
+    function toggleRecordingPause() {
+      if (!mediaRecorder) return;
+      const btn = document.getElementById('recToggleBtn');
+      if (mediaRecorder.state === "recording") {
+         mediaRecorder.pause();
+         clearInterval(recTimerInterval);
+         btn.innerText = "▶️ Resume";
+         document.getElementById('recIndicator').classList.remove('active');
+         addLog("Recording paused.");
+      } else if (mediaRecorder.state === "paused") {
+         mediaRecorder.resume();
+         recTimerInterval = setInterval(() => {
+            recSeconds++;
+            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+            const secs = String(recSeconds % 60).padStart(2, '0');
+            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
+         }, 1000);
+         btn.innerText = "⏸️ Pause";
+         document.getElementById('recIndicator').classList.add('active');
+         addLog("Recording resumed.");
+      }
+    }
+
+    function stopRecordingAndUpload() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+         mediaRecorder.stop();
+         clearInterval(recTimerInterval);
+         document.getElementById('recIndicator').classList.remove('active');
+         document.getElementById('recTimerText').innerText = "Uploading to Drive...";
+      }
+    }
+
+    function uploadRecordingToDrive() {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const clientName = document.getElementById('ws-client-display').value;
+      const pocName = document.getElementById('ws-poc').value;
+
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = function() {
+         const base64Data = reader.result.split(',')[1];
+         addLog(`Uploading audio recording for ${pocName}...`);
+         
+         callGoogleAPI('saveRecordingToDrive', {
+            clientName: clientName,
+            pocName: pocName,
+            audioBase64: base64Data,
+            fileType: audioBlob.type
+         }).then(res => {
+            showToast("Recording saved to Google Drive!", "success");
+            addLog(`Recording saved: ${res.fileName}`);
+            document.getElementById('recTimerText').innerText = "Recording Saved ✅";
+         }).catch(err => {
+            showToast("Failed to upload recording: " + err.message, "danger");
+            addLog(`Upload error: ${err.message}`);
+            document.getElementById('recTimerText').innerText = "Upload Failed ❌";
+         });
+      };
+    }
+
     function triggerWorkspaceByData(row) {
       try {
           document.getElementById('ws-row-id').value = row.id;
@@ -892,7 +1005,8 @@
           
           const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
           const cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
-          document.getElementById('ws-phone').value = cleanMobile !== 'No Mobile' ? cleanMobile : cleanPhone;
+          document.getElementById('ws-phone-work').value = cleanPhone;
+          document.getElementById('ws-phone-mobile').value = cleanMobile;
 
           document.getElementById('ws-timezone-val').value = row.timezone || '';
           document.getElementById('ws-customnote-val').value = row.customNote || '';
@@ -1034,9 +1148,8 @@
     }
 
     function closeWorkspace() {
-      if (activeCall) {
-          showToast('Please end the call before leaving the workspace.', 'danger');
-          return;
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          stopRecordingAndUpload();
       }
       if (clockInterval) clearInterval(clockInterval);
       const ws = document.getElementById('actionWorkspace');
@@ -1101,109 +1214,9 @@
       setTimeout(() => focusTextarea.focus(), 100);
     }
 
-    // ==========================================
-    // TELNYX WEBRTC CALLING ENGINE
-    // ==========================================
-    function initTelnyx() {
-      addLog('Authenticating with Telnyx via Google API...');
-      
-      callGoogleAPI('getTelnyxToken')
-        .then(res => {
-          
-          // Extracts the raw JWT string carefully
-          let tokenStr = typeof res.token === 'string' ? res.token : (res.token[0] || res.token);
-          
-          telnyxCallerId = res.callerId;
-          telnyxClient = new TelnyxRTC({ login_token: tokenStr });
-          telnyxClient.remoteElement = 'remoteMedia'; 
-
-          telnyxClient.on('telnyx.ready', () => {
-            isTelnyxReady = true;
-            addLog("Telnyx WebRTC connected and ready.");
-          });
-
-          telnyxClient.on('telnyx.error', (error) => {
-            addLog("Telnyx Error: " + JSON.stringify(error));
-          });
-
-          telnyxClient.on('telnyx.notification', (notification) => {
-            if (notification.type === 'callUpdate') {
-              activeCall = notification.call;
-              const btn = document.getElementById('callActionBtn');
-              
-              if (activeCall.state === 'ringing') {
-                if(btn) btn.innerHTML = 'Ringing...';
-              } else if (activeCall.state === 'active') {
-                showToast('Call Connected!', 'success');
-                if(btn) btn.innerHTML = '🛑 End Call';
-              } else if (activeCall.state === 'destroy') {
-                showToast('Call Ended.', 'warning');
-                activeCall = null;
-                if(btn) btn.innerHTML = '📞 Call Now';
-              }
-            }
-          });
-
-          telnyxClient.connect();
-        })
-        .catch(err => {
-           addLog(`Telnyx Auth Failed: ${err.message}`);
-        });
-    }
-
-    function initiateCall(phone, client) {
-      const btn = document.getElementById('callActionBtn');
-
-      if (activeCall) {
-         activeCall.hangup();
-         if(btn) btn.innerHTML = '📞 Call Now';
-         activeCall = null;
-         return;
-      }
-
-      if (!phone || phone.toLowerCase().includes('no mobile') || phone.toLowerCase().includes('no phone')) {
-         showToast('No valid phone number for this contact.', 'warning');
-         return;
-      }
-
-      if (!telnyxClient) {
-         showToast('Phone system disconnected. Refreshing connection...', 'warning');
-         initTelnyx();
-         return;
-      }
-
-      if (!isTelnyxReady) {
-        showToast('Phone system is still connecting. Please wait a moment.', 'warning');
-        return;
-      }
-      
-      // Strip spaces, dashes, and brackets before sending to Telnyx
-      const cleanPhone = phone.replace(/[^0-9+]/g, '');
-      
-      addLog(`Dialing ${cleanPhone} via Telnyx...`);
-      showToast(`Dialing ${client}...`, 'success');
-      if(btn) btn.innerHTML = 'Dialing...';
-      
-      try {
-          activeCall = telnyxClient.newCall({
-            destinationNumber: cleanPhone,
-            callerNumber: telnyxCallerId,
-            audio: true,
-            video: false
-          });
-      } catch(err) {
-          showToast('Call failed to initiate. Check logs.', 'danger');
-          addLog(`Dial Error: ${err.message}`);
-          if(btn) btn.innerHTML = '📞 Call Now';
-          activeCall = null;
-      }
-    }
-
     function submitWorkspace() {
-      if (activeCall) {
-          showToast('Please end the active call before submitting.', 'danger');
-          return;
-      }
+      stopRecordingAndUpload();
+      
       const btn = document.getElementById('ws-submit-btn');
       btn.innerText = "Submitting...";
       btn.disabled = true;
@@ -1623,7 +1636,6 @@
         
         const email = payload.email.toLowerCase();
         
-        // Strict Security Validation
         if (!email.endsWith('@mindmatrix.net')) {
             errMsg.textContent = "Unauthorized: Must use an @mindmatrix.net account.";
             errMsg.style.display = 'block';
@@ -1635,7 +1647,6 @@
             return;
         }
 
-        // Success - Save 7 Day Session
         const expiryTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); 
         localStorage.setItem("mm_cx_portal_session", JSON.stringify({ token: token, expiry: expiryTime, email: email }));
         
@@ -1650,7 +1661,6 @@
             document.getElementById('mm-login-screen').style.display = 'none';
             document.getElementById('app-components').style.display = 'block';
             fetchData();
-            initTelnyx();
         }, 400);
     }
 
