@@ -910,8 +910,7 @@
 
           telnyxCallerId = res.callerId;
           
-          const RTCClass = window.TelnyxRTC?.TelnyxRTC || window.TelnyxRTC;
-          telnyxClient = new RTCClass({ login_token: tokenStr });
+          telnyxClient = new TelnyxRTC({ login_token: tokenStr });
           telnyxClient.remoteElement = 'remoteMedia'; 
 
           telnyxClient.on('telnyx.ready', () => {
