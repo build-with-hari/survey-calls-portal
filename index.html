@@ -7,9 +7,11 @@
 
   <link rel="icon" href="https://www.google.com/s2/favicons?domain=mindmatrix.net&sz=128" type="image/png">
   
-  <!-- Telnyx WebRTC SDK & Google SSO -->
+  <!-- Telnyx WebRTC SDK, Google SSO, and Flatpickr Calendar -->
   <script src="https://cdn.jsdelivr.net/npm/@telnyx/webrtc@latest"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <style>
     /* CORE THEME & GLASSMORPHISM CSS */
@@ -681,19 +683,19 @@
       
       <label class="input-label">POC Name</label><input type="text" id="editPocNameInput" class="modal-input">
       
-      <!-- NEW MANUAL ATTEMPT OVERRIDES -->
+      <!-- NEW MANUAL ATTEMPT OVERRIDES WITH FLATPICKR -->
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
         <div style="flex:1;">
           <label class="input-label">Attempt 1 Date</label>
-          <input type="text" id="editAttempt1" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+          <input type="text" id="editAttempt1" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
         </div>
         <div style="flex:1;">
           <label class="input-label">Attempt 2 Date</label>
-          <input type="text" id="editAttempt2" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+          <input type="text" id="editAttempt2" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
         </div>
         <div style="flex:1;">
           <label class="input-label">Attempt 3 Date</label>
-          <input type="text" id="editAttempt3" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+          <input type="text" id="editAttempt3" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
         </div>
       </div>
 
@@ -715,6 +717,16 @@
       <label class="input-label">Persistent Custom Note</label><textarea id="editNoteInput" class="modal-input" style="min-height: 80px;" placeholder="Does not like early morning calls..."></textarea>
       
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('editPocModal')">Cancel</button><button class="btn-primary" id="saveEditBtn" onclick="submitPocEdits()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="logsPinModal" onclick="closeOnBackgroundClick(event, 'logsPinModal')">
+    <div class="modal-content" style="max-width: 400px;">
+      <h2 style="font-size:1.5rem; font-weight:700;">Admin Authorization</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Enter Admin PIN to view internal system logs.</p>
+      <input type="password" id="logsPinInput" class="modal-input" placeholder="Enter PIN..." style="text-align: center; letter-spacing: 5px; font-size: 1.25rem;">
+      <p id="logsPinErrorText" class="error-text">Incorrect PIN.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;"><button class="btn-outline" onclick="closeModal('logsPinModal')">Cancel</button><button class="btn-primary" onclick="verifyLogsPin()">View Logs</button></div>
     </div>
   </div>
 
@@ -766,14 +778,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="syncResultModal" onclick="closeOnBackgroundClick(event, 'syncResultModal')">
-    <div class="modal-content">
-      <h2 style="font-size:1.5rem; font-weight:700; color:var(--safe-color);">✅ Sync Complete!</h2>
-      <p id="syncResultMsg" class="header-subtitle" style="margin: 1.25rem 0; font-size:1rem; line-height:1.5; color:var(--text-main);"></p>
-      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;"><button class="btn-primary" onclick="closeModal('syncResultModal')">Awesome</button></div>
-    </div>
-  </div>
-
   <script>
     // ==========================================
     // CONFIGURATION
@@ -805,18 +809,25 @@
     let isTelnyxReady = false;
     let telnyxCallerId = '';
 
-    // System Logs Shortcut (Shift + L) with PIN
+    // System Logs Shortcut (Shift + L) with Custom Modal
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
             e.preventDefault();
-            const pin = prompt("Enter Admin PIN to view System Logs:");
-            if (pin === "4274") {
-                openModal('logsModal');
-            } else if (pin !== null) {
-                showToast("Incorrect PIN. Access Denied.", "danger");
-            }
+            document.getElementById('logsPinInput').value = '';
+            document.getElementById('logsPinErrorText').style.display = 'none';
+            openModal('logsPinModal');
         }
     });
+
+    function verifyLogsPin() {
+        if (document.getElementById('logsPinInput').value === "4274") {
+            closeModal('logsPinModal');
+            document.getElementById('logsPinInput').value = '';
+            setTimeout(() => openModal('logsModal'), 300);
+        } else {
+            document.getElementById('logsPinErrorText').style.display = 'block';
+        }
+    }
 
     async function callGoogleAPI(action, payload = {}) {
         // SECURITY: Attach the Google JWT token to every backend request
@@ -999,7 +1010,7 @@
       toast.id = 'mm-toast-alert';
       toast.innerText = msg;
       
-      // Increased z-index to completely ensure it displays over everything, even on fast view transitions
+      // Increased z-index and display time to ensure it shows perfectly post-modal
       toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
       
       if (type === 'success') toast.style.backgroundColor = '#10b981';
@@ -1010,7 +1021,6 @@
       
       setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
       
-      // Stay visible slightly longer (4.5s) to guarantee the user sees it post-modal
       setTimeout(() => { 
           toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)';
           setTimeout(() => toast.remove(), 400); 
@@ -1083,7 +1093,7 @@
       document.getElementById('callOverlayStatus').style.color = "var(--warning-color)";
       document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
       document.getElementById('callOverlayDuration').innerText = "00:00";
-      document.getElementById('dtmfDisplay').innerText = ""; // clear dialpad display
+      document.getElementById('dtmfDisplay').innerText = ""; 
       
       const overlay = document.getElementById('activeCallOverlay');
       overlay.classList.add('active');
@@ -1153,11 +1163,13 @@
                 document.getElementById('callOverlayStatus').style.color = "var(--safe-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--safe-color)";
                 
-                // Show Dialpad toggle once connected
                 document.getElementById('ivrDialpad').style.display = 'none';
                 document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
                 
                 startCallTimer();
+                
+                // SAFE 2-WAY RECORDING START: Start recording ONLY once call is fully active to avoid mic locking
+                startAutoRecording();
               
               } else if (activeCall.state === 'destroy') {
                 showToast('Call Ended.', 'warning');
@@ -1171,13 +1183,11 @@
                    stopRecordingAndUpload();
                 }
 
-                // TRIGGER POST-CALL POPUP
                 document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
                 document.getElementById('postCallNotes').value = '';
                 setDropdownValueSafe('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', '');
                 document.getElementById('postCallOutcomeDisplay').innerText = 'Select Outcome...';
                 
-                // Inherit Attempt from workspace (dynamically pick latest available)
                 const wsAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1';
                 document.querySelectorAll('.attempt-btn').forEach(el => {
                     if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active');
@@ -1198,7 +1208,7 @@
     }
 
     // ==========================================
-    // PHONE SELECTION & AUTOMATIC AUDIO RECORDING
+    // PHONE SELECTION & TWO-WAY RECORDING
     // ==========================================
     function handleCallNowClick() {
       const btn = document.getElementById('callActionBtn');
@@ -1251,7 +1261,6 @@
       showToast(`Dialing ${client}...`, 'safe');
       if(btn) btn.innerHTML = 'Dialing...';
       
-      // Show Floating Call Overlay
       showCallOverlay(pocName);
 
       try {
@@ -1261,10 +1270,6 @@
             audio: true,
             video: false
           });
-
-          // Automatically start recording 2-way call audio
-          startAutoRecording();
-
       } catch(err) {
           showToast('Call failed to initiate. Check logs.', 'danger');
           addLog(`Dial Error: ${err.message}`);
@@ -1275,33 +1280,34 @@
     }
 
     async function startAutoRecording() {
+      let audioCtx;
       try {
-        // Create an Audio Context to mix Local Mic and Remote Call Audio
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContextClass();
+        audioCtx = new AudioContextClass();
+        window.activeAudioCtx = audioCtx; // Store globally for proper cleanup later
         const dest = audioCtx.createMediaStreamDestination();
 
-        // 1. Capture Local Microphone
+        // 1. Capture Local Microphone safely
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const localSource = audioCtx.createMediaStreamSource(localStream);
         localSource.connect(dest);
 
-        // 2. Capture Remote Telnyx Audio (Client's Voice)
-        const remoteAudioEl = document.getElementById('remoteMedia');
-        let remoteStream = null;
-        if (remoteAudioEl.srcObject) {
-            remoteStream = remoteAudioEl.srcObject;
-        } else if (remoteAudioEl.captureStream) {
-            remoteStream = remoteAudioEl.captureStream();
-        } else if (remoteAudioEl.mozCaptureStream) {
-            remoteStream = remoteAudioEl.mozCaptureStream();
-        }
+        // 2. Capture Remote Audio safely (Wrap in try/catch so mic recording continues even if this fails)
+        try {
+            const remoteAudioEl = document.getElementById('remoteMedia');
+            let remoteStream = remoteAudioEl.srcObject;
+            
+            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
+            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
 
-        if (remoteStream) {
-            const remoteSource = audioCtx.createMediaStreamSource(remoteStream);
-            remoteSource.connect(dest);
-        } else {
-            addLog("Warning: Remote audio stream not captured yet.");
+            if (remoteStream && remoteStream.getAudioTracks().length > 0) {
+                const remoteSource = audioCtx.createMediaStreamSource(remoteStream);
+                remoteSource.connect(dest);
+            } else {
+                addLog("Note: Client audio stream not available to merge.");
+            }
+        } catch (remoteErr) {
+            addLog(`Remote audio merge skipped: ${remoteErr.message}`);
         }
 
         // Resume Audio Context in case browser policy suspended it
@@ -1312,7 +1318,7 @@
         audioChunks = [];
         mediaRecorder = new MediaRecorder(dest.stream);
         
-        // Save the physical local stream so we can shut the mic off later
+        // Save the physical local stream so we can shut the mic off completely later
         mediaRecorder.localStreamToStop = localStream;
 
         mediaRecorder.ondataavailable = event => {
@@ -1368,7 +1374,8 @@
 
     function stopRecordingAndUpload() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-         // Release the physical microphone hardware entirely
+         
+         // 1. Release the physical microphone hardware entirely
          if (mediaRecorder.localStreamToStop) {
              mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
          }
@@ -1377,6 +1384,11 @@
          clearInterval(recTimerInterval);
          document.getElementById('recIndicator').classList.remove('active');
          document.getElementById('recTimerText').innerText = "Uploading to Drive...";
+      }
+      
+      // 2. Shut down the AudioContext mixer to fully drop background hardware locks
+      if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') {
+          window.activeAudioCtx.close();
       }
     }
 
@@ -1425,11 +1437,10 @@
           document.getElementById('ws-timezone-val').value = row.timezone || '';
           document.getElementById('ws-customnote-val').value = row.customNote || '';
           
-          // Determine logical current attempt based on what dates exist
           let logicalAttempt = 'Attempt 1';
-          if (row.att3) logicalAttempt = 'Attempt 3';
-          else if (row.att2) logicalAttempt = 'Attempt 3';
-          else if (row.att1) logicalAttempt = 'Attempt 2';
+          if (row.att3 && row.att3 !== "-") logicalAttempt = 'Attempt 3';
+          else if (row.att2 && row.att2 !== "-") logicalAttempt = 'Attempt 3';
+          else if (row.att1 && row.att1 !== "-") logicalAttempt = 'Attempt 2';
 
           setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', logicalAttempt);
           
@@ -1530,9 +1541,9 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
-       document.getElementById('editAttempt1').value = pocData ? pocData.att1 : "";
-       document.getElementById('editAttempt2').value = pocData ? pocData.att2 : "";
-       document.getElementById('editAttempt3').value = pocData ? pocData.att3 : "";
+       document.getElementById('editAttempt1').value = pocData && pocData.att1 !== "-" ? pocData.att1 : "";
+       document.getElementById('editAttempt2').value = pocData && pocData.att2 !== "-" ? pocData.att2 : "";
+       document.getElementById('editAttempt3').value = pocData && pocData.att3 !== "-" ? pocData.att3 : "";
 
        document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
        if(pocData && pocData.tags) {
@@ -1665,7 +1676,6 @@
             return;
         }
 
-        // Sync values to the main workspace form
         document.getElementById('ws-call-attempt-val').value = attempt;
         document.getElementById('ws-call-status-val').value = outcome;
         document.getElementById('ws-internal-notes').value = notes;
@@ -1684,7 +1694,7 @@
       const internalNotes = document.getElementById('ws-internal-notes').value;
       const attempt = document.getElementById('ws-call-attempt-val').value;
 
-      if (!status) {
+      if (!status || status === "Select Outcome...") {
           showToast("Please select a call outcome.", "warning");
           btn.innerText = "Submit Survey & Save Log";
           btn.disabled = false;
@@ -1729,7 +1739,6 @@
         .then(data => {
           btn.innerText = "Submit Survey & Save Log";
           btn.disabled = false;
-          // Updated explicit long-lasting toast
           showToast('Log successfully saved to sheet! Workspace closed.', 'success');
           addLog(`Save successful for row ${rowId}`);
           closeWorkspace();
@@ -1964,7 +1973,6 @@
       document.getElementById('kpi-pending').textContent = pending;
       document.getElementById('kpi-invalid').textContent = invalid;
       
-      // Update Footer Stats
       document.getElementById('footerPocCount').textContent = searchFiltered.length;
       document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
 
@@ -1986,12 +1994,11 @@
 
       let groupsArray = Object.keys(groupedData).map(clientName => ({ clientName: clientName, pocs: groupedData[clientName] }));
 
-      // Find the most recent date from Attempt 1, 2, or 3
       function getLatestAttemptDate(row) {
           let latest = "";
           let latestDate = 0;
           [row.att1, row.att2, row.att3].forEach(dStr => {
-              if (dStr) {
+              if (dStr && dStr !== "-") {
                   let d = new Date(dStr).getTime();
                   if (d > latestDate) { latestDate = d; latest = dStr; }
               }
@@ -2047,6 +2054,10 @@
 
         if (!isCollapsed) {
           pocs.forEach((row, index) => {
+            const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
+            const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
+            const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful', 'Inactive / On Hold'];
+
             let badgeClass = 'badge-pending';
             if (reachedStatuses.includes(row.status)) badgeClass = 'badge-safe';
             if (pendingStatuses.includes(row.status)) badgeClass = 'badge-warning';
@@ -2064,9 +2075,9 @@
             const noteIcon = row.customNote ? `<span class="badge-note" data-tooltip-top="${row.customNote.replace(/"/g, '&quot;')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>Note</span>` : '';
             
             let latestAttemptTag = '';
-            if (row.att3) latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`;
-            else if (row.att2) latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`;
-            else if (row.att1) latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
+            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`;
+            else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`;
+            else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
 
             tr.innerHTML = `
               <td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">
@@ -2171,6 +2182,12 @@
 
     window.onload = function() {
         initRatings();
+
+        // Initialize Flatpickr for attempt date overrides
+        flatpickr(".date-picker", {
+            dateFormat: "M d, Y",
+            allowInput: true
+        });
 
         const storedSession = localStorage.getItem("mm_cx_portal_session");
         if (storedSession) {
