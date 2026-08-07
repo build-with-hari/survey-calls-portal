@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CX Survey Calls Portal | Mindmatrix</title>
   
-  <!-- Google SSO -->
+  <!-- Telnyx WebRTC SDK & Google SSO -->
+  <script src="https://cdn.jsdelivr.net/npm/@telnyx/webrtc@latest"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -197,6 +198,9 @@
   </style>
 </head>
 <body>
+
+  <!-- Invisible Audio Element for Telnyx SDK -->
+  <audio id="remoteMedia" autoplay></audio>
 
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -567,7 +571,7 @@
   <div class="modal-overlay" id="selectPhoneModal" onclick="closeOnBackgroundClick(event, 'selectPhoneModal')">
     <div class="modal-content" style="max-width: 420px;">
       <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Choose Phone Number</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select which line you would like to dial via ITC Cloud.</p>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select which line you would like to dial via Telnyx WebRTC.</p>
       
       <div style="display: flex; flex-direction: column; gap: 1rem;">
         <button class="btn-primary" id="btnDialWork" style="justify-content: center; padding: 1rem;" onclick="executeDial('work')">🏢 Dial Work: <span id="lblWorkNum"></span></button>
@@ -664,6 +668,7 @@
     // ==========================================
     // CONFIGURATION
     // ==========================================
+    // PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE:
     const API_URL = "https://script.google.com/macros/s/AKfycbx9CElrTL_8oYs_CTmCf6LOap7-FQP6y4SYeDmb8dBdpZ2jprZ7XvX-AGW7814m6ekdOw/exec"; 
     const GOOGLE_CLIENT_ID = "992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"; 
 
@@ -672,6 +677,12 @@
     let audioChunks = [];
     let recSeconds = 0;
     let recTimerInterval = null;
+
+    // TELNYX GLOBALS
+    let telnyxClient = null;
+    let activeCall = null;
+    let isTelnyxReady = false;
+    let telnyxCallerId = '';
 
     // System Logs Shortcut (Shift + L)
     document.addEventListener('keydown', function(e) {
@@ -826,6 +837,18 @@
        });
     }
 
+    document.addEventListener('click', function(e) {
+       if(e.target && e.target.type === 'radio' && e.target.closest('.rating-container')) {
+           if(e.target.dataset.wasChecked === 'true') {
+               e.target.checked = false;
+               e.target.dataset.wasChecked = 'false';
+           } else {
+               document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false');
+               e.target.dataset.wasChecked = 'true';
+           }
+       }
+    });
+
     function showToast(msg, type) {
       const existing = document.getElementById('mm-toast-alert');
       if (existing) existing.remove();
@@ -862,10 +885,99 @@
     }
     function openPinModal() { openModal('pinModal'); }
 
+
+    // ==========================================
+    // TELNYX SDK INTEGRATION
+    // ==========================================
+    function initTelnyx() {
+      addLog('Authenticating with Telnyx via Google API...');
+      
+      callGoogleAPI('getTelnyxToken')
+        .then(res => {
+          if (!res || res.success === false) {
+             const errorMsg = res ? res.error : 'Empty response from backend';
+             addLog(`Telnyx API Error: ${errorMsg}`);
+             showToast('Phone system authentication failed. Check logs.', 'danger');
+             return;
+          }
+
+          let tokenStr = typeof res.token === 'string' ? res.token : (res.token ? res.token.toString() : '');
+          if (!tokenStr) {
+             addLog('Telnyx Auth Failed: Token string is empty.');
+             showToast('Invalid Telnyx Token received.', 'danger');
+             return;
+          }
+
+          telnyxCallerId = res.callerId;
+          
+          const RTCClass = window.TelnyxRTC?.TelnyxRTC || window.TelnyxRTC;
+          telnyxClient = new RTCClass({ login_token: tokenStr });
+          telnyxClient.remoteElement = 'remoteMedia'; 
+
+          telnyxClient.on('telnyx.ready', () => {
+            isTelnyxReady = true;
+            addLog("Telnyx WebRTC connected and ready.");
+            showToast("Phone line connected and ready!", "success");
+          });
+
+          telnyxClient.on('telnyx.error', (error) => {
+            addLog("Telnyx Socket Error: " + JSON.stringify(error));
+            isTelnyxReady = false;
+          });
+
+          telnyxClient.on('telnyx.notification', (notification) => {
+            if (notification.type === 'callUpdate') {
+              activeCall = notification.call;
+              const btn = document.getElementById('callActionBtn');
+              
+              if (activeCall.state === 'ringing') {
+                if(btn) btn.innerHTML = '🔔 Ringing...';
+              } else if (activeCall.state === 'active') {
+                showToast('Call Connected!', 'success');
+                if(btn) btn.innerHTML = '🛑 End Call';
+              } else if (activeCall.state === 'destroy') {
+                showToast('Call Ended.', 'warning');
+                activeCall = null;
+                if(btn) btn.innerHTML = '📞 Call Now';
+                // Stop recording when call is destroyed
+                if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                   stopRecordingAndUpload();
+                }
+              }
+            }
+          });
+
+          telnyxClient.connect();
+        })
+        .catch(err => {
+           addLog(`Telnyx Auth Network Error: ${err.message}`);
+           showToast('Network error connecting to phone system.', 'danger');
+        });
+    }
+
     // ==========================================
     // PHONE SELECTION & AUTOMATIC AUDIO RECORDING
     // ==========================================
     function handleCallNowClick() {
+      const btn = document.getElementById('callActionBtn');
+
+      if (activeCall) {
+         activeCall.hangup();
+         if(btn) btn.innerHTML = '📞 Call Now';
+         activeCall = null;
+         return;
+      }
+
+      if (!telnyxClient) {
+         showToast('Phone system disconnected. Check logs (Shift+L).', 'danger');
+         return;
+      }
+
+      if (!isTelnyxReady) {
+        showToast('Phone system is still connecting. Please wait a moment.', 'warning');
+        return;
+      }
+
       const workNum = document.getElementById('ws-phone-work').value;
       const mobileNum = document.getElementById('ws-phone-mobile').value;
 
@@ -889,15 +1001,30 @@
       closeModal('selectPhoneModal');
       const targetNum = type === 'work' ? document.getElementById('ws-phone-work').value : document.getElementById('ws-phone-mobile').value;
       const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
+      const client = document.getElementById('ws-client-display').value;
+      const btn = document.getElementById('callActionBtn');
 
-      addLog(`Dialing ${cleanPhone} via ITC Cloud...`);
-      showToast(`Launching ITC Cloud for ${cleanPhone}...`, 'success');
+      addLog(`Dialing ${cleanPhone} via Telnyx...`);
+      showToast(`Dialing ${client}...`, 'safe');
+      if(btn) btn.innerHTML = 'Dialing...';
+      
+      try {
+          activeCall = telnyxClient.newCall({
+            destinationNumber: cleanPhone,
+            callerNumber: telnyxCallerId,
+            audio: true,
+            video: false
+          });
 
-      // 1. Trigger ITC Cloud / Desktop Handler
-      window.location.href = `tel:${cleanPhone}`;
+          // Automatically start recording call audio (Agent's Mic)
+          startAutoRecording();
 
-      // 2. Automatically start recording call audio
-      startAutoRecording();
+      } catch(err) {
+          showToast('Call failed to initiate. Check logs.', 'danger');
+          addLog(`Dial Error: ${err.message}`);
+          if(btn) btn.innerHTML = '📞 Call Now';
+          activeCall = null;
+      }
     }
 
     async function startAutoRecording() {
@@ -1150,6 +1277,9 @@
     function closeWorkspace() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
           stopRecordingAndUpload();
+      }
+      if (activeCall) {
+          activeCall.hangup();
       }
       if (clockInterval) clearInterval(clockInterval);
       const ws = document.getElementById('actionWorkspace');
@@ -1661,6 +1791,7 @@
             document.getElementById('mm-login-screen').style.display = 'none';
             document.getElementById('app-components').style.display = 'block';
             fetchData();
+            initTelnyx();
         }, 400);
     }
 
