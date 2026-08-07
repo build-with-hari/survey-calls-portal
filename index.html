@@ -218,7 +218,7 @@
 </head>
 <body>
 
-  <!-- Invisible Audio Element for Telnyx SDK -->
+  <!-- Invisible Audio Element for Telnyx SDK (Remote Audio) -->
   <audio id="remoteMedia" autoplay></audio>
 
   <div class="blob blob-1"></div>
@@ -302,12 +302,12 @@
           </div>
         </div>
 
-        <!-- Clickable KPIs -->
+        <!-- Clickable KPIs (Simplified) -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
           <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpi-total">0</div></div>
-          <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
+          <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Success / Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
           <div class="kpi-card" id="kpi-card-pending" onclick="toggleKpiFilter('Pending')"><div class="kpi-label">Pending / Voicemail</div><div class="kpi-value warning" id="kpi-pending">0</div></div>
-          <div class="kpi-card" id="kpi-card-invalid" onclick="toggleKpiFilter('Invalid')"><div class="kpi-label">Invalid Number</div><div class="kpi-value danger" id="kpi-invalid">0</div></div>
+          <div class="kpi-card" id="kpi-card-invalid" onclick="toggleKpiFilter('Invalid')"><div class="kpi-label">Unsuccessful / Invalid</div><div class="kpi-value danger" id="kpi-invalid">0</div></div>
         </div>
 
         <!-- Data Panel -->
@@ -347,7 +347,7 @@
                     Client & Contact Details <span id="sort-icon-client"></span>
                   </th>
                   <th class="sortable" onclick="setSort('contact')" data-tooltip-top="Sort by Contact Info">Phone / Email <span id="sort-icon-contact"></span></th>
-                  <th class="sortable" onclick="setSort('date')" data-tooltip-top="Sort by Date">Last Reached <span id="sort-icon-date"></span></th>
+                  <th class="sortable" onclick="setSort('date')" data-tooltip-top="Sort by Date">Last Attempt Date <span id="sort-icon-date"></span></th>
                   <th class="sortable" onclick="setSort('status')" data-tooltip-top="Sort by Status">Call Status <span id="sort-icon-status"></span></th>
                   <th style="text-align: center;">Actions</th>
                 </tr>
@@ -355,6 +355,11 @@
               <tbody id="table-body"></tbody>
             </table>
           </div>
+          
+          <div id="statsFooter" style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: none;">
+              Total Clients: <span id="footerClientCount" style="color: var(--text-main);">0</span> &nbsp;|&nbsp; Total POCs: <span id="footerPocCount" style="color: var(--text-main);">0</span>
+          </div>
+
         </div>
       </div>
 
@@ -673,7 +678,25 @@
     <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
+      
       <label class="input-label">POC Name</label><input type="text" id="editPocNameInput" class="modal-input">
+      
+      <!-- NEW MANUAL ATTEMPT OVERRIDES -->
+      <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
+        <div style="flex:1;">
+          <label class="input-label">Attempt 1 Date</label>
+          <input type="text" id="editAttempt1" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">Attempt 2 Date</label>
+          <input type="text" id="editAttempt2" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+        </div>
+        <div style="flex:1;">
+          <label class="input-label">Attempt 3 Date</label>
+          <input type="text" id="editAttempt3" class="modal-input" placeholder="MMM dd, yyyy" style="margin:0;">
+        </div>
+      </div>
+
       <label class="input-label">Predefined Tags</label>
       <div id="editTagsContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
         <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Not Interested"> Not Interested</label>
@@ -681,20 +704,23 @@
         <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Escalated"> Escalated</label>
         <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="VIP"> VIP</label>
       </div>
+
       <label class="input-label">Timezone (Powers Live Clock)</label>
       <div class="custom-select" id="tz-custom-dropdown" style="width: 100%; margin: 0.25rem 0 1.25rem 0;">
          <input type="text" id="editTzInput" class="modal-input" style="margin:0;" placeholder="Search or select timezone..." onfocus="openTzDropdown()" oninput="filterTzDropdown()">
          <div class="select-options" id="tz-options" style="max-height: 200px;"></div>
          <input type="hidden" id="editTzIana">
       </div>
+      
       <label class="input-label">Persistent Custom Note</label><textarea id="editNoteInput" class="modal-input" style="min-height: 80px;" placeholder="Does not like early morning calls..."></textarea>
+      
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('editPocModal')">Cancel</button><button class="btn-primary" id="saveEditBtn" onclick="submitPocEdits()">Save Changes</button></div>
     </div>
   </div>
 
   <div class="modal-overlay" id="logsModal" onclick="closeOnBackgroundClick(event, 'logsModal')">
     <div class="modal-content" style="max-width: 600px; text-align: left; background: #000; color: #0f0; border-color: #333;">
-      <h2 style="font-size:1.2rem; font-weight:700; margin-bottom: 1rem; color: #fff;">System Logs (Shift + L)</h2>
+      <h2 style="font-size:1.2rem; font-weight:700; margin-bottom: 1rem; color: #fff;">System Logs</h2>
       <div id="logsContainer" style="height: 300px; overflow-y: auto; background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333;"></div>
       <div style="text-align: right; margin-top: 1rem;"><button class="btn-outline" style="border-color: #333; color: #fff;" onclick="closeModal('logsModal')">Close</button></div>
     </div>
@@ -779,16 +805,25 @@
     let isTelnyxReady = false;
     let telnyxCallerId = '';
 
-    // System Logs Shortcut (Shift + L)
+    // System Logs Shortcut (Shift + L) with PIN
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
             e.preventDefault();
-            openModal('logsModal');
+            const pin = prompt("Enter Admin PIN to view System Logs:");
+            if (pin === "4274") {
+                openModal('logsModal');
+            } else if (pin !== null) {
+                showToast("Incorrect PIN. Access Denied.", "danger");
+            }
         }
     });
 
     async function callGoogleAPI(action, payload = {}) {
+        // SECURITY: Attach the Google JWT token to every backend request
+        const session = JSON.parse(localStorage.getItem("mm_cx_portal_session") || "{}");
+        payload.authToken = session.token;
         payload.action = action;
+        
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -964,7 +999,8 @@
       toast.id = 'mm-toast-alert';
       toast.innerText = msg;
       
-      toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600; font-size: 0.95rem; z-index: 999999; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.2); pointer-events: none; text-align: center; max-width: 80%;';
+      // Increased z-index to completely ensure it displays over everything, even on fast view transitions
+      toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
       
       if (type === 'success') toast.style.backgroundColor = '#10b981';
       else if (type === 'warning') toast.style.backgroundColor = '#f59e0b';
@@ -973,10 +1009,12 @@
       document.body.appendChild(toast);
       
       setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
+      
+      // Stay visible slightly longer (4.5s) to guarantee the user sees it post-modal
       setTimeout(() => { 
           toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)';
           setTimeout(() => toast.remove(), 400); 
-      }, 3500);
+      }, 4500);
     }
 
     function openModal(id) {
@@ -1114,6 +1152,11 @@
                 document.getElementById('callOverlayStatus').innerText = "Connected";
                 document.getElementById('callOverlayStatus').style.color = "var(--safe-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--safe-color)";
+                
+                // Show Dialpad toggle once connected
+                document.getElementById('ivrDialpad').style.display = 'none';
+                document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
+                
                 startCallTimer();
               
               } else if (activeCall.state === 'destroy') {
@@ -1134,13 +1177,13 @@
                 setDropdownValueSafe('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', '');
                 document.getElementById('postCallOutcomeDisplay').innerText = 'Select Outcome...';
                 
-                // Inherit Attempt from workspace
-                const currAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1';
+                // Inherit Attempt from workspace (dynamically pick latest available)
+                const wsAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1';
                 document.querySelectorAll('.attempt-btn').forEach(el => {
-                    if (el.getAttribute('data-val') === currAttempt) el.classList.add('active');
+                    if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active');
                     else el.classList.remove('active');
                 });
-                document.getElementById('postCallAttemptVal').value = currAttempt;
+                document.getElementById('postCallAttemptVal').value = wsAttempt;
                 openModal('postCallModal');
               }
             }
@@ -1219,7 +1262,7 @@
             video: false
           });
 
-          // Automatically start recording call audio (Agent's Mic)
+          // Automatically start recording 2-way call audio
           startAutoRecording();
 
       } catch(err) {
@@ -1233,9 +1276,44 @@
 
     async function startAutoRecording() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Create an Audio Context to mix Local Mic and Remote Call Audio
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContextClass();
+        const dest = audioCtx.createMediaStreamDestination();
+
+        // 1. Capture Local Microphone
+        const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const localSource = audioCtx.createMediaStreamSource(localStream);
+        localSource.connect(dest);
+
+        // 2. Capture Remote Telnyx Audio (Client's Voice)
+        const remoteAudioEl = document.getElementById('remoteMedia');
+        let remoteStream = null;
+        if (remoteAudioEl.srcObject) {
+            remoteStream = remoteAudioEl.srcObject;
+        } else if (remoteAudioEl.captureStream) {
+            remoteStream = remoteAudioEl.captureStream();
+        } else if (remoteAudioEl.mozCaptureStream) {
+            remoteStream = remoteAudioEl.mozCaptureStream();
+        }
+
+        if (remoteStream) {
+            const remoteSource = audioCtx.createMediaStreamSource(remoteStream);
+            remoteSource.connect(dest);
+        } else {
+            addLog("Warning: Remote audio stream not captured yet.");
+        }
+
+        // Resume Audio Context in case browser policy suspended it
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
         audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(dest.stream);
+        
+        // Save the physical local stream so we can shut the mic off later
+        mediaRecorder.localStreamToStop = localStream;
 
         mediaRecorder.ondataavailable = event => {
           if (event.data.size > 0) audioChunks.push(event.data);
@@ -1256,7 +1334,7 @@
            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
         }, 1000);
 
-        addLog("Microphone call recording started automatically.");
+        addLog("Two-way call recording started successfully.");
         showToast("Call recording started automatically.", "safe");
 
       } catch (err) {
@@ -1290,9 +1368,9 @@
 
     function stopRecordingAndUpload() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-         // Release the physical microphone hardware
-         if (mediaRecorder.stream) {
-             mediaRecorder.stream.getTracks().forEach(track => track.stop());
+         // Release the physical microphone hardware entirely
+         if (mediaRecorder.localStreamToStop) {
+             mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
          }
 
          mediaRecorder.stop();
@@ -1347,14 +1425,17 @@
           document.getElementById('ws-timezone-val').value = row.timezone || '';
           document.getElementById('ws-customnote-val').value = row.customNote || '';
           
-          if(row.attempt) {
-              setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', row.attempt);
-              document.getElementById('ws-top-attempt-badge').innerText = row.attempt;
-              document.getElementById('ws-top-attempt-badge').style.display = 'inline-block';
-          } else {
-              setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', 'Attempt 1');
-              document.getElementById('ws-top-attempt-badge').style.display = 'none';
-          }
+          // Determine logical current attempt based on what dates exist
+          let logicalAttempt = 'Attempt 1';
+          if (row.att3) logicalAttempt = 'Attempt 3';
+          else if (row.att2) logicalAttempt = 'Attempt 3';
+          else if (row.att1) logicalAttempt = 'Attempt 2';
+
+          setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', logicalAttempt);
+          
+          const attemptBadge = document.getElementById('ws-top-attempt-badge');
+          attemptBadge.innerText = logicalAttempt;
+          attemptBadge.style.display = 'inline-block';
 
           const firstName = row.poc.split(' ')[0] || '[First Name]';
           document.querySelectorAll('.dyn-client-name').forEach(el => el.textContent = row.poc);
@@ -1449,6 +1530,10 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
+       document.getElementById('editAttempt1').value = pocData ? pocData.att1 : "";
+       document.getElementById('editAttempt2').value = pocData ? pocData.att2 : "";
+       document.getElementById('editAttempt3').value = pocData ? pocData.att3 : "";
+
        document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
        if(pocData && pocData.tags) {
           const tagsArr = pocData.tags.split(',').map(t => t.trim());
@@ -1467,13 +1552,19 @@
        const tzIana = document.getElementById('editTzIana').value;
        const note = document.getElementById('editNoteInput').value;
        
+       const attDates = {
+           a1: document.getElementById('editAttempt1').value,
+           a2: document.getElementById('editAttempt2').value,
+           a3: document.getElementById('editAttempt3').value
+       };
+
        const tagsArr = [];
        document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
        const tagsStr = tagsArr.join(',');
 
        addLog(`Updating details for row ${rowId}`);
        
-       callGoogleAPI('updateContactDetails', { rowId, pocName: name, timezone: tzIana, customNote: note, tags: tagsStr })
+       callGoogleAPI('updateContactDetails', { rowId, pocName: name, timezone: tzIana, customNote: note, tags: tagsStr, attemptDates: attDates })
          .then(data => {
             btn.innerText = "Save Changes"; btn.disabled = false;
             closeModal('editPocModal');
@@ -1602,7 +1693,7 @@
 
       addLog(`Submitting workspace. Status: ${status}`);
 
-      const skipSurveyStatuses = ['Called / Left Voicemail', 'Email Sent', 'Unsuccessful', 'Inactive / On Hold'];
+      const skipSurveyStatuses = ['Called / Left Voicemail', 'Email Sent', 'Unsuccessful', 'Inactive / On Hold', 'Invalid / Disconnected Number', 'Declined / Not Interested'];
 
       if (!skipSurveyStatuses.includes(status)) {
         const formData = new FormData();
@@ -1634,13 +1725,12 @@
         }).catch(err => { console.error(err); addLog(`Form Fetch Error: ${err}`); });
       }
 
-      const formattedNotes = `[${attempt} - ${status}] ${internalNotes}`.trim();
-
-      callGoogleAPI('logCallAction', { rowId, status, notes: formattedNotes, attempt })
+      callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
         .then(data => {
           btn.innerText = "Submit Survey & Save Log";
           btn.disabled = false;
-          showToast('Call logged securely!', 'success');
+          // Updated explicit long-lasting toast
+          showToast('Log successfully saved to sheet! Workspace closed.', 'success');
           addLog(`Save successful for row ${rowId}`);
           closeWorkspace();
           rawData = data.rows || [];
@@ -1659,6 +1749,9 @@
       let currentTheme = document.documentElement.getAttribute('data-theme');
       let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', newTheme);
+      
+      const btn = document.getElementById('themeBtn');
+      btn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
     }
 
     function populateExecFilter() {
@@ -1694,6 +1787,7 @@
           document.getElementById('kpi-container').style.display = 'flex';
           document.getElementById('source-tabs').style.display = 'flex';
           document.getElementById('controls-bar').style.display = 'flex';
+          document.getElementById('statsFooter').style.display = 'block';
           document.getElementById('table-container').style.display = 'block';
           populateExecFilter();
           filterData();
@@ -1845,6 +1939,10 @@
 
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
       let reached = 0, pending = 0, invalid = 0;
+      
+      const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
+      const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
+      const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful', 'Inactive / On Hold'];
 
       let searchFiltered = sourceFiltered.filter(row => {
         if (execQuery !== 'ALL' && row.executive !== execQuery) return false;
@@ -1853,13 +1951,9 @@
         const cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
         const match = (row.client || "").toLowerCase().includes(query) || (row.poc || "").toLowerCase().includes(query) || (row.email || "").toLowerCase().includes(query) || cleanPhoneSearch.includes(query) || cleanMobileSearch.includes(query);
         
-        // Define reached vs pending logic based on new status names
-        const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-        const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful'];
-
         if (match) {
           if (reachedStatuses.includes(row.status)) reached++;
-          else if (row.status === 'Pending' || row.status === 'Called / Left Voicemail') pending++;
+          else if (pendingStatuses.includes(row.status)) pending++;
           else if (invalidStatuses.includes(row.status)) invalid++;
         }
         return match;
@@ -1869,15 +1963,16 @@
       document.getElementById('kpi-reached').textContent = reached;
       document.getElementById('kpi-pending').textContent = pending;
       document.getElementById('kpi-invalid').textContent = invalid;
+      
+      // Update Footer Stats
+      document.getElementById('footerPocCount').textContent = searchFiltered.length;
+      document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
 
       let finalFiltered = searchFiltered;
       if (activeKpiFilter) {
           finalFiltered = searchFiltered.filter(row => {
-              const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-              const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful'];
-
               if(activeKpiFilter === 'Reached') return reachedStatuses.includes(row.status);
-              if(activeKpiFilter === 'Pending') return row.status === 'Pending' || row.status === 'Called / Left Voicemail';
+              if(activeKpiFilter === 'Pending') return pendingStatuses.includes(row.status);
               if(activeKpiFilter === 'Invalid') return invalidStatuses.includes(row.status);
               return true;
           });
@@ -1891,10 +1986,23 @@
 
       let groupsArray = Object.keys(groupedData).map(clientName => ({ clientName: clientName, pocs: groupedData[clientName] }));
 
+      // Find the most recent date from Attempt 1, 2, or 3
+      function getLatestAttemptDate(row) {
+          let latest = "";
+          let latestDate = 0;
+          [row.att1, row.att2, row.att3].forEach(dStr => {
+              if (dStr) {
+                  let d = new Date(dStr).getTime();
+                  if (d > latestDate) { latestDate = d; latest = dStr; }
+              }
+          });
+          return latest || "-";
+      }
+
       function getSortValue(row, col) {
         if (col === 'client') return (row.client || "").toLowerCase();
         if (col === 'contact') return (row.email || "").toLowerCase();
-        if (col === 'date') return row.lastContact === "-" ? "0000-00-00" : row.lastContact;
+        if (col === 'date') return getLatestAttemptDate(row) === "-" ? "0000-00-00" : getLatestAttemptDate(row);
         if (col === 'status') return (row.status || "").toLowerCase();
         return "";
       }
@@ -1939,12 +2047,9 @@
 
         if (!isCollapsed) {
           pocs.forEach((row, index) => {
-            const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-            const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful'];
-
             let badgeClass = 'badge-pending';
             if (reachedStatuses.includes(row.status)) badgeClass = 'badge-safe';
-            if (row.status === 'Called / Left Voicemail') badgeClass = 'badge-warning';
+            if (pendingStatuses.includes(row.status)) badgeClass = 'badge-warning';
             if (invalidStatuses.includes(row.status)) badgeClass = 'badge-danger';
 
             const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
@@ -1957,7 +2062,11 @@
             
             const tagHtml = row.tags ? row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); font-size:0.65rem; padding:0.2rem 0.5rem; border-radius:6px;">${t.trim()}</span>`).join('') : '';
             const noteIcon = row.customNote ? `<span class="badge-note" data-tooltip-top="${row.customNote.replace(/"/g, '&quot;')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>Note</span>` : '';
-            const attemptBadge = row.attempt ? `<span class="badge badge-attempt">${row.attempt}</span>` : '';
+            
+            let latestAttemptTag = '';
+            if (row.att3) latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`;
+            else if (row.att2) latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`;
+            else if (row.att1) latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
 
             tr.innerHTML = `
               <td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">
@@ -1966,7 +2075,7 @@
                 
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">
                    <span style="font-size:1.05rem; font-weight:600;">${row.poc}</span>
-                   ${attemptBadge}
+                   ${latestAttemptTag}
                    ${tagHtml}
                    ${noteIcon}
                 </div>
@@ -1978,7 +2087,7 @@
                 <div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div>
                 <div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div>
               </td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${row.lastContact}</td>
+              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td>
               <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td>
               <td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell">
               </td>
