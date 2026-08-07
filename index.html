@@ -910,7 +910,15 @@
 
           telnyxCallerId = res.callerId;
           
-          telnyxClient = new TelnyxRTC({ login_token: tokenStr });
+          // --- THE FIX IS HERE ---
+          if (typeof TelnyxWebRTC === 'undefined') {
+              showToast('Phone SDK failed to load. Disable adblockers and refresh.', 'danger');
+              addLog('Telnyx Error: TelnyxWebRTC global object is missing.');
+              return;
+          }
+          telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: tokenStr });
+          // -----------------------
+
           telnyxClient.remoteElement = 'remoteMedia'; 
 
           telnyxClient.on('telnyx.ready', () => {
