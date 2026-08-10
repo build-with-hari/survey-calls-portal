@@ -1087,30 +1087,34 @@
     function openPinModal() { openModal('pinModal'); }
 
     // ==========================================
-    // EMAIL DISPATCH
+    // EMAIL DISPATCH (Client-Side Natively via Gmail)
     // ==========================================
     function dispatchEmail() {
-        const btn = document.getElementById('sendEmailBtn');
-        const to = document.getElementById('ws-email-val').value;
-        const cc = document.getElementById('email-cc-val').value;
-        const subject = document.getElementById('email-subject-val').value;
-        const body = document.getElementById('email-body-val').value;
+        const rawTo = document.getElementById('ws-email-val').value;
+        const rawCc = document.getElementById('email-cc-val').value;
+        const rawSubject = document.getElementById('email-subject-val').value;
+        const rawBody = document.getElementById('email-body-val').value;
 
-        if (!to) { showToast("No email address found for this contact.", "danger"); return; }
+        if (!rawTo) { 
+            showToast("No email address found for this contact.", "danger"); 
+            return; 
+        }
         
-        btn.innerText = "Sending..."; btn.disabled = true;
-        callGoogleAPI('sendEmail', { to, cc, subject, body })
-        .then(res => {
-            btn.innerText = "✉️ Send Email"; btn.disabled = false;
-            showToast("Email dispatched successfully via Gmail!", "success");
-            closeModal('emailModal');
-            addLog(`Dispatched email to ${to}`);
-        })
-        .catch(err => {
-            btn.innerText = "✉️ Send Email"; btn.disabled = false;
-            showToast("Failed to send email. Check logs.", "danger");
-            addLog(`Email Send Error: ${err.message}`);
-        });
+        // Safely encode all text so line breaks and special characters format correctly in Gmail
+        const to = encodeURIComponent(rawTo);
+        const cc = encodeURIComponent(rawCc);
+        const subject = encodeURIComponent(rawSubject);
+        const body = encodeURIComponent(rawBody);
+
+        // Construct the native Google Workspace compose URL
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&cc=${cc}&su=${subject}&body=${body}`;
+        
+        // Pop open the native Gmail window for the executive
+        window.open(gmailUrl, '_blank');
+        
+        showToast("Opening Google Workspace Mail...", "success");
+        closeModal('emailModal');
+        addLog(`Opened email draft for ${rawTo}`);
     }
 
     // ==========================================
