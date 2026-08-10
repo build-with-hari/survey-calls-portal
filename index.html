@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CX Survey Calls Portal | Mindmatrix</title>
-
+  
   <link rel="icon" href="https://www.google.com/s2/favicons?domain=mindmatrix.net&sz=128" type="image/png">
   
-  <!-- Telnyx WebRTC SDK, Google SSO, and Flatpickr Calendar -->
+  <!-- Telnyx WebRTC SDK, Google SSO, Flatpickr, and Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/@telnyx/webrtc@latest"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     /* CORE THEME & GLASSMORPHISM CSS */
@@ -33,7 +34,12 @@
     }
 
     /* THIS FIXES THE FLATPICKR LAYERING ISSUE */
-    .flatpickr-calendar { z-index: 999999 !important; font-family: inherit; box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; border: 1px solid var(--glass-border) !important; }
+    .flatpickr-calendar { 
+        z-index: 999999 !important; 
+        font-family: inherit; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; 
+        border: 1px solid var(--glass-border) !important; 
+    }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
     html, body { overflow: hidden !important; margin: 0; padding: 0; background-color: var(--bg-color); height: 100vh; width: 100vw; }
@@ -67,10 +73,10 @@
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--glass-border); padding: 0.65rem 1.25rem; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; }
     .btn-outline:hover { background: var(--glass-highlight); }
-    .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0.5rem; border-radius: 8px; opacity: 0.85; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0.5rem; border-radius: 8px; opacity: 0.85; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; color: var(--text-main); }
     .btn-icon:hover { opacity: 1; background: var(--glass-highlight); transform: scale(1.1); }
     
-    .theme-toggle { font-size: 1.4rem; padding: 0.4rem; background: transparent; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); }
+    .theme-toggle { font-size: 1.4rem; padding: 0.4rem; background: transparent; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); color: var(--text-main); }
     .theme-toggle:hover { background: var(--glass-highlight); color: var(--accent-primary) !important; }
     
     .icon-spin { display: inline-block; animation: spin 1s infinite linear; }
@@ -134,6 +140,17 @@
     /* NEW ATTEMPT BADGE */
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
+    .pulse-live { 
+        display: inline-block; 
+        width: 8px; height: 8px; 
+        background-color: var(--safe-color); 
+        border-radius: 50%; 
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); 
+        animation: pulse 1.5s infinite; 
+        margin-left: 5px; 
+        vertical-align: middle;
+    }
+    
     .loader-container { text-align: center; padding: 4rem 0; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
     .spinner { width: 40px; height: 40px; border: 4px solid var(--glass-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s infinite linear; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -215,11 +232,21 @@
     }
     .active-call-overlay.active { transform: translateY(0); opacity: 1; }
     .call-pulse { width: 12px; height: 12px; background: var(--warning-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
     
     /* POST-CALL MODAL ATTEMPT BUTTONS */
     .attempt-btn { flex: 1; padding: 0.6rem; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
     .attempt-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+    
+    /* TIMELINE CSS */
+    .timeline-container { text-align: left; padding: 1rem 0; margin-top: 1rem; border-top: 1px solid var(--glass-border); }
+    .timeline-item { position: relative; padding-left: 24px; margin-bottom: 1.5rem; }
+    .timeline-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-primary); }
+    .timeline-item::after { content: ''; position: absolute; left: 5px; top: 20px; bottom: -20px; width: 2px; background: var(--glass-border); }
+    .timeline-item:last-child::after { display: none; }
+    .tl-date { font-size: 0.8rem; color: var(--accent-primary); font-weight: 600; margin-bottom: 4px; }
+    .tl-content { background: var(--input-bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--glass-border); font-size: 0.9rem; color: var(--text-main); white-space: pre-wrap; }
+    .tl-audio-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; font-size: 0.8rem; color: var(--safe-color); text-decoration: none; font-weight: 600; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 6px; }
+    .tl-audio-link:hover { background: rgba(16, 185, 129, 0.2); }
   </style>
 </head>
 <body>
@@ -275,15 +302,15 @@
       </div>
   </div>
 
-  <!-- MAIN APPLICATION COMPONENTS (Hidden until logged in) -->
+  <!-- MAIN DASHBOARD -->
   <div id="app-components" style="display: none;">
+      
       <!-- FLOATING NAV ARROWS -->
       <div class="floating-nav" id="global-nav-arrows">
         <button class="nav-arrow" onclick="scrollActiveView('up')" data-tooltip-top="Scroll Top">↑</button>
         <button class="nav-arrow" onclick="scrollActiveView('down')" data-tooltip-top="Scroll Bottom">↓</button>
       </div>
 
-      <!-- MAIN DASHBOARD -->
       <div class="app-scroll-container" id="mainDashboard">
 
         <div class="liquid-glass">
@@ -300,10 +327,13 @@
               <button class="theme-toggle" onclick="fetchData()" id="refreshBtn" data-tooltip-bottom="Reload Data" style="color: var(--text-muted);">
                 <svg id="refreshIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
               </button>
+              <button class="btn-outline" onclick="openAnalytics()">📊 Analytics</button>
               <button class="btn-outline" onclick="openModal('addEntryModal')">➕ Add Entry</button>
               <button class="btn-outline" onclick="openPinModal()">☁️ Sync CRM</button>
               <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" data-tooltip-bottom="Toggle Theme">🌙</button>
-              <button class="btn-outline" onclick="logout()" data-tooltip-bottom="Sign Out">🚪 Logout</button>
+              <button class="btn-icon" onclick="logout()" data-tooltip-bottom="Sign Out">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -360,6 +390,11 @@
               </thead>
               <tbody id="table-body"></tbody>
             </table>
+            
+            <!-- Pagination Controls -->
+            <div id="paginationControls" style="text-align: center; margin-top: 1rem; display: none;">
+               <button class="btn-outline" onclick="loadMoreData()">Load More Records ↓</button>
+            </div>
           </div>
           
           <div id="statsFooter" style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: none;">
@@ -376,7 +411,7 @@
         <div class="workspace-left">
           <div class="ws-header-area">
             <button class="back-btn" onclick="closeWorkspace()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 
               Back to Dashboard
             </button>
             
@@ -402,6 +437,11 @@
           <div class="rec-bar">
             <div class="rec-indicator" id="recIndicator"></div>
             <span id="recTimerText" style="font-size: 0.85rem; font-weight: 600; font-family: monospace; flex: 1;">Recording Standby</span>
+            
+            <!-- Hidden inputs to hold generated AI data -->
+            <input type="hidden" id="ws-recording-url">
+            <input type="hidden" id="ws-ai-summary">
+            
             <button class="btn-outline" id="recToggleBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="toggleRecordingPause()">⏸️ Pause</button>
             <button class="btn-outline" id="recStopBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-color: var(--danger-color); color: var(--danger-color);" onclick="stopRecordingAndUpload()">🛑 Stop & Save</button>
           </div>
@@ -411,6 +451,7 @@
                 Speaking with: <strong class="dyn-client-name" style="color: var(--accent-primary);">[Name]</strong> at <strong class="dyn-company-name">[Company]</strong>
              </span>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: var(--input-bg); border: 1px solid var(--input-border);" data-tooltip-top="Edit POC Details / Tags" onclick="openEditModal()">✏️ Edit Details</button>
+             <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56,189,248,0.3);" onclick="openTimeline()">🕒 View Timeline & Recordings</button>
           </div>
           
           <!-- Tags Display injected dynamically -->
@@ -447,7 +488,7 @@
             <p><b>If they won't commit:</b><br>“No problem. I can also send you a quick email with a short feedback link so you can share your thoughts at your convenience. Would that work better?”</p>
             <div class="template-card">
               <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Follow-up Email (CC TL/Mgr)</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('notime')">Copy Template</button>
+              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('notime')">Preview & Send</button>
             </div>
           </div>
 
@@ -459,7 +500,7 @@
             <p>Thank you, and have a wonderful day!”</p>
             <div class="template-card">
               <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Voicemail Follow-up</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('voicemail')">Copy Template</button>
+              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('voicemail')">Preview & Send</button>
             </div>
           </div>
 
@@ -480,7 +521,7 @@
             </ul>
             <div class="template-card">
               <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Initial Outreach Email</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('unreachable')">Copy Template</button>
+              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('unreachable')">Preview & Send</button>
             </div>
           </div>
         </div>
@@ -588,7 +629,7 @@
 
           </div>
 
-          <!-- MANUAL CALL LOGGING SECTION (For Email/No Dial logging) -->
+          <!-- MANUAL CALL LOGGING SECTION -->
           <div class="form-group" style="border: 2px solid var(--accent-primary); background: var(--bg-color); margin-top: 2rem;" id="ws-outcome-section">
             <h3 style="margin-top:0; color: var(--accent-primary); margin-bottom: 1rem;">📝 Manual Call Log</h3>
             
@@ -618,7 +659,7 @@
                    <span id="status-display">Select Outcome...</span>
                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </div>
-               <!-- Populated via Javascript to match modal -->
+               <!-- Populated via Javascript -->
                <div class="select-options" id="status-dropdown-opts"></div>
                <input type="hidden" id="ws-call-status-val" value="">
             </div>
@@ -630,7 +671,30 @@
       </div>
   </div>
 
-  <!-- SELECT PHONE MODAL -->
+  <!-- MODALS -->
+  <div class="modal-overlay" id="analyticsModal" onclick="closeOnBackgroundClick(event, 'analyticsModal')">
+    <div class="modal-content" style="max-width: 600px; width: 90%;">
+      <h2 style="font-size:1.5rem; font-weight:700; margin-bottom: 1.5rem;">Visual Analytics</h2>
+      <div style="position: relative; height: 350px; width: 100%;">
+          <canvas id="outcomeChart"></canvas>
+      </div>
+      <div style="margin-top: 2rem;"><button class="btn-outline" onclick="closeModal('analyticsModal')">Close Dashboard</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="timelineModal" onclick="closeOnBackgroundClick(event, 'timelineModal')">
+    <div class="modal-content" style="max-width: 550px; text-align: left;">
+      <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">Historical Timeline</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Past interactions and AI summaries with this contact.</p>
+      
+      <div id="timelineContainer" class="timeline-container">
+          <!-- Injected via JS -->
+      </div>
+      
+      <div style="margin-top: 1.5rem; text-align: center;"><button class="btn-outline" onclick="closeModal('timelineModal')">Close Timeline</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="selectPhoneModal" onclick="closeOnBackgroundClick(event, 'selectPhoneModal')">
     <div class="modal-content" style="max-width: 420px;">
       <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Choose Phone Number</h2>
@@ -647,7 +711,6 @@
     </div>
   </div>
 
-  <!-- POST CALL MODAL -->
   <div class="modal-overlay" id="postCallModal" onclick="closeOnBackgroundClick(event, 'postCallModal')">
     <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Call Ended</h2>
@@ -667,7 +730,6 @@
              <span id="postCallOutcomeDisplay">Select Outcome...</span>
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
          </div>
-         <!-- Populated via Javascript -->
          <div class="select-options" id="postCallOutcomeDropdown-opts" style="max-height: 200px;"></div>
          <input type="hidden" id="postCallOutcomeVal">
       </div>
@@ -679,7 +741,6 @@
     </div>
   </div>
 
-  <!-- MODALS -->
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
     <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
@@ -687,7 +748,7 @@
       
       <label class="input-label">POC Name</label><input type="text" id="editPocNameInput" class="modal-input">
       
-      <!-- NEW MANUAL ATTEMPT OVERRIDES WITH FLATPICKR -->
+      <!-- FLATPICKR INPUTS -->
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
         <div style="flex:1;">
           <label class="input-label">Attempt 1 Date</label>
@@ -738,7 +799,7 @@
     <div class="modal-content" style="max-width: 600px; text-align: left; background: #000; color: #0f0; border-color: #333;">
       <h2 style="font-size:1.2rem; font-weight:700; margin-bottom: 1rem; color: #fff;">System Logs</h2>
       <div id="logsContainer" style="height: 300px; overflow-y: auto; background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333;"></div>
-      <div style="text-align: right; margin-top: 1rem;"><button class="btn-outline" style="border-color: #333; color: #fff;" onclick="closeModal('logsModal')">Close</button></div>
+      <div style="text-align: right; margin-top: 1rem;"><button class="btn-outline logs-close-btn" style="border-color: #333; color: #fff;" onclick="closeModal('logsModal')">Close</button></div>
     </div>
   </div>
 
@@ -767,10 +828,24 @@
 
   <div class="modal-overlay" id="emailModal" onclick="closeOnBackgroundClick(event, 'emailModal')">
     <div class="modal-content" style="max-width: 600px; text-align: left;">
-      <h2 style="font-size:1.2rem; font-weight:700; margin-bottom: 1rem;">📋 Copy Email Template</h2>
-      <label class="input-label">Subject</label><div style="display: flex; gap: 10px; margin-bottom: 1rem;"><input type="text" id="email-subject-val" class="modal-input" style="margin:0;" readonly><button class="btn-primary" onclick="copyToClipboard('email-subject-val')">Copy</button></div>
-      <label class="input-label">Body</label><textarea id="email-body-val" class="modal-input" style="min-height: 250px; margin:0; resize: none; width: 100%; box-sizing: border-box;" readonly></textarea>
-      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('emailModal')">Close</button><button class="btn-primary" onclick="copyToClipboard('email-body-val')">Copy Body</button></div>
+      <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">📋 Preview Outreach Email</h2>
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.75rem; border-radius: 8px; color: var(--warning-color); font-size: 0.85rem; margin-bottom: 1rem;">
+         ⚠️ <strong>Note:</strong> Clicking Send will instantly dispatch this email from your connected @mindmatrix.net Google Workspace account.
+      </div>
+      
+      <label class="input-label">CC (Optional - Comma Separated)</label>
+      <input type="text" id="email-cc-val" class="modal-input" placeholder="manager@mindmatrix.net">
+      
+      <label class="input-label">Subject</label>
+      <input type="text" id="email-subject-val" class="modal-input">
+      
+      <label class="input-label">Body</label>
+      <textarea id="email-body-val" class="modal-input" style="min-height: 200px; resize: vertical; width: 100%;"></textarea>
+      
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+        <button class="btn-outline" onclick="closeModal('emailModal')">Cancel</button>
+        <button class="btn-primary" id="sendEmailBtn" onclick="dispatchEmail()">✉️ Send Email</button>
+      </div>
     </div>
   </div>
 
@@ -794,34 +869,32 @@
     // ==========================================
     // CONFIGURATION
     // ==========================================
-    // PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE:
     const API_URL = "https://script.google.com/macros/s/AKfycbx9CElrTL_8oYs_CTmCf6LOap7-FQP6y4SYeDmb8dBdpZ2jprZ7XvX-AGW7814m6ekdOw/exec"; 
     const GOOGLE_CLIENT_ID = "992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"; 
 
-    // CALL OUTCOMES LIST
     const OUTCOMES = [
       "Called / Left Voicemail", "Email Sent", "Meeting Scheduled", "Completed", 
       "Deferred by Client", "Exploring / Learning", "Low Engagement", "Inactive / On Hold", 
       "Unsuccessful", "Declined / Not Interested", "Not Launched Yet", "Recently Launched", "Requesting Cancellation"
     ];
 
-    // AUDIO RECORDING GLOBALS
     let mediaRecorder = null;
     let audioChunks = [];
     let recSeconds = 0;
     let recTimerInterval = null;
-
-    // CALL OVERLAY GLOBALS
     let callDurationInterval = null;
     let callDurationSeconds = 0;
-
-    // TELNYX GLOBALS
     let telnyxClient = null;
     let activeCall = null;
     let isTelnyxReady = false;
     let telnyxCallerId = '';
 
-    // System Logs Shortcut (Shift + L) with Custom Modal & Auto-Focus
+    let presenceInterval = null;
+    let currentPaginationLimit = 50;
+    let analyticsChart = null;
+    let activePresence = {}; 
+
+    // System Logs Shortcut (Shift + L) with Auto-Focus & Enter support
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
             e.preventDefault();
@@ -860,9 +933,7 @@
             const result = await response.json();
             if (result.status === 'error') throw new Error(result.message);
             return result.data;
-        } catch (err) {
-            throw err;
-        }
+        } catch (err) { throw err; }
     }
 
     const SVG_CHEVRON_DOWN = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
@@ -907,7 +978,9 @@
     }
 
     function toggleDropdown(wrapperId) {
-        document.querySelectorAll('.select-options.open, .poc-select-options.open').forEach(el => { if (el.id !== wrapperId + '-opts' && el.id !== wrapperId) el.classList.remove('open'); });
+        document.querySelectorAll('.select-options.open, .poc-select-options.open').forEach(el => { 
+            if (el.id !== wrapperId + '-opts' && el.id !== wrapperId) el.classList.remove('open'); 
+        });
         const opts = document.getElementById(wrapperId + '-opts');
         if (opts) opts.classList.toggle('open');
     }
@@ -916,7 +989,7 @@
         document.getElementById(hiddenId).value = val;
         document.getElementById(displayId).innerHTML = display;
         document.getElementById(wrapperId + '-opts').classList.remove('open');
-        if (hiddenId === 'execFilterVal') filterData(); 
+        if (hiddenId === 'execFilterVal') { currentPaginationLimit = 50; filterData(); }
     }
 
     function setDropdownValueSafe(wrapperId, hiddenId, displayId, val) {
@@ -933,48 +1006,30 @@
         const manualOpts = document.getElementById('status-dropdown-opts');
         modalOpts.innerHTML = '';
         manualOpts.innerHTML = '';
-
         OUTCOMES.forEach(out => {
             modalOpts.innerHTML += `<div class="select-option" onclick="selectDropdownVal('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', '${out}', '${out}')">${out}</div>`;
             manualOpts.innerHTML += `<div class="select-option" onclick="selectDropdownVal('status-dropdown', 'ws-call-status-val', 'status-display', '${out}', '${out}')">${out}</div>`;
         });
     }
 
-    function togglePocDropdown() { 
-        const opts = document.getElementById('ws-poc-options');
-        opts.classList.toggle('open');
-    }
-    
-    function openTzDropdown() {
-      const optContainer = document.getElementById('tz-options');
-      optContainer.classList.add('open');
-      renderTzList(tzList);
-    }
-
+    function togglePocDropdown() { document.getElementById('ws-poc-options').classList.toggle('open'); }
+    function openTzDropdown() { const o = document.getElementById('tz-options'); o.classList.add('open'); renderTzList(tzList); }
     function filterTzDropdown() {
       const q = document.getElementById('editTzInput').value.toLowerCase();
-      const filtered = tzList.filter(t => t.label.toLowerCase().includes(q) || t.iana.toLowerCase().includes(q));
-      renderTzList(filtered);
+      renderTzList(tzList.filter(t => t.label.toLowerCase().includes(q) || t.iana.toLowerCase().includes(q)));
     }
-
     function renderTzList(list) {
       const optContainer = document.getElementById('tz-options');
       optContainer.innerHTML = '';
       list.forEach(t => {
          const div = document.createElement('div');
-         div.className = 'select-option';
-         div.innerHTML = t.label;
-         div.onclick = function() {
-            document.getElementById('editTzInput').value = t.label;
-            document.getElementById('editTzIana').value = t.iana;
-            optContainer.classList.remove('open');
-         };
+         div.className = 'select-option'; div.innerHTML = t.label;
+         div.onclick = function() { document.getElementById('editTzInput').value = t.label; document.getElementById('editTzIana').value = t.iana; optContainer.classList.remove('open'); };
          optContainer.appendChild(div);
       });
       if(list.length === 0) optContainer.innerHTML = `<div class="select-option" style="color:var(--text-muted)">No matches found</div>`;
     }
 
-    // Global Click Handler ensuring all dropdowns close gracefully
     document.addEventListener('click', function(e) {
       if(!e.target.closest('.custom-select') && !e.target.closest('.poc-custom-select') && !e.target.closest('.flatpickr-calendar')) {
          document.querySelectorAll('.select-options.open').forEach(el => el.classList.remove('open'));
@@ -986,236 +1041,153 @@
        const iana = document.getElementById('ws-timezone-val').value;
        const display = document.getElementById('ws-live-time');
        if (!iana || !display) return;
-       try {
-           const timeString = new Date().toLocaleTimeString('en-US', { timeZone: iana, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-           display.textContent = `(${timeString} local time)`;
-       } catch(e) {
-           display.textContent = "";
-       }
+       try { display.textContent = `(${new Date().toLocaleTimeString('en-US', { timeZone: iana, hour: '2-digit', minute: '2-digit', second: '2-digit' })} local time)`; } catch(e) { display.textContent = ""; }
     }
 
     function initRatings() {
-       const ratingGroups = [
-         { id: 'rating-1', name: 'entry.695001045' }, { id: 'rating-2', name: 'entry.1538619285' },
-         { id: 'rating-3', name: 'entry.1376447678' }, { id: 'rating-4', name: 'entry.1432157009' },
-         { id: 'rating-5', name: 'entry.522456438' }, { id: 'rating-6', name: 'entry.1393320595' }
+       const ratingGroups = [ 
+           { id: 'rating-1', name: 'entry.695001045' }, { id: 'rating-2', name: 'entry.1538619285' }, 
+           { id: 'rating-3', name: 'entry.1376447678' }, { id: 'rating-4', name: 'entry.1432157009' }, 
+           { id: 'rating-5', name: 'entry.522456438' }, { id: 'rating-6', name: 'entry.1393320595' } 
        ];
        ratingGroups.forEach(g => {
          const container = document.getElementById(g.id);
-         if(container) {
-           container.innerHTML = '';
-           for(let i=1; i<=10; i++) {
-             container.innerHTML += `<label class="rating-label"><input type="radio" name="${g.name}" value="${i}"><span class="rating-span">${i}</span></label>`;
-           }
+         if(container) { 
+             container.innerHTML = ''; 
+             for(let i=1; i<=10; i++) container.innerHTML += `<label class="rating-label"><input type="radio" name="${g.name}" value="${i}"><span class="rating-span">${i}</span></label>`; 
          }
        });
     }
 
     document.addEventListener('click', function(e) {
        if(e.target && e.target.type === 'radio' && e.target.closest('.rating-container')) {
-           if(e.target.dataset.wasChecked === 'true') {
-               e.target.checked = false;
-               e.target.dataset.wasChecked = 'false';
-           } else {
-               document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false');
-               e.target.dataset.wasChecked = 'true';
-           }
+           if(e.target.dataset.wasChecked === 'true') { e.target.checked = false; e.target.dataset.wasChecked = 'false'; } 
+           else { document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false'); e.target.dataset.wasChecked = 'true'; }
        }
     });
 
     function showToast(msg, type) {
       const existing = document.getElementById('mm-toast-alert');
       if (existing) existing.remove();
-      
       const toast = document.createElement('div');
       toast.id = 'mm-toast-alert';
       toast.innerText = msg;
-      
-      // Increased z-index and display time to ensure it shows perfectly post-modal
       toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
-      
       if (type === 'success') toast.style.backgroundColor = '#10b981';
       else if (type === 'warning') toast.style.backgroundColor = '#f59e0b';
       else toast.style.backgroundColor = '#ef4444'; 
-      
       document.body.appendChild(toast);
-      
       setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
-      
-      setTimeout(() => { 
-          toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)';
-          setTimeout(() => toast.remove(), 400); 
-      }, 4500);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)'; setTimeout(() => toast.remove(), 400); }, 4500);
     }
 
-    function openModal(id) {
-      document.getElementById(id).style.display = 'flex';
-      setTimeout(() => document.getElementById(id).classList.add('active'), 10);
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-      setTimeout(() => document.getElementById(id).style.display = 'none', 300);
-    }
-    function closeOnBackgroundClick(event, id) {
-      if (event.target.id === id) closeModal(id);
-    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; setTimeout(() => document.getElementById(id).classList.add('active'), 10); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); setTimeout(() => document.getElementById(id).style.display = 'none', 300); }
+    function closeOnBackgroundClick(event, id) { if (event.target.id === id) closeModal(id); }
     function openPinModal() { openModal('pinModal'); }
 
+    // ==========================================
+    // EMAIL DISPATCH
+    // ==========================================
+    function dispatchEmail() {
+        const btn = document.getElementById('sendEmailBtn');
+        const to = document.getElementById('ws-email-val').value;
+        const cc = document.getElementById('email-cc-val').value;
+        const subject = document.getElementById('email-subject-val').value;
+        const body = document.getElementById('email-body-val').value;
 
-    // ==========================================
-    // TELNYX SDK INTEGRATION & UI
-    // ==========================================
-    function hangupCall() {
-      if (activeCall) {
-         activeCall.hangup();
-      }
+        if (!to) { showToast("No email address found for this contact.", "danger"); return; }
+        
+        btn.innerText = "Sending..."; btn.disabled = true;
+        callGoogleAPI('sendEmail', { to, cc, subject, body })
+        .then(res => {
+            btn.innerText = "✉️ Send Email"; btn.disabled = false;
+            showToast("Email dispatched successfully via Gmail!", "success");
+            closeModal('emailModal');
+            addLog(`Dispatched email to ${to}`);
+        })
+        .catch(err => {
+            btn.innerText = "✉️ Send Email"; btn.disabled = false;
+            showToast("Failed to send email. Check logs.", "danger");
+            addLog(`Email Send Error: ${err.message}`);
+        });
     }
 
+    // ==========================================
+    // TELNYX SDK INTEGRATION
+    // ==========================================
+    function hangupCall() { if (activeCall) activeCall.hangup(); }
     function toggleDialpad() {
-        const dp = document.getElementById('ivrDialpad');
-        const btn = document.getElementById('toggleDialpadBtn');
-        if (dp.style.display === 'none') {
-            dp.style.display = 'grid';
-            btn.innerHTML = '🔼 Hide Keypad';
-        } else {
-            dp.style.display = 'none';
-            btn.innerHTML = '🎛️ Show Keypad';
-        }
+        const dp = document.getElementById('ivrDialpad'), btn = document.getElementById('toggleDialpadBtn');
+        if (dp.style.display === 'none') { dp.style.display = 'grid'; btn.innerHTML = '🔼 Hide Keypad'; } 
+        else { dp.style.display = 'none'; btn.innerHTML = '🎛️ Show Keypad'; }
     }
-
-    function sendDTMF(digit) {
-      if (activeCall) {
-         activeCall.dtmf(digit);
-         document.getElementById('dtmfDisplay').innerText += digit;
-         addLog(`Sent DTMF Tone: ${digit}`);
-      }
-    }
-
+    function sendDTMF(digit) { if (activeCall) { activeCall.dtmf(digit); document.getElementById('dtmfDisplay').innerText += digit; addLog(`Sent DTMF Tone: ${digit}`); } }
+    
     function startCallTimer() {
       if (callDurationInterval) clearInterval(callDurationInterval);
-      callDurationSeconds = 0;
-      document.getElementById('callOverlayDuration').innerText = "00:00";
-      
+      callDurationSeconds = 0; document.getElementById('callOverlayDuration').innerText = "00:00";
       callDurationInterval = setInterval(() => {
         callDurationSeconds++;
-        const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0');
-        const secs = String(callDurationSeconds % 60).padStart(2, '0');
+        const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0'), secs = String(callDurationSeconds % 60).padStart(2, '0');
         document.getElementById('callOverlayDuration').innerText = `${mins}:${secs}`;
       }, 1000);
     }
-
-    function stopCallTimer() {
-      if (callDurationInterval) clearInterval(callDurationInterval);
-    }
-
+    
+    function stopCallTimer() { if (callDurationInterval) clearInterval(callDurationInterval); }
+    
     function showCallOverlay(pocName) {
-      document.getElementById('callOverlayName').innerText = pocName || "Unknown Contact";
-      document.getElementById('callOverlayStatus').innerText = "Dialing...";
-      document.getElementById('callOverlayStatus').style.color = "var(--warning-color)";
-      document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
-      document.getElementById('callOverlayDuration').innerText = "00:00";
-      document.getElementById('dtmfDisplay').innerText = ""; 
-      
-      const overlay = document.getElementById('activeCallOverlay');
-      overlay.classList.add('active');
+      document.getElementById('callOverlayName').innerText = pocName || "Unknown Contact"; document.getElementById('callOverlayStatus').innerText = "Dialing...";
+      document.getElementById('callOverlayStatus').style.color = "var(--warning-color)"; document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
+      document.getElementById('callOverlayDuration').innerText = "00:00"; document.getElementById('dtmfDisplay').innerText = ""; 
+      document.getElementById('activeCallOverlay').classList.add('active');
     }
-
-    function hideCallOverlay() {
-      const overlay = document.getElementById('activeCallOverlay');
-      overlay.classList.remove('active');
-      stopCallTimer();
-    }
+    
+    function hideCallOverlay() { document.getElementById('activeCallOverlay').classList.remove('active'); stopCallTimer(); }
 
     function initTelnyx() {
       addLog('Authenticating with Telnyx via Google API...');
-      
-      callGoogleAPI('getTelnyxToken')
-        .then(res => {
-          if (!res || res.success === false) {
-             const errorMsg = res ? res.error : 'Empty response from backend';
-             addLog(`Telnyx API Error: ${errorMsg}`);
-             showToast('Phone system authentication failed. Check logs.', 'danger');
-             return;
-          }
-
+      callGoogleAPI('getTelnyxToken').then(res => {
+          if (!res || res.success === false) { addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); showToast('Phone system authentication failed.', 'danger'); return; }
           let tokenStr = typeof res.token === 'string' ? res.token : (res.token ? res.token.toString() : '');
-          if (!tokenStr) {
-             addLog('Telnyx Auth Failed: Token string is empty.');
-             showToast('Invalid Telnyx Token received.', 'danger');
-             return;
-          }
-
+          if (!tokenStr) { addLog('Telnyx Auth Failed: Empty token.'); return; }
           telnyxCallerId = res.callerId;
           
-          if (typeof TelnyxWebRTC === 'undefined') {
-              showToast('Phone SDK failed to load. Disable adblockers and refresh.', 'danger');
-              addLog('Telnyx Error: TelnyxWebRTC global object is missing.');
-              return;
-          }
+          if (typeof TelnyxWebRTC === 'undefined') { showToast('Phone SDK failed to load. Disable adblockers.', 'danger'); return; }
           telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: tokenStr });
           telnyxClient.remoteElement = 'remoteMedia'; 
 
-          telnyxClient.on('telnyx.ready', () => {
-            isTelnyxReady = true;
-            addLog("Telnyx WebRTC connected and ready.");
-            showToast("Phone line connected and ready!", "success");
-          });
-
+          telnyxClient.on('telnyx.ready', () => { isTelnyxReady = true; addLog("Telnyx WebRTC connected and ready."); });
           telnyxClient.on('telnyx.error', (error) => {
-            if (error && error.error && error.error.fatal === false) {
-                // Non-fatal error gracefully suppressed (e.g. BYE_SEND_FAILED early hangup)
-                addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event."));
-                return;
-            }
-            addLog("Telnyx Socket Error: " + JSON.stringify(error));
-            isTelnyxReady = false;
-            
-            // Auto Reconnect mechanism if the socket silently drops
-            setTimeout(() => {
-                if (!isTelnyxReady && telnyxClient) {
-                    addLog("Attempting Telnyx background reconnect...");
-                    telnyxClient.connect();
-                }
-            }, 3000);
+            if (error && error.error && error.error.fatal === false) { addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event.")); return; }
+            addLog("Telnyx Socket Error: " + JSON.stringify(error)); isTelnyxReady = false;
+            setTimeout(() => { if (!isTelnyxReady && telnyxClient) { addLog("Attempting Telnyx background reconnect..."); telnyxClient.connect(); } }, 3000);
           });
-
           telnyxClient.on('telnyx.notification', (notification) => {
             if (notification.type === 'callUpdate') {
               activeCall = notification.call;
               const btn = document.getElementById('callActionBtn');
-              
               if (activeCall.state === 'ringing') {
                 if(btn) btn.innerHTML = '🔔 Ringing...';
                 document.getElementById('callOverlayStatus').innerText = "Ringing...";
                 document.getElementById('callOverlayStatus').style.color = "var(--warning-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
-              
               } else if (activeCall.state === 'active') {
                 showToast('Call Connected!', 'success');
                 if(btn) btn.innerHTML = '🛑 End Call';
                 document.getElementById('callOverlayStatus').innerText = "Connected";
                 document.getElementById('callOverlayStatus').style.color = "var(--safe-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--safe-color)";
-                
-                document.getElementById('ivrDialpad').style.display = 'none';
-                document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
-                
+                document.getElementById('ivrDialpad').style.display = 'none'; document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
                 startCallTimer();
-                
-                // SAFE 2-WAY RECORDING START
                 startAutoRecording();
-              
               } else if (activeCall.state === 'destroy') {
                 showToast('Call Ended.', 'warning');
                 activeCall = null;
                 if(btn) btn.innerHTML = '📞 Call Now';
                 hideCallOverlay();
-                document.getElementById('ivrDialpad').style.display = 'none';
-                document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
-                
-                if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                   stopRecordingAndUpload();
-                }
+                document.getElementById('ivrDialpad').style.display = 'none'; document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
+                if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
 
                 document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
                 document.getElementById('postCallNotes').value = '';
@@ -1224,63 +1196,27 @@
                 
                 const wsAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1';
                 document.querySelectorAll('.attempt-btn').forEach(el => {
-                    if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active');
-                    else el.classList.remove('active');
+                    if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active'); else el.classList.remove('active');
                 });
                 document.getElementById('postCallAttemptVal').value = wsAttempt;
                 openModal('postCallModal');
               }
             }
           });
-
           telnyxClient.connect();
-        })
-        .catch(err => {
-           addLog(`Telnyx Auth Network Error: ${err.message}`);
-           showToast('Network error connecting to phone system.', 'danger');
-        });
+        }).catch(err => { addLog(`Telnyx Auth Error: ${err.message}`); });
     }
 
-    // ==========================================
-    // PHONE SELECTION & TWO-WAY RECORDING
-    // ==========================================
     function handleCallNowClick() {
-      const btn = document.getElementById('callActionBtn');
-
-      if (activeCall) {
-         activeCall.hangup();
-         if(btn) btn.innerHTML = '📞 Call Now';
-         activeCall = null;
-         return;
-      }
-
-      if (!telnyxClient) {
-         showToast('Phone system disconnected. Check logs (Shift+L).', 'danger');
-         return;
-      }
-
-      if (!isTelnyxReady) {
-        showToast('Phone system is still connecting. Please wait a moment.', 'warning');
-        return;
-      }
-
-      const workNum = document.getElementById('ws-phone-work').value;
-      const mobileNum = document.getElementById('ws-phone-mobile').value;
-
-      const validWork = workNum && !workNum.toLowerCase().includes('no phone');
-      const validMobile = mobileNum && !mobileNum.toLowerCase().includes('no mobile');
-
-      if (validWork && validMobile) {
-         document.getElementById('lblWorkNum').innerText = workNum;
-         document.getElementById('lblMobileNum').innerText = mobileNum;
-         openModal('selectPhoneModal');
-      } else if (validWork) {
-         executeDial('work');
-      } else if (validMobile) {
-         executeDial('mobile');
-      } else {
-         showToast('No valid phone number for this contact.', 'warning');
-      }
+      if (activeCall) { activeCall.hangup(); document.getElementById('callActionBtn').innerHTML = '📞 Call Now'; activeCall = null; return; }
+      if (!telnyxClient) { showToast('Phone system disconnected. Check logs (Shift+L).', 'danger'); return; }
+      if (!isTelnyxReady) { showToast('Phone system is connecting. Please wait.', 'warning'); return; }
+      const workNum = document.getElementById('ws-phone-work').value, mobileNum = document.getElementById('ws-phone-mobile').value;
+      const validWork = workNum && !workNum.toLowerCase().includes('no phone'), validMobile = mobileNum && !mobileNum.toLowerCase().includes('no mobile');
+      if (validWork && validMobile) { document.getElementById('lblWorkNum').innerText = workNum; document.getElementById('lblMobileNum').innerText = mobileNum; openModal('selectPhoneModal'); } 
+      else if (validWork) executeDial('work'); 
+      else if (validMobile) executeDial('mobile'); 
+      else showToast('No valid phone number for this contact.', 'warning');
     }
 
     function executeDial(type) {
@@ -1294,156 +1230,145 @@
       addLog(`Dialing ${pocName} at ${cleanPhone} via Telnyx...`);
       showToast(`Dialing ${pocName} (${client})...`, 'safe');
       if(btn) btn.innerHTML = 'Dialing...';
-      
       showCallOverlay(pocName);
 
       try {
-          activeCall = telnyxClient.newCall({
-            destinationNumber: cleanPhone,
-            callerNumber: telnyxCallerId,
-            audio: true,
-            video: false
-          });
+          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false });
       } catch(err) {
-          showToast('Call failed to initiate. Check logs.', 'danger');
-          addLog(`Dial Error: ${err.message}`);
+          showToast('Call failed to initiate. Check logs.', 'danger'); addLog(`Dial Error: ${err.message}`);
           if(btn) btn.innerHTML = '📞 Call Now';
-          hideCallOverlay();
-          activeCall = null;
+          hideCallOverlay(); activeCall = null;
       }
     }
 
     async function startAutoRecording() {
       let audioCtx;
       try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
-        window.activeAudioCtx = audioCtx; 
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContextClass(); window.activeAudioCtx = audioCtx; 
         const dest = audioCtx.createMediaStreamDestination();
-
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const localSource = audioCtx.createMediaStreamSource(localStream);
-        localSource.connect(dest);
+        const localSource = audioCtx.createMediaStreamSource(localStream); localSource.connect(dest);
 
         try {
             const remoteAudioEl = document.getElementById('remoteMedia');
             let remoteStream = remoteAudioEl.srcObject;
-            
             if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
             if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
+            if (remoteStream && remoteStream.getAudioTracks().length > 0) { const remoteSource = audioCtx.createMediaStreamSource(remoteStream); remoteSource.connect(dest); }
+        } catch (remoteErr) { addLog(`Remote audio merge skipped: ${remoteErr.message}`); }
 
-            if (remoteStream && remoteStream.getAudioTracks().length > 0) {
-                const remoteSource = audioCtx.createMediaStreamSource(remoteStream);
-                remoteSource.connect(dest);
-            } else {
-                addLog("Note: Client audio stream not available to merge.");
-            }
-        } catch (remoteErr) {
-            addLog(`Remote audio merge skipped: ${remoteErr.message}`);
-        }
-
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-        }
-
-        audioChunks = [];
-        mediaRecorder = new MediaRecorder(dest.stream);
-        
-        mediaRecorder.localStreamToStop = localStream;
-
-        mediaRecorder.ondataavailable = event => {
-          if (event.data.size > 0) audioChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = uploadRecordingToDrive;
-
-        mediaRecorder.start();
-        recSeconds = 0;
-        document.getElementById('recIndicator').classList.add('active');
-        document.getElementById('recTimerText').innerText = "REC 00:00";
-
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
+        mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
+        mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
+        recSeconds = 0; document.getElementById('recIndicator').classList.add('active'); document.getElementById('recTimerText').innerText = "REC 00:00";
         if (recTimerInterval) clearInterval(recTimerInterval);
         recTimerInterval = setInterval(() => {
            recSeconds++;
-           const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
-           const secs = String(recSeconds % 60).padStart(2, '0');
+           const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0'), secs = String(recSeconds % 60).padStart(2, '0');
            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
         }, 1000);
-
-        addLog("Two-way call recording started successfully.");
-
-      } catch (err) {
-        addLog(`Microphone access error: ${err.message}`);
-      }
+        addLog("Two-way call recording started.");
+      } catch (err) { addLog(`Microphone access error: ${err.message}`); }
     }
 
     function toggleRecordingPause() {
       if (!mediaRecorder) return;
       const btn = document.getElementById('recToggleBtn');
       if (mediaRecorder.state === "recording") {
-         mediaRecorder.pause();
-         clearInterval(recTimerInterval);
-         btn.innerText = "▶️ Resume";
-         document.getElementById('recIndicator').classList.remove('active');
-         addLog("Recording paused.");
+         mediaRecorder.pause(); clearInterval(recTimerInterval); btn.innerText = "▶️ Resume"; document.getElementById('recIndicator').classList.remove('active'); addLog("Recording paused.");
       } else if (mediaRecorder.state === "paused") {
          mediaRecorder.resume();
          recTimerInterval = setInterval(() => {
             recSeconds++;
-            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
-            const secs = String(recSeconds % 60).padStart(2, '0');
+            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0'), secs = String(recSeconds % 60).padStart(2, '0');
             document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
          }, 1000);
-         btn.innerText = "⏸️ Pause";
-         document.getElementById('recIndicator').classList.add('active');
-         addLog("Recording resumed.");
+         btn.innerText = "⏸️ Pause"; document.getElementById('recIndicator').classList.add('active'); addLog("Recording resumed.");
       }
     }
 
     function stopRecordingAndUpload() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-         
-         // 1. Release the physical microphone hardware entirely
-         if (mediaRecorder.localStreamToStop) {
-             mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
-         }
-
-         mediaRecorder.stop();
-         clearInterval(recTimerInterval);
-         document.getElementById('recIndicator').classList.remove('active');
-         document.getElementById('recTimerText').innerText = "Uploading to Drive...";
+         if (mediaRecorder.localStreamToStop) mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
+         mediaRecorder.stop(); clearInterval(recTimerInterval);
+         document.getElementById('recIndicator').classList.remove('active'); document.getElementById('recTimerText').innerText = "Analyzing Audio & Uploading...";
       }
-      
-      // 2. Shut down the AudioContext mixer to fully drop background hardware locks
-      if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') {
-          window.activeAudioCtx.close();
-      }
+      if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') window.activeAudioCtx.close();
     }
 
     function uploadRecordingToDrive() {
       const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
       const clientName = document.getElementById('ws-client-display').value;
       const pocName = document.getElementById('ws-poc').value;
-
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
+      const reader = new FileReader(); reader.readAsDataURL(audioBlob);
       reader.onloadend = function() {
          const base64Data = reader.result.split(',')[1];
-         addLog(`Uploading audio recording for ${pocName}...`);
-         
-         callGoogleAPI('saveRecordingToDrive', {
-            clientName: clientName,
-            pocName: pocName,
-            audioBase64: base64Data,
-            fileType: audioBlob.type
-         }).then(res => {
+         addLog(`Processing audio & Groq AI summarize...`);
+         callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type }).then(res => {
             addLog(`Recording saved: ${res.fileName}`);
-            document.getElementById('recTimerText').innerText = "Recording Saved ✅";
+            document.getElementById('recTimerText').innerText = "Audio Saved & Summarized ✅";
+            document.getElementById('ws-recording-url').value = res.fileUrl || ''; 
+            document.getElementById('ws-ai-summary').value = res.aiSummary || '';
          }).catch(err => {
             addLog(`Upload error: ${err.message}`);
             document.getElementById('recTimerText').innerText = "Upload Failed ❌";
          });
       };
+    }
+
+    // ==========================================
+    // TIMELINE RENDERING
+    // ==========================================
+    function openTimeline() {
+        const rowId = document.getElementById('ws-row-id').value;
+        const pocData = rawData.find(r => r.id.toString() === rowId.toString());
+        const container = document.getElementById('timelineContainer');
+        container.innerHTML = '';
+
+        if(!pocData) { container.innerHTML = "<p>No data found.</p>"; openModal('timelineModal'); return; }
+
+        let timelineHTML = "";
+        
+        // Render Attempts if dates exist
+        const atts = [];
+        if(pocData.att1 && pocData.att1 !== "-") atts.push({ label: 'Attempt 1 Registered', date: pocData.att1 });
+        if(pocData.att2 && pocData.att2 !== "-") atts.push({ label: 'Attempt 2 Registered', date: pocData.att2 });
+        if(pocData.att3 && pocData.att3 !== "-") atts.push({ label: 'Attempt 3 Registered', date: pocData.att3 });
+        
+        // Parse the Custom Notes for history
+        let notesArr = [];
+        if (pocData.notes) {
+            // Split by separator defined in Apps Script
+            const blocks = pocData.notes.split("--- [Log Separator] ---");
+            blocks.forEach(block => {
+                const b = block.trim();
+                if(b) {
+                    let recLink = "";
+                    const linkMatch = b.match(/🔗 Audio Recording: (https:\/\/[^\s]+)/);
+                    if (linkMatch) recLink = linkMatch[1];
+                    let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim();
+                    notesArr.push({ type: 'note', content: cleanNote, audio: recLink });
+                }
+            });
+        }
+
+        if(atts.length === 0 && notesArr.length === 0) {
+            container.innerHTML = "<p style='color:var(--text-muted)'>No history logged yet.</p>";
+            openModal('timelineModal'); return;
+        }
+
+        atts.forEach(a => {
+            timelineHTML += `<div class="timeline-item"><div class="tl-date">${a.date}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${a.label}</div></div>`;
+        });
+
+        notesArr.reverse().forEach(n => {
+            let audioBtn = n.audio ? `<br><a href="${n.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : "";
+            timelineHTML += `<div class="timeline-item"><div class="tl-content">${n.content}${audioBtn}</div></div>`;
+        });
+
+        container.innerHTML = timelineHTML;
+        openModal('timelineModal');
     }
 
     function triggerWorkspaceByData(row) {
@@ -1487,21 +1412,13 @@
               const opt = document.createElement('div');
               opt.className = 'select-option poc-select-option'; 
               opt.innerHTML = `<div class="poc-opt-name">${p.poc}</div><div class="poc-opt-status">Status: ${p.status}</div>`;
-              opt.onclick = function(e) {
-                  e.stopPropagation(); 
-                  document.getElementById('ws-poc-options').classList.remove('open');
-                  triggerPocSwitch(p.id);
-              };
+              opt.onclick = function(e) { e.stopPropagation(); document.getElementById('ws-poc-options').classList.remove('open'); triggerPocSwitch(p.id); };
               optionsContainer.appendChild(opt);
           });
 
           const wsTags = document.getElementById('ws-tags-display');
-          if (row.tags) {
-              wsTags.innerHTML = row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main);">${t.trim()}</span>`).join('');
-              wsTags.style.display = 'flex';
-          } else {
-              wsTags.style.display = 'none';
-          }
+          if (row.tags) { wsTags.innerHTML = row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main);">${t.trim()}</span>`).join(''); wsTags.style.display = 'flex'; } 
+          else { wsTags.style.display = 'none'; }
 
           const infoBox = document.getElementById('ws-persistent-info');
           const noteWrapper = document.getElementById('ws-note-wrapper');
@@ -1510,52 +1427,54 @@
              infoBox.style.display = 'block';
              const tzMatch = tzList.find(t => t.iana === row.timezone);
              document.getElementById('ws-tz-display').textContent = tzMatch ? tzMatch.label : (row.timezone || 'Not Set');
-             
-             if(row.timezone) {
-                document.getElementById('ws-live-time').style.display = 'inline';
-                if (clockInterval) clearInterval(clockInterval);
-                clockInterval = setInterval(updateLiveClock, 1000);
-                updateLiveClock();
-             } else {
-                document.getElementById('ws-live-time').style.display = 'none';
-                if (clockInterval) clearInterval(clockInterval);
-             }
-
-             if (row.customNote) {
-                 noteWrapper.style.display = 'block';
-                 document.getElementById('ws-note-display').textContent = row.customNote;
-             } else {
-                 noteWrapper.style.display = 'none';
-             }
-          } else {
-             infoBox.style.display = 'none';
-             if (clockInterval) clearInterval(clockInterval);
-          }
+             if(row.timezone) { document.getElementById('ws-live-time').style.display = 'inline'; if (clockInterval) clearInterval(clockInterval); clockInterval = setInterval(updateLiveClock, 1000); updateLiveClock(); } 
+             else { document.getElementById('ws-live-time').style.display = 'none'; if (clockInterval) clearInterval(clockInterval); }
+             if (row.customNote) { noteWrapper.style.display = 'block'; document.getElementById('ws-note-display').textContent = row.customNote; } 
+             else { noteWrapper.style.display = 'none'; }
+          } else { infoBox.style.display = 'none'; if (clockInterval) clearInterval(clockInterval); }
 
           document.querySelectorAll('#workspace-form-area input[type="radio"]').forEach(el => { el.checked = false; el.dataset.wasChecked = 'false'; });
           document.querySelectorAll('#workspace-form-area input[type="checkbox"]').forEach(el => el.checked = false);
           document.querySelectorAll('#workspace-form-area textarea, #workspace-form-area input[type="text"]').forEach(el => el.value = '');
           
           setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
+          document.getElementById('ws-recording-url').value = ''; 
+          document.getElementById('ws-ai-summary').value = '';
           
           openScriptTab('ws-live-call', document.querySelector('.script-tab'));
 
           document.getElementById('mainDashboard').style.display = 'none';
-          const ws = document.getElementById('actionWorkspace');
-          ws.style.display = 'flex';
-          setTimeout(() => ws.classList.add('active'), 10);
+          const ws = document.getElementById('actionWorkspace'); ws.style.display = 'flex'; setTimeout(() => ws.classList.add('active'), 10);
           addLog(`Workspace opened for POC: ${row.poc}`);
-      } catch (err) {
-          showToast('Failed to open workspace. Check logs.', 'danger');
-          addLog(`UI CRASH opening workspace: ${err.message}`);
-          console.error(err);
-      }
+          
+          // Trigger presence update
+          callGoogleAPI('heartbeat', { activeRowId: row.id }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
+          
+      } catch (err) { showToast('Failed to open workspace.', 'danger'); addLog(`UI CRASH: ${err.message}`); }
     }
 
-    function triggerPocSwitch(id) {
-       const pocData = rawData.find(r => r.id.toString() === id.toString());
-       if(pocData) triggerWorkspaceByData(pocData);
+    function renderPresence() {
+        const loggedIn = document.getElementById('loggedInUser').innerText;
+        document.querySelectorAll('.pulse-live').forEach(el => el.remove());
+        const tbody = document.getElementById('table-body');
+        
+        Object.keys(activePresence).forEach(user => {
+            if (user === loggedIn) return; // Don't show myself
+            const rowId = activePresence[user].rowId;
+            if(!rowId) return;
+            const r = rawData.find(x => x.id.toString() === rowId.toString());
+            if(r) {
+                const spans = tbody.querySelectorAll('span');
+                spans.forEach(span => {
+                    if (span.innerText === r.poc && span.style.fontWeight === "600") {
+                        span.innerHTML += `<span class="pulse-live" data-tooltip-top="Being viewed by ${user}"></span>`;
+                    }
+                });
+            }
+        });
     }
+
+    function triggerPocSwitch(id) { const pocData = rawData.find(r => r.id.toString() === id.toString()); if(pocData) triggerWorkspaceByData(pocData); }
 
     function openEditModal() {
        const rowId = document.getElementById('ws-row-id').value;
@@ -1568,27 +1487,21 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
-       document.getElementById('editAttempt1').value = pocData && pocData.att1 !== "-" ? pocData.att1 : "";
-       document.getElementById('editAttempt2').value = pocData && pocData.att2 !== "-" ? pocData.att2 : "";
-       document.getElementById('editAttempt3').value = pocData && pocData.att3 !== "-" ? pocData.att3 : "";
+       document.getElementById('editAttempt1')._flatpickr.setDate(pocData && pocData.att1 !== "-" ? pocData.att1 : "");
+       document.getElementById('editAttempt2')._flatpickr.setDate(pocData && pocData.att2 !== "-" ? pocData.att2 : "");
+       document.getElementById('editAttempt3')._flatpickr.setDate(pocData && pocData.att3 !== "-" ? pocData.att3 : "");
 
        document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
        if(pocData && pocData.tags) {
           const tagsArr = pocData.tags.split(',').map(t => t.trim());
-          document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => {
-             if(tagsArr.includes(cb.value)) cb.checked = true;
-          });
+          document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => { if(tagsArr.includes(cb.value)) cb.checked = true; });
        }
        openModal('editPocModal');
     }
 
     function submitPocEdits() {
-       const btn = document.getElementById('saveEditBtn');
-       btn.innerText = "Saving..."; btn.disabled = true;
+       const btn = document.getElementById('saveEditBtn'); btn.innerText = "Saving..."; btn.disabled = true;
        const rowId = document.getElementById('ws-row-id').value;
-       const name = document.getElementById('editPocNameInput').value;
-       const tzIana = document.getElementById('editTzIana').value;
-       const note = document.getElementById('editNoteInput').value;
        
        const attDates = {
            a1: document.getElementById('editAttempt1').value,
@@ -1596,66 +1509,35 @@
            a3: document.getElementById('editAttempt3').value
        };
 
-       const tagsArr = [];
-       document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
-       const tagsStr = tagsArr.join(',');
-
-       addLog(`Updating details for row ${rowId}`);
+       const tagsArr = []; document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
        
-       callGoogleAPI('updateContactDetails', { rowId, pocName: name, timezone: tzIana, customNote: note, tags: tagsStr, attemptDates: attDates })
+       callGoogleAPI('updateContactDetails', { rowId, pocName: document.getElementById('editPocNameInput').value, timezone: document.getElementById('editTzIana').value, customNote: document.getElementById('editNoteInput').value, tags: tagsArr.join(','), attemptDates: attDates })
          .then(data => {
-            btn.innerText = "Save Changes"; btn.disabled = false;
-            closeModal('editPocModal');
-            rawData = data.rows || [];
-            populateExecFilter(); 
-            filterData();
-            triggerPocSwitch(rowId);
-            showToast('POC details updated successfully!', 'success');
-         })
-         .catch(err => {
-            btn.innerText = "Save Changes"; btn.disabled = false;
-            showToast("API Error: " + err.message, "danger");
-            addLog(`API CRASH on Update: ${err.message}`);
-         });
+            btn.innerText = "Save Changes"; btn.disabled = false; closeModal('editPocModal');
+            rawData = data.rows || []; currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
+         }).catch(err => { btn.innerText = "Save Changes"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
     }
 
     function closeWorkspace() {
-      if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          stopRecordingAndUpload();
-      }
-      if (activeCall) {
-          activeCall.hangup();
-      }
+      if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
+      if (activeCall) activeCall.hangup();
       if (clockInterval) clearInterval(clockInterval);
-      const ws = document.getElementById('actionWorkspace');
-      ws.classList.remove('active');
-      setTimeout(() => {
-        ws.style.display = 'none';
-        document.getElementById('mainDashboard').style.display = 'block';
-      }, 300);
+      const ws = document.getElementById('actionWorkspace'); ws.classList.remove('active');
+      setTimeout(() => { ws.style.display = 'none'; document.getElementById('mainDashboard').style.display = 'block'; }, 300);
+      
+      callGoogleAPI('heartbeat', { activeRowId: null }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
     }
 
     function openScriptTab(tabId, btn) {
       document.querySelectorAll('.script-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.script-tab').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-
-      const overlay = document.getElementById('form-overlay');
-      if (tabId === 'ws-voicemail' || tabId === 'ws-email') {
-        overlay.style.display = 'flex';
-      } else {
-        overlay.style.display = 'none';
-      }
+      document.getElementById(tabId).classList.add('active'); btn.classList.add('active');
+      document.getElementById('form-overlay').style.display = (tabId === 'ws-voicemail' || tabId === 'ws-email') ? 'flex' : 'none';
     }
 
     function openEmailTemplate(type) {
-      const poc = document.getElementById('ws-poc').value || '';
-      const client = document.getElementById('ws-client-display').value || '';
-      const firstName = poc.split(' ')[0] || '[First Name]';
-      
-      let subj = "We'd love your feedback on Mindmatrix Bridge - " + client;
-      let body = "";
+      const poc = document.getElementById('ws-poc').value || '', client = document.getElementById('ws-client-display').value || '', firstName = poc.split(' ')[0] || '[First Name]';
+      let subj = "We'd love your feedback on Mindmatrix Bridge - " + client, body = "";
 
       if (type === 'notime') {
         body = "Hi " + firstName + ",\n\nThank you for taking a moment to speak with us earlier. We are sharing the feedback form link below so you can fill it out at your convenience:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nYour feedback is valuable and helps us improve your experience with the Mindmatrix Bridge platform.\n\nIf you would like to schedule a call later, please let us know your preferred time, and we'll be happy to arrange it.\n\nThank you for your time and cooperation. We appreciate your partnership.\n\nBest regards,";
@@ -1665,313 +1547,164 @@
         subj = "Request for a Quick Portal Feedback Call - " + client;
         body = "Hi " + firstName + ",\n\nI hope you're doing well.\n\nWe are beginning our periodic survey calls to better understand how your team is using the portal and to identify opportunities to improve your overall experience. This will include a short series of questions regarding portal usage, challenges, and any enhancements you'd like to see.\n\nCould you please share your availability for a quick call (20 - 30 minutes) sometime this week or next week? We'll schedule it at a time convenient for you.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nLooking forward to your response.";
       }
-
-      document.getElementById('email-subject-val').value = subj;
-      document.getElementById('email-body-val').value = body;
-      openModal('emailModal');
+      document.getElementById('email-subject-val').value = subj; document.getElementById('email-body-val').value = body; openModal('emailModal');
     }
 
-    function copyToClipboard(elementId) {
-      const el = document.getElementById(elementId);
-      el.select();
-      navigator.clipboard.writeText(el.value).then(() => showToast('Copied to clipboard!', 'success'));
-    }
-
-    function openFocusMode(sourceEl, title) {
-      focusTargetElement = sourceEl;
-      document.getElementById('focus-title').innerText = title;
-      const focusTextarea = document.getElementById('focus-textarea');
-      focusTextarea.value = sourceEl.value;
-      focusTextarea.oninput = function() { focusTargetElement.value = this.value; };
-      openModal('focusModal');
-      setTimeout(() => focusTextarea.focus(), 100);
-    }
-
-    function selectAttempt(btn) {
-        document.querySelectorAll('.attempt-btn').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('postCallAttemptVal').value = btn.getAttribute('data-val');
-    }
+    function openFocusMode(sourceEl, title) { focusTargetElement = sourceEl; document.getElementById('focus-title').innerText = title; const focusTextarea = document.getElementById('focus-textarea'); focusTextarea.value = sourceEl.value; focusTextarea.oninput = function() { focusTargetElement.value = this.value; }; openModal('focusModal'); setTimeout(() => focusTextarea.focus(), 100); }
+    function selectAttempt(btn) { document.querySelectorAll('.attempt-btn').forEach(el => el.classList.remove('active')); btn.classList.add('active'); document.getElementById('postCallAttemptVal').value = btn.getAttribute('data-val'); }
 
     function submitPostCallLog() {
-        const attempt = document.getElementById('postCallAttemptVal').value;
-        const outcome = document.getElementById('postCallOutcomeVal').value;
-        const notes = document.getElementById('postCallNotes').value;
-
-        if (!outcome) {
-            showToast("Please select a call outcome.", "warning");
-            return;
-        }
-
-        document.getElementById('ws-call-attempt-val').value = attempt;
-        document.getElementById('ws-call-status-val').value = outcome;
-        document.getElementById('ws-internal-notes').value = notes;
-        
-        closeModal('postCallModal');
-        submitWorkspace();
+        const attempt = document.getElementById('postCallAttemptVal').value, outcome = document.getElementById('postCallOutcomeVal').value, notes = document.getElementById('postCallNotes').value;
+        if (!outcome) { showToast("Please select a call outcome.", "warning"); return; }
+        document.getElementById('ws-call-attempt-val').value = attempt; document.getElementById('ws-call-status-val').value = outcome; document.getElementById('ws-internal-notes').value = notes;
+        closeModal('postCallModal'); submitWorkspace();
     }
 
     function submitWorkspace() {
-      const btn = document.getElementById('ws-submit-btn');
-      btn.innerText = "Submitting...";
-      btn.disabled = true;
+      const btn = document.getElementById('ws-submit-btn'); btn.innerText = "Submitting..."; btn.disabled = true;
+      const rowId = document.getElementById('ws-row-id').value, status = document.getElementById('ws-call-status-val').value, internalNotes = document.getElementById('ws-internal-notes').value, attempt = document.getElementById('ws-call-attempt-val').value;
+      const recordingUrl = document.getElementById('ws-recording-url').value;
+      const aiSummary = document.getElementById('ws-ai-summary').value;
 
-      const rowId = document.getElementById('ws-row-id').value;
-      const status = document.getElementById('ws-call-status-val').value;
-      const internalNotes = document.getElementById('ws-internal-notes').value;
-      const attempt = document.getElementById('ws-call-attempt-val').value;
-
-      if (!status || status === "Select Outcome...") {
-          showToast("Please select a call outcome.", "warning");
-          btn.innerText = "Submit Survey & Save Log";
-          btn.disabled = false;
-          return;
-      }
-
-      addLog(`Submitting workspace. Status: ${status}`);
+      if (!status || status === "Select Outcome...") { showToast("Please select a call outcome.", "warning"); btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; return; }
 
       const skipSurveyStatuses = ['Called / Left Voicemail', 'Email Sent', 'Unsuccessful', 'Inactive / On Hold', 'Invalid / Disconnected Number', 'Declined / Not Interested'];
 
       if (!skipSurveyStatuses.includes(status)) {
         const formData = new FormData();
-        const inputs = document.querySelectorAll('#survey-form-container input[name], #survey-form-container textarea[name]');
-        
-        inputs.forEach(input => {
-          if (input.type === 'radio' || input.type === 'checkbox') {
-            if (input.checked) formData.append(input.name, input.value);
-          } else {
-            if (input.name === 'entry.2102672062.other_option_response') {
-                const otherCheck = document.getElementById('feature-other-check');
-                if (otherCheck && otherCheck.checked && input.value) {
-                    formData.append(input.name, input.value);
-                }
-            } else {
-                formData.append(input.name, input.value);
-            }
-          }
+        document.querySelectorAll('#survey-form-container input[name], #survey-form-container textarea[name]').forEach(input => {
+          if (input.type === 'radio' || input.type === 'checkbox') { if (input.checked) formData.append(input.name, input.value); } 
+          else { if (input.name === 'entry.2102672062.other_option_response') { const oc = document.getElementById('feature-other-check'); if (oc && oc.checked && input.value) formData.append(input.name, input.value); } else { formData.append(input.name, input.value); } }
         });
-
-        formData.append("pageHistory", "0");
-        formData.append("entry.944856988", document.getElementById('ws-client').value);
-        formData.append("entry.1071857762", document.getElementById('ws-exec').value);
-        formData.append("entry.2115264353", document.getElementById('ws-poc').value);
-        formData.append("emailAddress", document.getElementById('ws-email-val').value);
-
-        fetch("https://docs.google.com/forms/d/e/1FAIpQLSdRXESvabIvUqN7U4ijPNe00NZTvzGXNAg4226qsOroV-hR1Q/formResponse", {
-          method: 'POST', mode: 'no-cors', body: formData
-        }).catch(err => { console.error(err); addLog(`Form Fetch Error: ${err}`); });
+        formData.append("pageHistory", "0"); formData.append("entry.944856988", document.getElementById('ws-client').value); formData.append("entry.1071857762", document.getElementById('ws-exec').value); formData.append("entry.2115264353", document.getElementById('ws-poc').value); formData.append("emailAddress", document.getElementById('ws-email-val').value);
+        fetch("https://docs.google.com/forms/d/e/1FAIpQLSdRXESvabIvUqN7U4ijPNe00NZTvzGXNAg4226qsOroV-hR1Q/formResponse", { method: 'POST', mode: 'no-cors', body: formData }).catch(err => { addLog(`Form Error: ${err}`); });
       }
 
-      callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
+      callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt, recordingUrl, aiSummary })
         .then(data => {
-          btn.innerText = "Submit Survey & Save Log";
-          btn.disabled = false;
-          showToast('Log successfully saved to sheet! Workspace closed.', 'success');
-          addLog(`Save successful for row ${rowId}`);
-          closeWorkspace();
-          rawData = data.rows || [];
-          populateExecFilter();
-          filterData();
-        })
-        .catch(err => {
-          btn.innerText = "Submit Survey & Save Log";
-          btn.disabled = false;
-          showToast("Network Error: " + err.message, 'danger');
-          addLog(`Save failed: ${err.message}`);
+          btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast('Log successfully saved to sheet!', 'success');
+          closeWorkspace(); rawData = data.rows || []; currentPaginationLimit = 50; filterData();
+        }).catch(err => { btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast("Network Error: " + err.message, 'danger'); });
+    }
+
+    // ==========================================
+    // VISUAL ANALYTICS (Chart.js)
+    // ==========================================
+    function openAnalytics() {
+        const counts = { Reached: 0, Pending: 0, Invalid: 0 };
+        const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
+        const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
+        
+        rawData.forEach(row => {
+            if (reachedStatuses.includes(row.status)) counts.Reached++;
+            else if (pendingStatuses.includes(row.status)) counts.Pending++;
+            else counts.Invalid++;
         });
+
+        openModal('analyticsModal');
+        
+        setTimeout(() => {
+            const ctx = document.getElementById('outcomeChart').getContext('2d');
+            if (analyticsChart) analyticsChart.destroy();
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            Chart.defaults.color = isDark ? '#94a3b8' : '#475569';
+            
+            analyticsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Success / Reached', 'Pending / Voicemail', 'Unsuccessful / Invalid'],
+                    datasets: [{
+                        data: [counts.Reached, counts.Pending, counts.Invalid],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }, 100);
     }
 
     function toggleTheme() {
-      let currentTheme = document.documentElement.getAttribute('data-theme');
-      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      let currentTheme = document.documentElement.getAttribute('data-theme'); let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', newTheme);
-      
-      const btn = document.getElementById('themeBtn');
-      btn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
+      document.getElementById('themeBtn').innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
     }
 
     function populateExecFilter() {
        const execs = [...new Set(rawData.map(r => r.executive).filter(e => e && typeof e === 'string' && e.trim() !== ''))].sort();
-       const selVal = document.getElementById('execFilterVal');
-       const currentVal = selVal.value;
-       
+       const selVal = document.getElementById('execFilterVal'); const currentVal = selVal.value;
        const optsDiv = document.getElementById('exec-dropdown-opts');
        optsDiv.innerHTML = `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', 'ALL', 'All Executives')">All Executives</div>`;
-       execs.forEach(ex => {
-          optsDiv.innerHTML += `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', '${ex}', '${ex}')">${ex}</div>`;
-       });
-       
-       if(execs.includes(currentVal)) {
-           setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', currentVal);
-       } else {
-           setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', 'ALL');
-       }
+       execs.forEach(ex => { optsDiv.innerHTML += `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', '${ex}', '${ex}')">${ex}</div>`; });
+       setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
     function fetchData() {
-      document.getElementById('table-container').style.display = 'none';
-      document.getElementById('loader').style.display = 'flex';
-      const refreshIcon = document.getElementById('refreshIcon');
-      if(refreshIcon) refreshIcon.classList.add('icon-spin');
-      addLog('Fetching fresh sheet data via API...');
+      document.getElementById('table-container').style.display = 'none'; document.getElementById('loader').style.display = 'flex';
+      const refreshIcon = document.getElementById('refreshIcon'); if(refreshIcon) refreshIcon.classList.add('icon-spin');
       
-      callGoogleAPI('getSurveyData')
-        .then(data => {
-          rawData = data.rows || [];
-          if(refreshIcon) refreshIcon.classList.remove('icon-spin');
-          document.getElementById('loader').style.display = 'none';
-          document.getElementById('kpi-container').style.display = 'flex';
-          document.getElementById('source-tabs').style.display = 'flex';
-          document.getElementById('controls-bar').style.display = 'flex';
-          document.getElementById('statsFooter').style.display = 'block';
-          document.getElementById('table-container').style.display = 'block';
-          populateExecFilter();
-          filterData();
-          addLog(`Loaded ${rawData.length} contacts.`);
-        })
-        .catch(err => {
-           showToast("API Error: " + err.message, "danger");
-           if(refreshIcon) refreshIcon.classList.remove('icon-spin');
-           addLog(`Fetch error: ${err.message}`);
-        });
+      callGoogleAPI('getSurveyData').then(data => {
+          rawData = data.rows || []; if(refreshIcon) refreshIcon.classList.remove('icon-spin');
+          document.getElementById('loader').style.display = 'none'; document.getElementById('kpi-container').style.display = 'flex'; document.getElementById('source-tabs').style.display = 'flex'; document.getElementById('controls-bar').style.display = 'flex'; document.getElementById('statsFooter').style.display = 'block'; document.getElementById('table-container').style.display = 'block';
+          populateExecFilter(); currentPaginationLimit = 50; filterData();
+      }).catch(err => { showToast("API Error: " + err.message, "danger"); if(refreshIcon) refreshIcon.classList.remove('icon-spin'); });
     }
 
     function submitZohoSync() {
-      const pin = document.getElementById('syncPinInput').value; 
-      if(!pin) return;
-      closeModal('pinModal'); 
-      document.getElementById('table-container').style.display = 'none';
-      document.getElementById('loader').style.display = 'flex';
-      document.getElementById('loaderText').textContent = 'Syncing Zoho CRM...';
-      addLog('Initiated Zoho CRM Sync');
+      const pin = document.getElementById('syncPinInput').value; if(!pin) return; closeModal('pinModal'); 
+      document.getElementById('table-container').style.display = 'none'; document.getElementById('loader').style.display = 'flex'; document.getElementById('loaderText').textContent = 'Syncing Zoho CRM...';
       
-      callGoogleAPI('secureZohoSync', { pin })
-        .then(response => {
-           rawData = response.data || [];
-           document.getElementById('loader').style.display = 'none';
-           document.getElementById('table-container').style.display = 'block';
-           populateExecFilter();
-           filterData();
-           document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts.`;
-           openModal('syncResultModal');
-           addLog(`Zoho sync complete. Added ${response.added} contacts.`);
-        })
-        .catch(err => {
-           document.getElementById('loader').style.display = 'none'; 
-           document.getElementById('table-container').style.display = 'block';
-           openPinModal(); 
-           document.getElementById('pinErrorText').textContent = err.message; 
-           document.getElementById('pinErrorText').style.display = 'block';
-           addLog(`Zoho sync failed: ${err.message}`);
+      callGoogleAPI('secureZohoSync', { pin }).then(response => {
+           rawData = response.data || []; document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
+           populateExecFilter(); currentPaginationLimit = 50; filterData(); document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts.`; openModal('syncResultModal');
+        }).catch(err => {
+           document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
+           openPinModal(); document.getElementById('pinErrorText').textContent = err.message; document.getElementById('pinErrorText').style.display = 'block';
         });
     }
 
     function submitAddEntry() {
-      const client = document.getElementById('addClientInput').value;
-      const exec = document.getElementById('addExecInput').value;
-      const poc = document.getElementById('addPocInput').value;
-      const email = document.getElementById('addEmailInput').value;
-      const phone = document.getElementById('addPhoneInput').value;
-      const mobile = document.getElementById('addMobileInput').value;
-      
-      if (!client.trim() || !poc.trim() || !email.trim()) {
-         document.getElementById('addErrorText').style.display = 'block';
-         return;
-      }
+      const client = document.getElementById('addClientInput').value, exec = document.getElementById('addExecInput').value, poc = document.getElementById('addPocInput').value, email = document.getElementById('addEmailInput').value, phone = document.getElementById('addPhoneInput').value, mobile = document.getElementById('addMobileInput').value;
+      if (!client.trim() || !poc.trim() || !email.trim()) { document.getElementById('addErrorText').style.display = 'block'; return; }
+      const btn = document.getElementById('saveEntryBtn'); btn.innerText = "Adding..."; btn.disabled = true;
 
-      const btn = document.getElementById('saveEntryBtn');
-      btn.innerText = "Adding..."; btn.disabled = true;
-
-      callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile })
-        .then(data => {
-          btn.innerText = "Add Contact"; btn.disabled = false;
-          closeModal('addEntryModal');
-          rawData = data.rows || [];
-          populateExecFilter();
-          filterData();
-          showToast('Manual entry added.', 'success');
-          addLog(`Manual contact added: ${poc}`);
-        })
-        .catch(err => {
-          btn.innerText = "Add Contact"; btn.disabled = false;
-          showToast("API Error: " + err.message, "danger");
-          addLog(`API CRASH on Add: ${err.message}`);
-        });
+      callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile }).then(data => {
+          btn.innerText = "Add Contact"; btn.disabled = false; closeModal('addEntryModal');
+          rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
+        }).catch(err => { btn.innerText = "Add Contact"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
     }
 
-    function toggleClient(clientName) {
-      if (collapsedClients.has(clientName)) collapsedClients.delete(clientName);
-      else collapsedClients.add(clientName);
-      filterData();
-    }
-
-    function toggleAllClients() {
-      const visibleClients = [...new Set(rawData.map(r => r.client))];
-      if (collapsedClients.size > 0) collapsedClients.clear();
-      else visibleClients.forEach(c => collapsedClients.add(c));
-      filterData();
-    }
-
-    function setSort(column) {
-      if (currentSortColumn === column) currentSortAsc = !currentSortAsc;
-      else { currentSortColumn = column; currentSortAsc = true; }
-      filterData();
-    }
+    function toggleClient(clientName) { if (collapsedClients.has(clientName)) collapsedClients.delete(clientName); else collapsedClients.add(clientName); filterData(); }
+    function toggleAllClients() { const visibleClients = [...new Set(rawData.map(r => r.client))]; if (collapsedClients.size > 0) collapsedClients.clear(); else visibleClients.forEach(c => collapsedClients.add(c)); filterData(); }
+    function setSort(column) { if (currentSortColumn === column) currentSortAsc = !currentSortAsc; else { currentSortColumn = column; currentSortAsc = true; } filterData(); }
 
     function toggleKpiFilter(status) {
-       if(activeKpiFilter === status) activeKpiFilter = null; 
-       else activeKpiFilter = status;
-       
-       document.querySelectorAll('.kpi-card').forEach(el => {
-          el.classList.remove('active-reached', 'active-pending', 'active-invalid');
-       });
-       
+       activeKpiFilter = (activeKpiFilter === status) ? null : status;
+       document.querySelectorAll('.kpi-card').forEach(el => el.classList.remove('active-reached', 'active-pending', 'active-invalid'));
        if(activeKpiFilter) {
           if(activeKpiFilter === 'Reached') document.getElementById('kpi-card-reached').classList.add('active-reached');
           if(activeKpiFilter === 'Pending') document.getElementById('kpi-card-pending').classList.add('active-pending');
           if(activeKpiFilter === 'Invalid') document.getElementById('kpi-card-invalid').classList.add('active-invalid');
        }
-       filterData();
+       currentPaginationLimit = 50; filterData();
     }
 
     function updateSortIcons() {
-      ['client', 'contact', 'date', 'status'].forEach(col => {
-        const icon = document.getElementById('sort-icon-' + col);
-        if(icon) icon.innerHTML = '';
-      });
-      const activeIcon = document.getElementById('sort-icon-' + currentSortColumn);
-      if(activeIcon) activeIcon.innerHTML = currentSortAsc ? SVG_SORT_UP : SVG_SORT_DOWN;
+      ['client', 'contact', 'date', 'status'].forEach(col => { const icon = document.getElementById('sort-icon-' + col); if(icon) icon.innerHTML = ''; });
+      const activeIcon = document.getElementById('sort-icon-' + currentSortColumn); if(activeIcon) activeIcon.innerHTML = currentSortAsc ? SVG_SORT_UP : SVG_SORT_DOWN;
     }
 
-    function switchSourceTab(source) {
-      currentSourceTab = source;
-      document.querySelectorAll('.source-tab').forEach(btn => { 
-        if (btn.getAttribute('data-source') === source) btn.classList.add('active'); 
-        else btn.classList.remove('active'); 
-      });
-      filterData();
-    }
+    function switchSourceTab(source) { currentSourceTab = source; document.querySelectorAll('.source-tab').forEach(btn => { if (btn.getAttribute('data-source') === source) btn.classList.add('active'); else btn.classList.remove('active'); }); currentPaginationLimit = 50; filterData(); }
+    function handleSearchInput() { const val = document.getElementById('searchInput').value; document.getElementById('searchClear').style.display = val.length > 0 ? 'flex' : 'none'; currentPaginationLimit = 50; filterData(); }
+    function clearSearch() { document.getElementById('searchInput').value = ''; document.getElementById('searchClear').style.display = 'none'; currentPaginationLimit = 50; filterData(); }
     
-    function handleSearchInput() { 
-      const val = document.getElementById('searchInput').value; 
-      document.getElementById('searchClear').style.display = val.length > 0 ? 'flex' : 'none'; 
-      filterData(); 
-    }
-    
-    function clearSearch() { 
-      document.getElementById('searchInput').value = ''; 
-      document.getElementById('searchClear').style.display = 'none'; 
-      filterData(); 
-    }
+    function loadMoreData() { currentPaginationLimit += 50; filterData(); }
 
     function filterData() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
-      const execQuery = document.getElementById('execFilterVal') ? document.getElementById('execFilterVal').value : 'ALL';
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '';
-      
-      document.getElementById('bulkToggleIcon').innerHTML = collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN;
-      updateSortIcons();
+      const query = document.getElementById('searchInput').value.toLowerCase().trim(), execQuery = document.getElementById('execFilterVal') ? document.getElementById('execFilterVal').value : 'ALL', tbody = document.getElementById('table-body');
+      tbody.innerHTML = ''; document.getElementById('bulkToggleIcon').innerHTML = collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; updateSortIcons();
 
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
       let reached = 0, pending = 0, invalid = 0;
@@ -1982,54 +1715,30 @@
 
       let searchFiltered = sourceFiltered.filter(row => {
         if (execQuery !== 'ALL' && row.executive !== execQuery) return false;
-
-        const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase();
-        const cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
+        const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase(), cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
         const match = (row.client || "").toLowerCase().includes(query) || (row.poc || "").toLowerCase().includes(query) || (row.email || "").toLowerCase().includes(query) || cleanPhoneSearch.includes(query) || cleanMobileSearch.includes(query);
-        
-        if (match) {
-          if (reachedStatuses.includes(row.status)) reached++;
-          else if (pendingStatuses.includes(row.status)) pending++;
-          else if (invalidStatuses.includes(row.status)) invalid++;
-        }
+        if (match) { if (reachedStatuses.includes(row.status)) reached++; else if (pendingStatuses.includes(row.status)) pending++; else if (invalidStatuses.includes(row.status)) invalid++; }
         return match;
       });
 
-      document.getElementById('kpi-total').textContent = searchFiltered.length;
-      document.getElementById('kpi-reached').textContent = reached;
-      document.getElementById('kpi-pending').textContent = pending;
-      document.getElementById('kpi-invalid').textContent = invalid;
-      
-      document.getElementById('footerPocCount').textContent = searchFiltered.length;
-      document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
+      document.getElementById('kpi-total').textContent = searchFiltered.length; document.getElementById('kpi-reached').textContent = reached; document.getElementById('kpi-pending').textContent = pending; document.getElementById('kpi-invalid').textContent = invalid;
+      document.getElementById('footerPocCount').textContent = searchFiltered.length; document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
 
       let finalFiltered = searchFiltered;
       if (activeKpiFilter) {
           finalFiltered = searchFiltered.filter(row => {
               if(activeKpiFilter === 'Reached') return reachedStatuses.includes(row.status);
               if(activeKpiFilter === 'Pending') return pendingStatuses.includes(row.status);
-              if(activeKpiFilter === 'Invalid') return invalidStatuses.includes(row.status);
-              return true;
+              if(activeKpiFilter === 'Invalid') return invalidStatuses.includes(row.status); return true;
           });
       }
 
-      const groupedData = {};
-      finalFiltered.forEach(row => {
-        if(!groupedData[row.client]) groupedData[row.client] = [];
-        groupedData[row.client].push(row);
-      });
-
+      const groupedData = {}; finalFiltered.forEach(row => { if(!groupedData[row.client]) groupedData[row.client] = []; groupedData[row.client].push(row); });
       let groupsArray = Object.keys(groupedData).map(clientName => ({ clientName: clientName, pocs: groupedData[clientName] }));
 
       function getLatestAttemptDate(row) {
-          let latest = "";
-          let latestDate = 0;
-          [row.att1, row.att2, row.att3].forEach(dStr => {
-              if (dStr && dStr !== "-") {
-                  let d = new Date(dStr).getTime();
-                  if (d > latestDate) { latestDate = d; latest = dStr; }
-              }
-          });
+          let latest = "", latestDate = 0;
+          [row.att1, row.att2, row.att3].forEach(dStr => { if (dStr && dStr !== "-") { let d = new Date(dStr).getTime(); if (d > latestDate) { latestDate = d; latest = dStr; } } });
           return latest || "-";
       }
 
@@ -2037,216 +1746,81 @@
         if (col === 'client') return (row.client || "").toLowerCase();
         if (col === 'contact') return (row.email || "").toLowerCase();
         if (col === 'date') return getLatestAttemptDate(row) === "-" ? "0000-00-00" : getLatestAttemptDate(row);
-        if (col === 'status') return (row.status || "").toLowerCase();
-        return "";
+        if (col === 'status') return (row.status || "").toLowerCase(); return "";
       }
 
-      groupsArray.forEach(group => {
-        group.pocs.sort((a, b) => {
-          let valA = getSortValue(a, currentSortColumn), valB = getSortValue(b, currentSortColumn);
-          if (valA < valB) return currentSortAsc ? -1 : 1;
-          if (valA > valB) return currentSortAsc ? 1 : -1;
-          return 0;
-        });
-      });
+      groupsArray.forEach(group => { group.pocs.sort((a, b) => { let valA = getSortValue(a, currentSortColumn), valB = getSortValue(b, currentSortColumn); if (valA < valB) return currentSortAsc ? -1 : 1; if (valA > valB) return currentSortAsc ? 1 : -1; return 0; }); });
+      groupsArray.sort((a, b) => { let valA = currentSortColumn === 'client' ? a.clientName.toLowerCase() : getSortValue(a.pocs[0], currentSortColumn); let valB = currentSortColumn === 'client' ? b.clientName.toLowerCase() : getSortValue(b.pocs[0], currentSortColumn); if (valA < valB) return currentSortAsc ? -1 : 1; if (valA > valB) return currentSortAsc ? 1 : -1; return 0; });
 
-      groupsArray.sort((a, b) => {
-        let valA = currentSortColumn === 'client' ? a.clientName.toLowerCase() : getSortValue(a.pocs[0], currentSortColumn);
-        let valB = currentSortColumn === 'client' ? b.clientName.toLowerCase() : getSortValue(b.pocs[0], currentSortColumn);
-        if (valA < valB) return currentSortAsc ? -1 : 1;
-        if (valA > valB) return currentSortAsc ? 1 : -1;
-        return 0;
-      });
+      const totalGroups = groupsArray.length;
+      const paginatedGroups = groupsArray.slice(0, currentPaginationLimit);
+      document.getElementById('paginationControls').style.display = totalGroups > currentPaginationLimit ? 'block' : 'none';
 
-      groupsArray.forEach(group => {
-        const clientName = group.clientName;
-        const pocs = group.pocs;
-        const isCollapsed = collapsedClients.has(clientName);
-        
+      paginatedGroups.forEach(group => {
+        const clientName = group.clientName, pocs = group.pocs, isCollapsed = collapsedClients.has(clientName);
         const sourceBadge = pocs[0].source === 'Zoho CRM' ? '<span class="badge-crm">CRM</span>' : '';
-        const headerTr = document.createElement('tr');
-        headerTr.style.background = 'var(--glass-highlight)';
-        headerTr.style.cursor = 'pointer';
-        headerTr.onclick = () => toggleClient(clientName);
-        
-        headerTr.innerHTML = `
-          <td colspan="5" style="padding: 0.8rem 1rem;">
-            <span style="display:inline-block; width:24px; text-align:center; margin-right:8px; color:var(--text-muted);">${isCollapsed ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN}</span>
-            <strong style="font-size: 1.1rem; color: var(--text-main); text-transform: capitalize; letter-spacing: 0.5px;">${clientName}</strong>
-            ${sourceBadge}
-            <span style="float: right; font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 3px;">${pocs.length} POC${pocs.length > 1 ? 's' : ''}</span>
-          </td>
-        `;
+        const headerTr = document.createElement('tr'); headerTr.style.background = 'var(--glass-highlight)'; headerTr.style.cursor = 'pointer'; headerTr.onclick = () => toggleClient(clientName);
+        headerTr.innerHTML = `<td colspan="5" style="padding: 0.8rem 1rem;"><span style="display:inline-block; width:24px; text-align:center; margin-right:8px; color:var(--text-muted);">${isCollapsed ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN}</span><strong style="font-size: 1.1rem; color: var(--text-main); text-transform: capitalize; letter-spacing: 0.5px;">${clientName}</strong>${sourceBadge}<span style="float: right; font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 3px;">${pocs.length} POC${pocs.length > 1 ? 's' : ''}</span></td>`;
         tbody.appendChild(headerTr);
 
         if (!isCollapsed) {
           pocs.forEach((row, index) => {
-            const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-            const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
-            const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful', 'Inactive / On Hold'];
-
             let badgeClass = 'badge-pending';
             if (reachedStatuses.includes(row.status)) badgeClass = 'badge-safe';
             if (pendingStatuses.includes(row.status)) badgeClass = 'badge-warning';
             if (invalidStatuses.includes(row.status)) badgeClass = 'badge-danger';
 
-            const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
-            const cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
-            
-            const isLast = index === pocs.length - 1;
-            const branchHeight = isLast ? '50%' : '100%';
-
+            const cleanPhone = (row.phone || "").toString().replace(/^'/, ''), cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
+            const isLast = index === pocs.length - 1, branchHeight = isLast ? '50%' : '100%';
             const tr = document.createElement('tr');
-            
             const tagHtml = row.tags ? row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); font-size:0.65rem; padding:0.2rem 0.5rem; border-radius:6px;">${t.trim()}</span>`).join('') : '';
             const noteIcon = row.customNote ? `<span class="badge-note" data-tooltip-top="${row.customNote.replace(/"/g, '&quot;')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>Note</span>` : '';
             
             let latestAttemptTag = '';
-            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`;
-            else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`;
-            else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
+            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`; else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`; else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
 
-            tr.innerHTML = `
-              <td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">
-                <div style="position: absolute; left: 1rem; top: 0; bottom: 0; height: ${branchHeight}; width: 2px; background: var(--glass-border);"></div>
-                <div style="position: absolute; left: 1rem; top: 50%; width: 1rem; height: 2px; background: var(--glass-border);"></div>
-                
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">
-                   <span style="font-size:1.05rem; font-weight:600;">${row.poc}</span>
-                   ${latestAttemptTag}
-                   ${tagHtml}
-                   ${noteIcon}
-                </div>
-                
-                <span style="font-size:0.8rem; color:var(--text-muted);">Exec: <strong style="color:var(--text-main);">${row.executive || 'Unassigned'}</strong></span>
-              </td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">
-                <div style="font-size:0.85rem; margin-bottom:3px;">🏢 ${cleanPhone}</div>
-                <div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div>
-                <div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div>
-              </td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td>
-              <td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell">
-              </td>
-            `;
-            
-            const btn = document.createElement('button');
-            btn.className = "btn-primary";
-            btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;";
-            btn.innerText = "🚀 Open Workspace";
-            
-            btn.onclick = () => triggerWorkspaceByData(row);
-            tr.querySelector('.action-cell').appendChild(btn);
-            tbody.appendChild(tr);
+            tr.innerHTML = `<td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="position: absolute; left: 1rem; top: 0; bottom: 0; height: ${branchHeight}; width: 2px; background: var(--glass-border);"></div><div style="position: absolute; left: 1rem; top: 50%; width: 1rem; height: 2px; background: var(--glass-border);"></div><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;"><span style="font-size:1.05rem; font-weight:600;">${row.poc}</span>${latestAttemptTag}${tagHtml}${noteIcon}</div><span style="font-size:0.8rem; color:var(--text-muted);">Exec: <strong style="color:var(--text-main);">${row.executive || 'Unassigned'}</strong></span></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="font-size:0.85rem; margin-bottom:3px;">🏢 ${cleanPhone}</div><div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div><div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td><td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell"></td>`;
+            const btn = document.createElement('button'); btn.className = "btn-primary"; btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;"; btn.innerText = "🚀 Open Workspace"; btn.onclick = () => triggerWorkspaceByData(row);
+            tr.querySelector('.action-cell').appendChild(btn); tbody.appendChild(tr);
           });
         }
       });
-    }
-
-    // ==========================================
-    // GOOGLE SSO & SESSION MANAGEMENT
-    // ==========================================
-    function parseJwt(token) {
-        try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        } catch(e) { return null; }
-    }
-
-    function handleSSOResponse(response) {
-        const token = response.credential;
-        const payload = parseJwt(token);
-        const errMsg = document.getElementById('mm-error-msg');
-        errMsg.style.display = 'none';
-
-        if (!payload || !payload.email) {
-            errMsg.textContent = "Invalid login token. Please try again.";
-            errMsg.style.display = 'block';
-            return;
-        }
-        
-        const email = payload.email.toLowerCase();
-        
-        if (!email.endsWith('@mindmatrix.net')) {
-            errMsg.textContent = "Unauthorized: Must use an @mindmatrix.net account.";
-            errMsg.style.display = 'block';
-            return;
-        }
-        if (email === 'accountteam@mindmatrix.net') {
-            errMsg.textContent = "Unauthorized: Account team access is restricted.";
-            errMsg.style.display = 'block';
-            return;
-        }
-
-        const expiryTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); 
-        localStorage.setItem("mm_cx_portal_session", JSON.stringify({ token: token, expiry: expiryTime, email: email }));
-        
-        loadDashboard(email);
+      
+      renderPresence();
     }
 
     function loadDashboard(email) {
-        document.getElementById('mm-login-screen').style.opacity = '0';
-        document.getElementById('loggedInUser').innerText = email;
-        
+        document.getElementById('mm-login-screen').style.opacity = '0'; document.getElementById('loggedInUser').innerText = email;
         setTimeout(() => {
-            document.getElementById('mm-login-screen').style.display = 'none';
-            document.getElementById('app-components').style.display = 'block';
-            populateOutcomeDropdowns();
-            fetchData();
-            initTelnyx();
+            document.getElementById('mm-login-screen').style.display = 'none'; document.getElementById('app-components').style.display = 'block';
+            populateOutcomeDropdowns(); fetchData(); initTelnyx();
+            
+            presenceInterval = setInterval(() => {
+                const activeRow = document.getElementById('actionWorkspace').classList.contains('active') ? document.getElementById('ws-row-id').value : null;
+                callGoogleAPI('heartbeat', { activeRowId: activeRow }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
+            }, 15000);
         }, 400);
-    }
-
-    function logout() {
-        localStorage.removeItem("mm_cx_portal_session");
-        window.location.reload();
     }
 
     window.onload = function() {
         initRatings();
-
-        // Initialize Flatpickr for attempt date overrides
-        flatpickr(".date-picker", {
-            dateFormat: "M d, Y",
-            allowInput: true
-        });
+        flatpickr(".date-picker", { dateFormat: "M d, Y", allowInput: true });
 
         const storedSession = localStorage.getItem("mm_cx_portal_session");
         if (storedSession) {
             try {
-                const sessionData = JSON.parse(storedSession);
-                const now = new Date().getTime();
-                if (sessionData.expiry && now < sessionData.expiry && sessionData.token && sessionData.email) {
-                    loadDashboard(sessionData.email);
-                    return; 
-                } else {
-                    localStorage.removeItem("mm_cx_portal_session");
-                }
+                const sessionData = JSON.parse(storedSession), now = new Date().getTime();
+                if (sessionData.expiry && now < sessionData.expiry && sessionData.token && sessionData.email) { loadDashboard(sessionData.email); return; } 
+                else localStorage.removeItem("mm_cx_portal_session");
             } catch(e) { localStorage.removeItem("mm_cx_portal_session"); }
         }
 
         setTimeout(function() {
             if (window.google && google.accounts) {
-                google.accounts.id.initialize({
-                    client_id: GOOGLE_CLIENT_ID,
-                    callback: handleSSOResponse
-                });
-                google.accounts.id.renderButton(
-                    document.getElementById("googleBtnContainer"),
-                    { theme: "outline", size: "large", shape: "pill" }
-                );
-                setTimeout(function() {
-                    document.getElementById("googleBtnContainer").style.opacity = "1";
-                }, 300);
-            } else {
-                document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh.";
-                document.getElementById('mm-error-msg').style.display = 'block';
-            }
+                google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
+                google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
+                setTimeout(() => document.getElementById("googleBtnContainer").style.opacity = "1", 300);
+            } else { document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; document.getElementById('mm-error-msg').style.display = 'block'; }
         }, 800); 
     };
   </script>
