@@ -297,7 +297,26 @@
           <img src="https://www.google.com/s2/favicons?domain=mindmatrix.net&sz=128" alt="Logo" style="height: 52px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
           <h2 id="mmLoginTitle" style="color: var(--text-main); font-size: 26px; margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px;">CX Survey Calls Portal</h2>
           <p id="mmLoginSub" style="color: var(--text-muted); margin: 0 0 35px 0; font-size: 16px; line-height: 1.5;">Sign in with your verified <br><strong style="color:var(--accent-primary);">@mindmatrix.net</strong> account to continue.</p>
-          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px;"></div>
+          
+          <!-- GOOGLE GIS HTML API (BULLETPROOF) -->
+          <div id="g_id_onload"
+               data-client_id="992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"
+               data-context="signin"
+               data-ux_mode="popup"
+               data-callback="handleSSOResponse"
+               data-auto_prompt="false">
+          </div>
+          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px;">
+             <div class="g_id_signin"
+                  data-type="standard"
+                  data-shape="pill"
+                  data-theme="outline"
+                  data-text="signin_with"
+                  data-size="large"
+                  data-logo_alignment="left">
+             </div>
+          </div>
+          
           <p id="mm-error-msg" style="color: var(--danger-color); display: none; margin: 24px 0 0 0; font-weight: 600; font-size: 14px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"></p>
       </div>
   </div>
@@ -338,7 +357,7 @@
           </div>
         </div>
 
-        <!-- Clickable KPIs -->
+        <!-- Clickable KPIs (Simplified) -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
           <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpi-total">0</div></div>
           <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Success / Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
@@ -1845,10 +1864,12 @@
     function logout() {
         localStorage.removeItem("mm_cx_portal_session");
         
-        // Instruct the Google Identity API to reset and revoke so you can sign in again cleanly.
+        // Clear Google's opt-out cookie manually to ensure the button never stays hidden
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        
         try {
             if (window.google && google.accounts && google.accounts.id) {
-                google.accounts.id.disableAutoSelect(); // Prevents instant auto-login loops
+                google.accounts.id.cancel();
             }
         } catch(e) {}
         
@@ -1867,13 +1888,6 @@
                 else localStorage.removeItem("mm_cx_portal_session");
             } catch(e) { localStorage.removeItem("mm_cx_portal_session"); }
         }
-
-        setTimeout(function() {
-            if (window.google && google.accounts) {
-                google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
-                google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
-            } else { document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; document.getElementById('mm-error-msg').style.display = 'block'; }
-        }, 800); 
     };
   </script>
 </body>
