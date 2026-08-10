@@ -338,7 +338,7 @@
           </div>
         </div>
 
-        <!-- Clickable KPIs (Simplified) -->
+        <!-- Clickable KPIs -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
           <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpi-total">0</div></div>
           <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Success / Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
@@ -1281,6 +1281,12 @@
 
         if (audioCtx.state === 'suspended') await audioCtx.resume();
         audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
+        
+        const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+        const wsSubmitBtn = document.getElementById('ws-submit-btn');
+        if(postCallBtn) { postCallBtn.disabled = true; postCallBtn.innerText = "⏳ Generating AI Summary..."; }
+        if(wsSubmitBtn) { wsSubmitBtn.disabled = true; wsSubmitBtn.innerText = "⏳ Generating AI Summary..."; }
+        
         mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
         mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
         recSeconds = 0; document.getElementById('recIndicator').classList.add('active'); document.getElementById('recTimerText').innerText = "REC 00:00";
@@ -1324,6 +1330,10 @@
       const clientName = document.getElementById('ws-client-display').value;
       const pocName = document.getElementById('ws-poc').value;
       const reader = new FileReader(); reader.readAsDataURL(audioBlob);
+      
+      const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+      const wsSubmitBtn = document.getElementById('ws-submit-btn');
+      
       reader.onloadend = function() {
          const base64Data = reader.result.split(',')[1];
          addLog(`Processing audio & Groq AI summarize...`);
@@ -1332,9 +1342,15 @@
             document.getElementById('recTimerText').innerText = "Audio Saved & Summarized ✅";
             document.getElementById('ws-recording-url').value = res.fileUrl || ''; 
             document.getElementById('ws-ai-summary').value = res.aiSummary || '';
+            
+            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
          }).catch(err => {
             addLog(`Upload error: ${err.message}`);
             document.getElementById('recTimerText').innerText = "Upload Failed ❌";
+            
+            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
          });
       };
     }
@@ -1459,6 +1475,12 @@
           setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
           document.getElementById('ws-recording-url').value = ''; 
           document.getElementById('ws-ai-summary').value = '';
+          
+          // Reset UI buttons
+          const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+          const wsSubmitBtn = document.getElementById('ws-submit-btn');
+          if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+          if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
           
           openScriptTab('ws-live-call', document.querySelector('.script-tab'));
 
@@ -1822,11 +1844,14 @@
 
     function logout() {
         localStorage.removeItem("mm_cx_portal_session");
+        
+        // Instruct the Google Identity API to reset and revoke so you can sign in again cleanly.
         try {
             if (window.google && google.accounts && google.accounts.id) {
-                google.accounts.id.disableAutoSelect(); // Prevents instant auto-login loop
+                google.accounts.id.disableAutoSelect(); // Prevents instant auto-login loops
             }
         } catch(e) {}
+        
         window.location.reload();
     }
 
