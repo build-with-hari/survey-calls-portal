@@ -33,7 +33,14 @@
       --modal-bg: #ffffff; --modal-border: rgba(0, 0, 0, 0.15); --input-bg: rgba(0, 0, 0, 0.04); --input-border: rgba(0, 0, 0, 0.22);
     }
 
-    .flatpickr-calendar { z-index: 999999 !important; font-family: inherit; box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; border: 1px solid var(--glass-border) !important; }
+    /* THIS FIXES THE FLATPICKR LAYERING ISSUE */
+    .flatpickr-calendar { 
+        z-index: 999999 !important; 
+        font-family: inherit; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; 
+        border: 1px solid var(--glass-border) !important; 
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
     html, body { overflow: hidden !important; margin: 0; padding: 0; background-color: var(--bg-color); height: 100vh; width: 100vw; }
     
@@ -47,6 +54,7 @@
     .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); animation-delay: -5s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(5%, 10%) scale(1.1); } 66% { transform: translate(-5%, -5%) scale(0.9); } }
 
+    /* PREMIUM TOOLTIPS */
     [data-tooltip-bottom], [data-tooltip-top] { position: relative; cursor: pointer; }
     [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
     [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
@@ -73,6 +81,7 @@
     
     .icon-spin { display: inline-block; animation: spin 1s infinite linear; }
 
+    /* CUSTOM SLEEK DROPDOWNS */
     .custom-select { position: relative; user-select: none; flex: 1; }
     .select-trigger { padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.2s; min-height: 42px; }
     .select-trigger:hover { border-color: var(--accent-primary); background: var(--glass-highlight); }
@@ -84,6 +93,7 @@
     .select-option:last-child { border-bottom: none; }
     .select-option:hover { background: var(--glass-highlight); color: var(--accent-primary); }
 
+    /* KPI CSS */
     .kpi-container { display: flex; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .kpi-card { flex: 1; min-width: 160px; padding: 1.25rem; border-radius: 16px; background: var(--modal-bg); border: 2px solid transparent; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
@@ -128,6 +138,7 @@
     .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.3); }
     .badge-crm { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; margin-left: 0.5rem; vertical-align: middle; }
     .badge-note { background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; vertical-align: middle; cursor: help; display: inline-flex; align-items: center; }
+    
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
     .admin-hide-cb { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; margin-right: 8px; vertical-align: middle;}
@@ -742,9 +753,8 @@
     </div>
   </div>
 
-  <!-- REMOVED onclick="closeOnBackgroundClick..." to make it mandatory -->
   <div class="modal-overlay" id="postCallModal">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Call Ended</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Log the outcome of your call with <span id="postCallPocName" style="font-weight:bold; color:var(--accent-primary);"></span>.</p>
       
@@ -774,7 +784,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
       
@@ -1070,6 +1080,8 @@
     const SVG_SORT_UP = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 4px; opacity: 0.8;"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
     const SVG_SORT_DOWN = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 4px; opacity: 0.8;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
 
+    window.collapsedClients = new Set();
+    
     const tzList = [
       { label: "US Eastern (EST/EDT)", iana: "America/New_York" }, { label: "US Central (CST/CDT)", iana: "America/Chicago" },
       { label: "US Mountain (MST/MDT)", iana: "America/Denver" }, { label: "US Mountain - Arizona (No DST)", iana: "America/Phoenix" },
@@ -1346,8 +1358,7 @@
                 if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
 
                 if(window.isUnlistedCall) {
-                   // Cleanly abort for unlisted calls, skip sheet log modal entirely.
-                   return;
+                   return; // Cleanly abort for unlisted calls, skip sheet log modal entirely.
                 }
 
                 document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
@@ -1714,6 +1725,7 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
+       // Pre-fill Call Status dropdown in edit modal
        const currentStatus = pocData.status || 'Pending';
        setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', currentStatus);
        
@@ -1945,10 +1957,29 @@
       const refreshIcon = document.getElementById('refreshIcon'); if(refreshIcon) refreshIcon.classList.add('icon-spin');
       
       callGoogleAPI('getSurveyData').then(data => {
-          rawData = data.rows || []; if(refreshIcon) refreshIcon.classList.remove('icon-spin');
-          document.getElementById('loader').style.display = 'none'; document.getElementById('kpi-container').style.display = 'flex'; document.getElementById('source-tabs').style.display = 'flex'; document.getElementById('controls-bar').style.display = 'flex'; document.getElementById('statsFooter').style.display = 'block'; document.getElementById('table-container').style.display = 'block';
-          populateExecFilter(); currentPaginationLimit = 50; filterData();
-      }).catch(err => { showToast("API Error: " + err.message, "danger"); if(refreshIcon) refreshIcon.classList.remove('icon-spin'); });
+          rawData = data.rows || []; 
+          if(refreshIcon) refreshIcon.classList.remove('icon-spin');
+          document.getElementById('loader').style.display = 'none'; 
+          document.getElementById('kpi-container').style.display = 'flex'; 
+          document.getElementById('source-tabs').style.display = 'flex'; 
+          document.getElementById('controls-bar').style.display = 'flex'; 
+          document.getElementById('statsFooter').style.display = 'block'; 
+          document.getElementById('table-container').style.display = 'block';
+          
+          setTimeout(() => {
+              try {
+                  populateExecFilter(); 
+                  currentPaginationLimit = 50; 
+                  filterData();
+              } catch(err) {
+                  console.error("UI Rendering Error: ", err);
+                  showToast("UI Error: " + err.message, "danger");
+              }
+          }, 0);
+      }).catch(err => { 
+          showToast("API Error: " + err.message, "danger"); 
+          if(refreshIcon) refreshIcon.classList.remove('icon-spin'); 
+      });
     }
 
     function submitZohoSync() {
@@ -1975,8 +2006,19 @@
         }).catch(err => { btn.innerText = "Add Contact"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
     }
 
-    function toggleClient(clientName) { if (collapsedClients.has(clientName)) collapsedClients.delete(clientName); else collapsedClients.add(clientName); filterData(); }
-    function toggleAllClients() { const visibleClients = [...new Set(rawData.map(r => r.client))]; if (collapsedClients.size > 0) collapsedClients.clear(); else visibleClients.forEach(c => collapsedClients.add(c)); filterData(); }
+    function toggleClient(clientName) { 
+        if (window.collapsedClients.has(clientName)) window.collapsedClients.delete(clientName); 
+        else window.collapsedClients.add(clientName); 
+        filterData(); 
+    }
+    
+    function toggleAllClients() { 
+        const visibleClients = [...new Set(rawData.map(r => r.client))]; 
+        if (window.collapsedClients.size > 0) window.collapsedClients.clear(); 
+        else visibleClients.forEach(c => window.collapsedClients.add(c)); 
+        filterData(); 
+    }
+    
     function setSort(column) { if (currentSortColumn === column) currentSortAsc = !currentSortAsc; else { currentSortColumn = column; currentSortAsc = true; } filterData(); }
 
     function toggleKpiFilter(status) {
@@ -2003,7 +2045,7 @@
 
     function filterData() {
       const query = document.getElementById('searchInput').value.toLowerCase().trim(), execQuery = document.getElementById('execFilterVal') ? document.getElementById('execFilterVal').value : 'ALL', tbody = document.getElementById('table-body');
-      tbody.innerHTML = ''; document.getElementById('bulkToggleIcon').innerHTML = collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; updateSortIcons();
+      tbody.innerHTML = ''; document.getElementById('bulkToggleIcon').innerHTML = window.collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; updateSortIcons();
 
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
       let completed = 0, attempted = 0, pending = 0;
@@ -2068,7 +2110,7 @@
       document.getElementById('paginationControls').style.display = totalGroups > currentPaginationLimit ? 'block' : 'none';
 
       paginatedGroups.forEach(group => {
-        const clientName = group.clientName, pocs = group.pocs, isCollapsed = collapsedClients.has(clientName);
+        const clientName = group.clientName, pocs = group.pocs, isCollapsed = window.collapsedClients.has(clientName);
         const sourceBadge = pocs[0].source === 'Zoho CRM' ? '<span class="badge-crm">CRM</span>' : '';
         const headerTr = document.createElement('tr'); headerTr.style.background = 'var(--glass-highlight)'; headerTr.style.cursor = 'pointer'; headerTr.onclick = () => toggleClient(clientName);
         headerTr.innerHTML = `<td colspan="5" style="padding: 0.8rem 1rem;"><span style="display:inline-block; width:24px; text-align:center; margin-right:8px; color:var(--text-muted);">${isCollapsed ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN}</span><strong style="font-size: 1.1rem; color: var(--text-main); text-transform: capitalize; letter-spacing: 0.5px;">${clientName}</strong>${sourceBadge}<span style="float: right; font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 3px;">${pocs.length} POC${pocs.length > 1 ? 's' : ''}</span></td>`;
