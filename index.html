@@ -962,6 +962,7 @@
     let currentPaginationLimit = 50;
     let analyticsChart = null;
     let activePresence = {}; 
+    let telnyxInitStarted = false;
     
     // --- RESTORED GLOBAL VARIABLES ---
     let rawData = [];
@@ -1753,7 +1754,6 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
-       // Pre-fill Call Status dropdown in edit modal
        const currentStatus = pocData.status || 'Pending';
        setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', currentStatus);
        
@@ -1999,6 +1999,13 @@
                   populateExecFilter(); 
                   currentPaginationLimit = 50; 
                   filterData();
+                  
+                  // FIRE TELNYX AFTER SHEET DATA LOADS TO PREVENT GOOGLE SERVER LOCK
+                  if (!window.telnyxInitStarted) {
+                      window.telnyxInitStarted = true;
+                      initTelnyx();
+                  }
+                  
               } catch(err) {
                   console.error("UI Rendering Error: ", err);
                   showToast("UI Error: " + err.message, "danger");
@@ -2202,7 +2209,8 @@
         
         setTimeout(() => {
             document.getElementById('mm-login-screen').style.display = 'none'; document.getElementById('app-components').style.display = 'block';
-            populateOutcomeDropdowns(); fetchData(); initTelnyx();
+            populateOutcomeDropdowns(); 
+            fetchData(); 
             
             presenceInterval = setInterval(() => {
                 const activeRow = document.getElementById('actionWorkspace').classList.contains('active') ? document.getElementById('ws-row-id').value : null;
