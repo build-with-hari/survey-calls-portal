@@ -357,11 +357,11 @@
           </div>
         </div>
 
-        <!-- Clickable KPIs (Simplified) -->
+        <!-- Clickable KPIs -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
           <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpi-total">0</div></div>
-          <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Success / Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
-          <div class="kpi-card" id="kpi-card-pending" onclick="toggleKpiFilter('Pending')"><div class="kpi-label">Pending / Voicemail</div><div class="kpi-value warning" id="kpi-pending">0</div></div>
+          <div class="kpi-card" id="kpi-card-reached" onclick="toggleKpiFilter('Reached')"><div class="kpi-label">Attempted / Reached</div><div class="kpi-value safe" id="kpi-reached">0</div></div>
+          <div class="kpi-card" id="kpi-card-pending" onclick="toggleKpiFilter('Pending')"><div class="kpi-label">Pending</div><div class="kpi-value warning" id="kpi-pending">0</div></div>
           <div class="kpi-card" id="kpi-card-invalid" onclick="toggleKpiFilter('Invalid')"><div class="kpi-label">Unsuccessful / Invalid</div><div class="kpi-value danger" id="kpi-invalid">0</div></div>
         </div>
 
@@ -456,10 +456,6 @@
           <div class="rec-bar">
             <div class="rec-indicator" id="recIndicator"></div>
             <span id="recTimerText" style="font-size: 0.85rem; font-weight: 600; font-family: monospace; flex: 1;">Recording Standby</span>
-            
-            <!-- Hidden inputs to hold generated AI data -->
-            <input type="hidden" id="ws-recording-url">
-            <input type="hidden" id="ws-ai-summary">
             
             <button class="btn-outline" id="recToggleBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="toggleRecordingPause()">⏸️ Pause</button>
             <button class="btn-outline" id="recStopBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-color: var(--danger-color); color: var(--danger-color);" onclick="stopRecordingAndUpload()">🛑 Stop & Save</button>
@@ -730,7 +726,8 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="postCallModal" onclick="closeOnBackgroundClick(event, 'postCallModal')">
+  <!-- REMOVED onclick="closeOnBackgroundClick..." to make it mandatory -->
+  <div class="modal-overlay" id="postCallModal">
     <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Call Ended</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Log the outcome of your call with <span id="postCallPocName" style="font-weight:bold; color:var(--accent-primary);"></span>.</p>
@@ -766,6 +763,16 @@
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
       
       <label class="input-label">POC Name</label><input type="text" id="editPocNameInput" class="modal-input">
+
+      <label class="input-label">Call Status / Outcome</label>
+      <div class="custom-select" id="edit-status-dropdown" style="margin-bottom: 1.25rem; width: 100%;">
+         <div class="select-trigger" onclick="toggleDropdown('edit-status-dropdown')">
+             <span id="edit-status-display">Select Outcome...</span>
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+         </div>
+         <div class="select-options" id="edit-status-dropdown-opts" style="max-height: 200px;"></div>
+         <input type="hidden" id="edit-status-val">
+      </div>
       
       <!-- FLATPICKR INPUTS -->
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
@@ -953,7 +960,6 @@
                 
                 const text = await response.text();
                 
-                // If Google serves an HTML error page instead of JSON, intercept it!
                 if (text.trim().startsWith('<')) {
                     if (attempt < retries) { 
                         await new Promise(r => setTimeout(r, 1500)); 
@@ -1088,11 +1094,16 @@
     function populateOutcomeDropdowns() {
         const modalOpts = document.getElementById('postCallOutcomeDropdown-opts');
         const manualOpts = document.getElementById('status-dropdown-opts');
+        const editOpts = document.getElementById('edit-status-dropdown-opts');
+        
         modalOpts.innerHTML = '';
         manualOpts.innerHTML = '';
+        if(editOpts) editOpts.innerHTML = '';
+        
         OUTCOMES.forEach(out => {
             modalOpts.innerHTML += `<div class="select-option" onclick="selectDropdownVal('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', '${out}', '${out}')">${out}</div>`;
             manualOpts.innerHTML += `<div class="select-option" onclick="selectDropdownVal('status-dropdown', 'ws-call-status-val', 'status-display', '${out}', '${out}')">${out}</div>`;
+            if(editOpts) editOpts.innerHTML += `<div class="select-option" onclick="selectDropdownVal('edit-status-dropdown', 'edit-status-val', 'edit-status-display', '${out}', '${out}')">${out}</div>`;
         });
     }
 
@@ -1345,11 +1356,6 @@
         if (audioCtx.state === 'suspended') await audioCtx.resume();
         audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
         
-        const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-        const wsSubmitBtn = document.getElementById('ws-submit-btn');
-        if(postCallBtn) { postCallBtn.disabled = true; postCallBtn.innerText = "⏳ Generating AI Summary..."; }
-        if(wsSubmitBtn) { wsSubmitBtn.disabled = true; wsSubmitBtn.innerText = "⏳ Generating AI Summary..."; }
-        
         mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
         mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
         recSeconds = 0; document.getElementById('recIndicator').classList.add('active'); document.getElementById('recTimerText').innerText = "REC 00:00";
@@ -1392,28 +1398,28 @@
       const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
       const clientName = document.getElementById('ws-client-display').value;
       const pocName = document.getElementById('ws-poc').value;
+      const rowId = document.getElementById('ws-row-id').value;
       const reader = new FileReader(); reader.readAsDataURL(audioBlob);
-      
-      const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-      const wsSubmitBtn = document.getElementById('ws-submit-btn');
       
       reader.onloadend = function() {
          const base64Data = reader.result.split(',')[1];
-         addLog(`Processing audio & Groq AI summarize...`);
-         callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type }).then(res => {
-            addLog(`Recording saved: ${res.fileName}`);
-            document.getElementById('recTimerText').innerText = "Audio Saved & Summarized ✅";
-            document.getElementById('ws-recording-url').value = res.fileUrl || ''; 
-            document.getElementById('ws-ai-summary').value = res.aiSummary || '';
-            
-            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
+         addLog(`Processing audio & Groq AI summarize in background...`);
+         
+         // Non-blocking upload
+         callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
+         .then(res => {
+            addLog(`Recording saved. Generating AI Summary...`);
+            // Once Drive upload finishes, explicitly trigger the new append endpoint
+            callGoogleAPI('appendAIToNotes', { rowId: rowId, recordingUrl: res.fileUrl, aiSummary: res.aiSummary })
+            .then(updateRes => {
+                rawData = updateRes.rows || [];
+                filterData();
+                showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success");
+                addLog(`AI Summary attached to row ${rowId}`);
+            })
+            .catch(err => addLog(`AI append error: ${err.message}`));
          }).catch(err => {
             addLog(`Upload error: ${err.message}`);
-            document.getElementById('recTimerText').innerText = "Upload Failed ❌";
-            
-            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
          });
       };
     }
@@ -1536,14 +1542,6 @@
           document.querySelectorAll('#workspace-form-area textarea, #workspace-form-area input[type="text"]').forEach(el => el.value = '');
           
           setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
-          document.getElementById('ws-recording-url').value = ''; 
-          document.getElementById('ws-ai-summary').value = '';
-          
-          // Reset UI buttons
-          const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-          const wsSubmitBtn = document.getElementById('ws-submit-btn');
-          if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-          if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
           
           openScriptTab('ws-live-call', document.querySelector('.script-tab'));
 
@@ -1590,6 +1588,10 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
+       // Pre-fill Call Status dropdown in edit modal
+       const currentStatus = pocData.status || 'Pending';
+       setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', currentStatus);
+       
        document.getElementById('editAttempt1')._flatpickr.setDate(pocData && pocData.att1 !== "-" ? pocData.att1 : "");
        document.getElementById('editAttempt2')._flatpickr.setDate(pocData && pocData.att2 !== "-" ? pocData.att2 : "");
        document.getElementById('editAttempt3')._flatpickr.setDate(pocData && pocData.att3 !== "-" ? pocData.att3 : "");
@@ -1611,10 +1613,11 @@
            a2: document.getElementById('editAttempt2').value,
            a3: document.getElementById('editAttempt3').value
        };
+       const statusVal = document.getElementById('edit-status-val').value;
 
        const tagsArr = []; document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
        
-       callGoogleAPI('updateContactDetails', { rowId, pocName: document.getElementById('editPocNameInput').value, timezone: document.getElementById('editTzIana').value, customNote: document.getElementById('editNoteInput').value, tags: tagsArr.join(','), attemptDates: attDates })
+       callGoogleAPI('updateContactDetails', { rowId, pocName: document.getElementById('editPocNameInput').value, timezone: document.getElementById('editTzIana').value, customNote: document.getElementById('editNoteInput').value, tags: tagsArr.join(','), attemptDates: attDates, status: statusVal })
          .then(data => {
             btn.innerText = "Save Changes"; btn.disabled = false; closeModal('editPocModal');
             rawData = data.rows || []; currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
@@ -1658,7 +1661,7 @@
 
     function submitPostCallLog() {
         const attempt = document.getElementById('postCallAttemptVal').value, outcome = document.getElementById('postCallOutcomeVal').value, notes = document.getElementById('postCallNotes').value;
-        if (!outcome) { showToast("Please select a call outcome.", "warning"); return; }
+        if (!outcome || outcome === "Select Outcome...") { showToast("Please select a call outcome.", "warning"); return; }
         document.getElementById('ws-call-attempt-val').value = attempt; document.getElementById('ws-call-status-val').value = outcome; document.getElementById('ws-internal-notes').value = notes;
         closeModal('postCallModal'); submitWorkspace();
     }
@@ -1666,8 +1669,6 @@
     function submitWorkspace() {
       const btn = document.getElementById('ws-submit-btn'); btn.innerText = "Submitting..."; btn.disabled = true;
       const rowId = document.getElementById('ws-row-id').value, status = document.getElementById('ws-call-status-val').value, internalNotes = document.getElementById('ws-internal-notes').value, attempt = document.getElementById('ws-call-attempt-val').value;
-      const recordingUrl = document.getElementById('ws-recording-url').value;
-      const aiSummary = document.getElementById('ws-ai-summary').value;
 
       if (!status || status === "Select Outcome...") { showToast("Please select a call outcome.", "warning"); btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; return; }
 
@@ -1683,7 +1684,7 @@
         fetch("https://docs.google.com/forms/d/e/1FAIpQLSdRXESvabIvUqN7U4ijPNe00NZTvzGXNAg4226qsOroV-hR1Q/formResponse", { method: 'POST', mode: 'no-cors', body: formData }).catch(err => { addLog(`Form Error: ${err}`); });
       }
 
-      callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt, recordingUrl, aiSummary })
+      callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
         .then(data => {
           btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast('Log successfully saved to sheet!', 'success');
           closeWorkspace(); rawData = data.rows || []; currentPaginationLimit = 50; filterData();
@@ -1695,8 +1696,8 @@
     // ==========================================
     function openAnalytics() {
         const counts = { Reached: 0, Pending: 0, Invalid: 0 };
-        const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-        const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
+        const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet', 'Called / Left Voicemail', 'Email Sent'];
+        const pendingStatuses = ['Pending'];
         
         rawData.forEach(row => {
             if (reachedStatuses.includes(row.status)) counts.Reached++;
@@ -1716,7 +1717,7 @@
             analyticsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Success / Reached', 'Pending / Voicemail', 'Unsuccessful / Invalid'],
+                    labels: ['Attempted / Reached', 'Pending', 'Unsuccessful / Invalid'],
                     datasets: [{
                         data: [counts.Reached, counts.Pending, counts.Invalid],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
@@ -1812,8 +1813,8 @@
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
       let reached = 0, pending = 0, invalid = 0;
       
-      const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet'];
-      const pendingStatuses = ['Pending', 'Called / Left Voicemail', 'Email Sent'];
+      const reachedStatuses = ['Completed', 'Exploring / Learning', 'Meeting Scheduled', 'Deferred by Client', 'Low Engagement', 'Declined / Not Interested', 'Requesting Cancellation', 'Recently Launched', 'Not Launched Yet', 'Called / Left Voicemail', 'Email Sent'];
+      const pendingStatuses = ['Pending'];
       const invalidStatuses = ['Invalid / Disconnected Number', 'Unsuccessful', 'Inactive / On Hold'];
 
       let searchFiltered = sourceFiltered.filter(row => {
@@ -1932,6 +1933,14 @@
                 else localStorage.removeItem("mm_cx_portal_session");
             } catch(e) { localStorage.removeItem("mm_cx_portal_session"); }
         }
+
+        setTimeout(function() {
+            if (window.google && google.accounts) {
+                google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
+                google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
+                setTimeout(() => document.getElementById("googleBtnContainer").style.opacity = "1", 300);
+            } else { document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; document.getElementById('mm-error-msg').style.display = 'block'; }
+        }, 800); 
     };
   </script>
 </body>
