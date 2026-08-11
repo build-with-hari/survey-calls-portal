@@ -33,14 +33,7 @@
       --modal-bg: #ffffff; --modal-border: rgba(0, 0, 0, 0.15); --input-bg: rgba(0, 0, 0, 0.04); --input-border: rgba(0, 0, 0, 0.22);
     }
 
-    /* THIS FIXES THE FLATPICKR LAYERING ISSUE */
-    .flatpickr-calendar { 
-        z-index: 999999 !important; 
-        font-family: inherit; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; 
-        border: 1px solid var(--glass-border) !important; 
-    }
-
+    .flatpickr-calendar { z-index: 999999 !important; font-family: inherit; box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; border: 1px solid var(--glass-border) !important; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
     html, body { overflow: hidden !important; margin: 0; padding: 0; background-color: var(--bg-color); height: 100vh; width: 100vw; }
     
@@ -54,7 +47,6 @@
     .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); animation-delay: -5s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(5%, 10%) scale(1.1); } 66% { transform: translate(-5%, -5%) scale(0.9); } }
 
-    /* PREMIUM TOOLTIPS */
     [data-tooltip-bottom], [data-tooltip-top] { position: relative; cursor: pointer; }
     [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
     [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
@@ -81,7 +73,6 @@
     
     .icon-spin { display: inline-block; animation: spin 1s infinite linear; }
 
-    /* CUSTOM SLEEK DROPDOWNS */
     .custom-select { position: relative; user-select: none; flex: 1; }
     .select-trigger { padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.2s; min-height: 42px; }
     .select-trigger:hover { border-color: var(--accent-primary); background: var(--glass-highlight); }
@@ -93,7 +84,6 @@
     .select-option:last-child { border-bottom: none; }
     .select-option:hover { background: var(--glass-highlight); color: var(--accent-primary); }
 
-    /* KPI CSS */
     .kpi-container { display: flex; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .kpi-card { flex: 1; min-width: 160px; padding: 1.25rem; border-radius: 16px; background: var(--modal-bg); border: 2px solid transparent; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
@@ -138,20 +128,12 @@
     .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.3); }
     .badge-crm { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; margin-left: 0.5rem; vertical-align: middle; }
     .badge-note { background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; vertical-align: middle; cursor: help; display: inline-flex; align-items: center; }
-    
-    /* NEW ATTEMPT BADGE */
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
-    .pulse-live { 
-        display: inline-block; 
-        width: 8px; height: 8px; 
-        background-color: var(--safe-color); 
-        border-radius: 50%; 
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); 
-        animation: pulse 1.5s infinite; 
-        margin-left: 5px; 
-        vertical-align: middle;
-    }
+    .admin-hide-cb { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; margin-right: 8px; vertical-align: middle;}
+    tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; }
+
+    .pulse-live { display: inline-block; width: 8px; height: 8px; background-color: var(--safe-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 1.5s infinite; margin-left: 5px; vertical-align: middle; }
     
     .loader-container { text-align: center; padding: 4rem 0; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
     .spinner { width: 40px; height: 40px; border: 4px solid var(--glass-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s infinite linear; }
@@ -163,7 +145,6 @@
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.active { display: flex; opacity: 1; }
-    /* REMOVED OVERFLOW:VISIBLE TO FIX MOBILE/LAPTOP SCREEN OVERFLOW ISSUES */
     .modal-content { max-height: 90vh; overflow-y: auto; overflow-x: hidden; max-width: 480px; width: 92%; text-align: center; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35); border-radius: 20px; padding: 2rem; color: var(--text-main); transform: scale(0.95); transition: transform 0.3s ease; }
     .modal-overlay.active .modal-content { transform: scale(1); }
     
@@ -185,7 +166,6 @@
     .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); cursor: pointer; border: none; background: transparent; font-weight: 600; font-size: 1rem; padding: 0; }
     .back-btn:hover { color: var(--accent-primary); }
     
-    /* UPDATED POC DROPDOWN CSS */
     .poc-custom-select { position: relative; user-select: none; max-width: 250px; flex: 1;}
     .poc-select-trigger { padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.2s; }
     .poc-select-trigger:hover { border-color: var(--accent-primary); background: rgba(56, 189, 248, 0.1); }
@@ -221,13 +201,11 @@
     .form-overlay { position: absolute; inset: 0; background: rgba(11, 15, 25, 0.75); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 50; border-radius: 12px; display: none; align-items: flex-start; justify-content: center; padding-top: 5rem; }
     .form-overlay-card { background: var(--modal-bg); padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: sticky; top: 5rem; width: 85%; max-width: 400px; }
 
-    /* RECORDING BAR STYLING */
     .rec-bar { display: flex; align-items: center; gap: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
     .rec-indicator { width: 12px; height: 12px; border-radius: 50%; background: var(--danger-color); }
     .rec-indicator.active { animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* ACTIVE CALL POPUP OVERLAY */
     .active-call-overlay {
       position: fixed; bottom: 2rem; right: 5rem; background: var(--modal-bg); border: 1px solid var(--modal-border);
       box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center;
@@ -236,11 +214,9 @@
     .active-call-overlay.active { transform: translateY(0); opacity: 1; }
     .call-pulse { width: 12px; height: 12px; background: var(--warning-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); animation: pulse 1.5s infinite; }
     
-    /* POST-CALL MODAL ATTEMPT BUTTONS */
     .attempt-btn { flex: 1; padding: 0.6rem; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
     .attempt-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
     
-    /* TIMELINE CSS */
     .timeline-container { text-align: left; padding: 1rem 0; margin-top: 1rem; border-top: 1px solid var(--glass-border); }
     .timeline-item { position: relative; padding-left: 24px; margin-bottom: 1.5rem; }
     .timeline-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-primary); }
@@ -260,6 +236,13 @@
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
 
+  <!-- ADMIN BULK ACTION BAR -->
+  <div id="adminBulkBar" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--modal-bg); border:1px solid var(--glass-border); padding:1rem 2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:999999; align-items:center; gap:1rem;"> 
+      <span id="adminBulkCount" style="font-weight: 600; color: var(--text-main);">0 Selected</span> 
+      <button class="btn-primary" onclick="submitBulkHide(true)" style="background: var(--danger-color);">Hide POCs</button> 
+      <button class="btn-outline" onclick="submitBulkHide(false)">Unhide POCs</button> 
+  </div>
+
   <!-- ACTIVE CALL OVERLAY -->
   <div id="activeCallOverlay" class="active-call-overlay" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
     <div style="display: flex; align-items: center; gap: 1.5rem;">
@@ -269,8 +252,6 @@
         <div id="callOverlayName" style="font-size: 1.1rem; font-weight: 700; margin: 2px 0; color: var(--text-main);">Client Name</div>
         <div id="callOverlayDuration" style="font-size: 1.5rem; font-weight: 300; font-family: monospace; color: var(--text-main);">00:00</div>
       </div>
-      
-      <!-- ADDED MUTE BUTTON -->
       <button id="muteCallBtn" class="btn-icon" style="background: var(--glass-bg); color: var(--text-main); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--glass-border);" onclick="toggleMuteCall()" data-tooltip-top="Mute Mic">
         <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
@@ -279,7 +260,6 @@
           <line x1="8" y1="23" x2="16" y2="23"></line>
         </svg>
       </button>
-
       <button class="btn-icon" style="background: var(--danger-color); color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);" onclick="hangupCall()" data-tooltip-top="End Call">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
       </button>
@@ -312,7 +292,6 @@
           <h2 id="mmLoginTitle" style="color: var(--text-main); font-size: 26px; margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px;">CX Survey Calls Portal</h2>
           <p id="mmLoginSub" style="color: var(--text-muted); margin: 0 0 35px 0; font-size: 16px; line-height: 1.5;">Sign in with your verified <br><strong style="color:var(--accent-primary);">@mindmatrix.net</strong> account to continue.</p>
           
-          <!-- GOOGLE GIS HTML API -->
           <div id="g_id_onload"
                data-client_id="992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"
                data-context="signin"
@@ -357,6 +336,9 @@
             </div>
             <div class="action-group">
               <span style="font-size: 0.85rem; color: var(--text-muted); margin-right: 10px;">Logged in as: <strong id="loggedInUser" style="color: var(--text-main);"></strong></span>
+              
+              <button id="btnRollover" class="btn-outline" style="display:none;" onclick="triggerRollover()">🔄 Rollover Month</button>
+              
               <button class="theme-toggle" onclick="fetchData()" id="refreshBtn" data-tooltip-bottom="Reload Data">
                 <svg id="refreshIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
               </button>
@@ -711,7 +693,10 @@
       <div style="position: relative; height: 350px; width: 100%;">
           <canvas id="outcomeChart"></canvas>
       </div>
-      <div style="margin-top: 2rem;"><button class="btn-outline" onclick="closeModal('analyticsModal')">Close Dashboard</button></div>
+      <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+          <button class="btn-outline" onclick="closeModal('analyticsModal')">Close Dashboard</button>
+          <button class="btn-primary" onclick="exportCSV()">📥 Export to CSV</button>
+      </div>
     </div>
   </div>
 
@@ -725,6 +710,19 @@
       </div>
       
       <div style="margin-top: 1.5rem; text-align: center;"><button class="btn-outline" onclick="closeModal('timelineModal')">Close Timeline</button></div>
+    </div>
+  </div>
+
+  <!-- UNLISTED DIALER MODAL -->
+  <div class="modal-overlay" id="unlistedCallModal" onclick="closeOnBackgroundClick(event, 'unlistedCallModal')">
+    <div class="modal-content" style="max-width: 400px;">
+      <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Manual Dialer</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Dial an unlisted number. Recordings will be sent to Drive.</p>
+      <input type="text" id="unlistedPhoneInput" class="modal-input" placeholder="+1 555-555-5555" style="text-align: center; font-size: 1.25rem;">
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+        <button class="btn-outline" onclick="closeModal('unlistedCallModal')">Cancel</button>
+        <button class="btn-primary" onclick="startUnlistedCall()">📞 Call Now</button>
+      </div>
     </div>
   </div>
 
@@ -935,8 +933,14 @@
     let currentPaginationLimit = 50;
     let analyticsChart = null;
     let activePresence = {}; 
+    
+    window.isAdmin = false;
+    window.showHidden = false;
+    window.isUnlistedCall = false;
+    window.unlistedPhoneNum = "";
+    window.lastFilteredData = [];
 
-    // System Logs Shortcut (Shift + L) with Auto-Focus & Enter support
+    // System Logs Shortcut (Shift + L) & Admin Features
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
             e.preventDefault();
@@ -944,6 +948,22 @@
             document.getElementById('logsPinErrorText').style.display = 'none';
             openModal('logsPinModal');
             setTimeout(() => document.getElementById('logsPinInput').focus(), 150);
+        }
+        
+        // ADMIN ONLY: Alt+S (Toggle Hidden POCs)
+        if (e.altKey && (e.key === 's' || e.key === 'S') && window.isAdmin) {
+            e.preventDefault();
+            window.showHidden = !window.showHidden;
+            filterData();
+            showToast(window.showHidden ? "Hidden POCs Visible 👁️" : "Hidden POCs Concealed 🙈", "warning");
+        }
+        
+        // UNLISTED DIALER: Alt+C
+        if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
+            document.getElementById('unlistedPhoneInput').value = '';
+            openModal('unlistedCallModal');
+            setTimeout(() => document.getElementById('unlistedPhoneInput').focus(), 150);
         }
     });
 
@@ -979,7 +999,6 @@
                 
                 const text = await response.text();
                 
-                // If Google serves an HTML error page instead of JSON, intercept it!
                 if (text.trim().startsWith('<')) {
                     if (attempt < retries) { 
                         await new Promise(r => setTimeout(r, 1500)); 
@@ -1050,16 +1069,6 @@
     const SVG_CHEVRON_RIGHT = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
     const SVG_SORT_UP = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 4px; opacity: 0.8;"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`;
     const SVG_SORT_DOWN = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 4px; opacity: 0.8;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
-
-    let rawData = [];
-    let currentSourceTab = 'ALL';
-    let collapsedClients = new Set();
-    let currentSortColumn = 'client';
-    let currentSortAsc = true;
-    let focusTargetElement = null; 
-    let activeKpiFilter = null;
-    let appLogs = [];
-    let clockInterval;
 
     const tzList = [
       { label: "US Eastern (EST/EDT)", iana: "America/New_York" }, { label: "US Central (CST/CDT)", iana: "America/Chicago" },
@@ -1230,7 +1239,7 @@
     }
 
     // ==========================================
-    // TELNYX SDK INTEGRATION
+    // TELNYX SDK INTEGRATION & UNLISTED DIALER
     // ==========================================
     function hangupCall() { if (activeCall) activeCall.hangup(); }
     
@@ -1315,13 +1324,13 @@
               activeCall = notification.call;
               const btn = document.getElementById('callActionBtn');
               if (activeCall.state === 'ringing') {
-                if(btn) btn.innerHTML = '🔔 Ringing...';
+                if(btn && !window.isUnlistedCall) btn.innerHTML = '🔔 Ringing...';
                 document.getElementById('callOverlayStatus').innerText = "Ringing...";
                 document.getElementById('callOverlayStatus').style.color = "var(--warning-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
               } else if (activeCall.state === 'active') {
                 showToast('Call Connected!', 'success');
-                if(btn) btn.innerHTML = '🛑 End Call';
+                if(btn && !window.isUnlistedCall) btn.innerHTML = '🛑 End Call';
                 document.getElementById('callOverlayStatus').innerText = "Connected";
                 document.getElementById('callOverlayStatus').style.color = "var(--safe-color)";
                 document.getElementById('callPulseIndicator').style.background = "var(--safe-color)";
@@ -1331,10 +1340,15 @@
               } else if (activeCall.state === 'destroy') {
                 showToast('Call Ended.', 'warning');
                 activeCall = null;
-                if(btn) btn.innerHTML = '📞 Call Now';
+                if(btn && !window.isUnlistedCall) btn.innerHTML = '📞 Call Now';
                 hideCallOverlay();
                 document.getElementById('ivrDialpad').style.display = 'none'; document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
                 if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
+
+                if(window.isUnlistedCall) {
+                   // Cleanly abort for unlisted calls, skip sheet log modal entirely.
+                   return;
+                }
 
                 document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
                 document.getElementById('postCallNotes').value = '';
@@ -1388,6 +1402,30 @@
       }
     }
 
+    function startUnlistedCall() {
+      const targetNum = document.getElementById('unlistedPhoneInput').value;
+      const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
+      if (cleanPhone.length < 10) { showToast('Invalid phone number.', 'danger'); return; }
+      
+      closeModal('unlistedCallModal');
+      window.isUnlistedCall = true;
+      window.unlistedPhoneNum = targetNum;
+
+      if (!telnyxClient || !isTelnyxReady) { showToast('Phone system not ready.', 'danger'); return; }
+
+      addLog(`Dialing Unlisted Number: ${cleanPhone}...`);
+      showToast(`Dialing unlisted number...`, 'safe');
+      showCallOverlay(targetNum);
+      document.getElementById('callOverlayName').innerText = "Unlisted Contact";
+
+      try {
+          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false });
+      } catch(err) {
+          showToast('Call failed to initiate. Check logs.', 'danger'); addLog(`Dial Error: ${err.message}`);
+          hideCallOverlay(); activeCall = null; window.isUnlistedCall = false;
+      }
+    }
+
     async function startAutoRecording() {
       let audioCtx;
       try {
@@ -1406,6 +1444,13 @@
 
         if (audioCtx.state === 'suspended') await audioCtx.resume();
         audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
+        
+        if(!window.isUnlistedCall) {
+            const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+            const wsSubmitBtn = document.getElementById('ws-submit-btn');
+            if(postCallBtn) { postCallBtn.disabled = true; postCallBtn.innerText = "⏳ Generating AI Summary..."; }
+            if(wsSubmitBtn) { wsSubmitBtn.disabled = true; wsSubmitBtn.innerText = "⏳ Generating AI Summary..."; }
+        }
         
         mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
         mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
@@ -1447,30 +1492,52 @@
 
     function uploadRecordingToDrive() {
       const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-      const clientName = document.getElementById('ws-client-display').value;
-      const pocName = document.getElementById('ws-poc').value;
+      const clientName = window.isUnlistedCall ? "Unlisted Calls" : document.getElementById('ws-client-display').value;
+      const pocName = window.isUnlistedCall ? window.unlistedPhoneNum : document.getElementById('ws-poc').value;
       const rowId = document.getElementById('ws-row-id').value;
       const reader = new FileReader(); reader.readAsDataURL(audioBlob);
       
+      const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+      const wsSubmitBtn = document.getElementById('ws-submit-btn');
+      const attemptVal = document.getElementById('ws-call-attempt-val') ? document.getElementById('ws-call-attempt-val').value : 'Attempt';
+      
       reader.onloadend = function() {
          const base64Data = reader.result.split(',')[1];
-         addLog(`Processing audio & Groq AI summarize in background...`);
+         addLog(`Processing audio upload in background...`);
          
-         // Non-blocking upload
+         if (window.isUnlistedCall) {
+            callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
+            .then(res => {
+               document.getElementById('recTimerText').innerText = "Unlisted Call Saved ✅";
+               showToast("Unlisted call recording saved to Drive.", "success");
+               window.isUnlistedCall = false;
+            }).catch(err => {
+               document.getElementById('recTimerText').innerText = "Upload Failed ❌";
+               window.isUnlistedCall = false;
+            });
+            return;
+         }
+         
+         // Standard mapped client upload
          callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
          .then(res => {
             addLog(`Recording saved. Generating AI Summary...`);
-            // Once Drive upload finishes, explicitly trigger the new append endpoint
-            callGoogleAPI('appendAIToNotes', { rowId: rowId, recordingUrl: res.fileUrl, aiSummary: res.aiSummary })
+            callGoogleAPI('appendAIToNotes', { rowId: rowId, recordingUrl: res.fileUrl, aiSummary: res.aiSummary, attempt: attemptVal })
             .then(updateRes => {
-                rawData = updateRes.rows || [];
-                filterData();
+                rawData = updateRes.rows || []; filterData();
                 showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success");
                 addLog(`AI Summary attached to row ${rowId}`);
-            })
-            .catch(err => addLog(`AI append error: ${err.message}`));
+                if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+                if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
+            }).catch(err => {
+                addLog(`AI append error: ${err.message}`);
+                if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+                if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
+            });
          }).catch(err => {
             addLog(`Upload error: ${err.message}`);
+            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
          });
       };
     }
@@ -1563,7 +1630,7 @@
           document.getElementById('ws-poc-selected-text').textContent = `${row.poc} (${row.status})`;
           const optionsContainer = document.getElementById('ws-poc-options');
           optionsContainer.innerHTML = '';
-          rawData.filter(r => r.client === row.client).forEach(p => {
+          rawData.filter(r => r.client === row.client && r.hidden === false).forEach(p => {
               const opt = document.createElement('div');
               opt.className = 'select-option poc-select-option'; 
               opt.innerHTML = `<div class="poc-opt-name">${p.poc}</div><div class="poc-opt-status">Status: ${p.status}</div>`;
@@ -1593,6 +1660,14 @@
           document.querySelectorAll('#workspace-form-area textarea, #workspace-form-area input[type="text"]').forEach(el => el.value = '');
           
           setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
+          document.getElementById('ws-recording-url').value = ''; 
+          document.getElementById('ws-ai-summary').value = '';
+          
+          // Reset UI buttons
+          const postCallBtn = document.querySelector('#postCallModal .btn-primary');
+          const wsSubmitBtn = document.getElementById('ws-submit-btn');
+          if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
+          if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
           
           openScriptTab('ws-live-call', document.querySelector('.script-tab'));
 
@@ -1639,7 +1714,6 @@
        document.getElementById('editTzIana').value = savedIana;
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
-       // Pre-fill Call Status dropdown in edit modal
        const currentStatus = pocData.status || 'Pending';
        setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', currentStatus);
        
@@ -1673,6 +1747,44 @@
             btn.innerText = "Save Changes"; btn.disabled = false; closeModal('editPocModal');
             rawData = data.rows || []; currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
          }).catch(err => { btn.innerText = "Save Changes"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+    }
+
+    // ==========================================
+    // ADMIN FUNCTIONS (Hide & Archive)
+    // ==========================================
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.admin-hide-cb:checked');
+        const bar = document.getElementById('adminBulkBar');
+        if (checked.length > 0) {
+            bar.style.display = 'flex';
+            document.getElementById('adminBulkCount').innerText = checked.length + " Selected";
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    function submitBulkHide(hideState) {
+        const checked = document.querySelectorAll('.admin-hide-cb:checked');
+        const ids = Array.from(checked).map(cb => parseInt(cb.value));
+        document.getElementById('adminBulkBar').style.display = 'none';
+        showToast("Updating visibility...", "warning");
+        
+        callGoogleAPI('hidePOCs', { rowIds: ids, hideState: hideState }).then(res => {
+            rawData = res.rows || []; 
+            filterData(); 
+            showToast("Visibility successfully updated.", "success");
+        }).catch(err => showToast("Error updating visibility: " + err.message, "danger"));
+    }
+
+    function triggerRollover() {
+        if(!confirm("Are you sure? This will archive your current Active Clients sheet and clear all Attempt Dates, Statuses, and Notes for the new month!")) return;
+        
+        showToast("Initiating Monthly Rollover...", "warning");
+        callGoogleAPI('rolloverMonth', {}).then(res => {
+            rawData = res.rows || []; 
+            filterData(); 
+            showToast("Monthly Rollover Complete! Ready for new calls.", "success");
+        }).catch(err => showToast("Rollover Error: " + err.message, "danger"));
     }
 
     function closeWorkspace() {
@@ -1743,7 +1855,7 @@
     }
 
     // ==========================================
-    // VISUAL ANALYTICS (Chart.js)
+    // VISUAL ANALYTICS & EXPORT
     // ==========================================
     function openAnalytics() {
         const counts = { Completed: 0, Attempted: 0, Pending: 0 };
@@ -1779,6 +1891,38 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }, 100);
+    }
+    
+    function exportCSV() {
+        let csv = "Month,Agent Name,POC Name,Email Address,Phone Number,Client Name,1st Attempt,2nd Attempt,3rd Attempt,Call Outcome,Call Notes (AI Notes),Custom Notes\n";
+        const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+        
+        window.lastFilteredData.forEach(r => {
+            const cleanPhone = (r.phone || "").toString().replace(/^'/, '');
+            const row = [
+                currentMonth,
+                `"${(r.executive || "").replace(/"/g, '""')}"`,
+                `"${(r.poc || "").replace(/"/g, '""')}"`,
+                `"${(r.email || "").replace(/"/g, '""')}"`,
+                `"${cleanPhone}"`,
+                `"${(r.client || "").replace(/"/g, '""')}"`,
+                `"${r.att1 || ""}"`,
+                `"${r.att2 || ""}"`,
+                `"${r.att3 || ""}"`,
+                `"${r.status || ""}"`,
+                `"${(r.notes || "").replace(/"/g, '""')}"`,
+                `"${(r.customNote || "").replace(/"/g, '""')}"`
+            ];
+            csv += row.join(",") + "\n";
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CX_Survey_Export_${currentMonth}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 
     function toggleTheme() {
@@ -1868,6 +2012,8 @@
       const pendingStatuses = ['Pending'];
 
       let searchFiltered = sourceFiltered.filter(row => {
+        if (!window.showHidden && row.hidden) return false;
+          
         if (execQuery !== 'ALL' && row.executive !== execQuery) return false;
         const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase(), cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
         const match = (row.client || "").toLowerCase().includes(query) || (row.poc || "").toLowerCase().includes(query) || (row.email || "").toLowerCase().includes(query) || cleanPhoneSearch.includes(query) || cleanMobileSearch.includes(query);
@@ -1878,6 +2024,8 @@
         }
         return match;
       });
+      
+      window.lastFilteredData = searchFiltered;
 
       document.getElementById('kpi-total').textContent = searchFiltered.length; 
       document.getElementById('kpi-completed').textContent = completed; 
@@ -1941,8 +2089,10 @@
             
             let latestAttemptTag = '';
             if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`; else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`; else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
+            
+            const checkboxHtml = window.isAdmin ? `<input type="checkbox" class="admin-hide-cb" value="${row.id}" onchange="updateBulkBar()">` : '';
 
-            tr.innerHTML = `<td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="position: absolute; left: 1rem; top: 0; bottom: 0; height: ${branchHeight}; width: 2px; background: var(--glass-border);"></div><div style="position: absolute; left: 1rem; top: 50%; width: 1rem; height: 2px; background: var(--glass-border);"></div><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;"><span style="font-size:1.05rem; font-weight:600;">${row.poc}</span>${latestAttemptTag}${tagHtml}${noteIcon}</div><span style="font-size:0.8rem; color:var(--text-muted);">Exec: <strong style="color:var(--text-main);">${row.executive || 'Unassigned'}</strong></span></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="font-size:0.85rem; margin-bottom:3px;">🏢 ${cleanPhone}</div><div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div><div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td><td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell"></td>`;
+            tr.innerHTML = `<td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="position: absolute; left: 1rem; top: 0; bottom: 0; height: ${branchHeight}; width: 2px; background: var(--glass-border);"></div><div style="position: absolute; left: 1rem; top: 50%; width: 1rem; height: 2px; background: var(--glass-border);"></div><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">${checkboxHtml}<span style="font-size:1.05rem; font-weight:600; text-decoration:${row.hidden ? 'line-through' : 'none'};">${row.poc}</span>${latestAttemptTag}${tagHtml}${noteIcon}</div><span style="font-size:0.8rem; color:var(--text-muted);">Exec: <strong style="color:var(--text-main);">${row.executive || 'Unassigned'}</strong></span></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="font-size:0.85rem; margin-bottom:3px;">🏢 ${cleanPhone}</div><div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div><div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div></td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td><td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td><td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell"></td>`;
             const btn = document.createElement('button'); btn.className = "btn-primary"; btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;"; btn.innerText = "🚀 Open Workspace"; btn.onclick = () => triggerWorkspaceByData(row);
             tr.querySelector('.action-cell').appendChild(btn); tbody.appendChild(tr);
           });
@@ -1954,6 +2104,13 @@
 
     function loadDashboard(email) {
         document.getElementById('mm-login-screen').style.opacity = '0'; document.getElementById('loggedInUser').innerText = email;
+        
+        // Setup Admin features
+        window.isAdmin = (email === 'hariharan.iyer@mindmatrix.net');
+        if (window.isAdmin) {
+            document.getElementById('btnRollover').style.display = 'inline-flex';
+        }
+        
         setTimeout(() => {
             document.getElementById('mm-login-screen').style.display = 'none'; document.getElementById('app-components').style.display = 'block';
             populateOutcomeDropdowns(); fetchData(); initTelnyx();
