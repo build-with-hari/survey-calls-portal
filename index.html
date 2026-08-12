@@ -263,10 +263,12 @@
   <div class="blob blob-2"></div>
 
   <!-- PERSISTENT TELNYX TOAST -->
-  <div id="telnyxToast" style="display:none; position:fixed; bottom: 20px; left: 20px; background: var(--warning-color); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: bold; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">☎️ Connecting to Phone System...</div>
+  <div id="phoneStatusToast" style="display:none; position:fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--warning-color); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 600; z-index: 999999; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: all 0.3s ease; align-items: center; gap: 8px;">
+      <span id="phoneStatusIcon" class="icon-spin">⏳</span> <span id="phoneStatusText">Connecting to Phone System...</span>
+  </div>
 
   <!-- ADMIN BULK ACTION BAR -->
-  <div id="adminBulkBar" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--modal-bg); border:1px solid var(--glass-border); padding:1rem 2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:999999; align-items:center; gap:1rem;"> 
+  <div id="adminBulkBar" style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--modal-bg); border:1px solid var(--glass-border); padding:1rem 2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:99999; align-items:center; gap:1rem;"> 
       <span id="adminBulkCount" style="font-weight: 600; color: var(--text-main);">0 Selected</span> 
       <button class="btn-primary" onclick="submitBulkHide(true)" style="background: var(--danger-color);">Hide POCs</button> 
       <button class="btn-outline" onclick="submitBulkHide(false)">Unhide POCs</button> 
@@ -364,6 +366,7 @@
               </div>
             </div>
             
+            <!-- CLEANED UP ICON ACTION BAR -->
             <div class="action-group">
               <span style="font-size: 0.85rem; color: var(--text-muted); margin-right: 10px; display: inline-block;">Logged in as: <strong id="loggedInUser" style="color: var(--text-main);"></strong></span>
               
@@ -885,8 +888,8 @@
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Add a contact manually outside of Zoho CRM.</p>
       
       <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
-         <button class="source-tab active" id="tabSingleEntry" onclick="toggleEntryMode('single')" style="flex:1;">Single Entry</button>
-         <button class="source-tab" id="tabBulkEntry" onclick="toggleEntryMode('bulk')" style="flex:1;">Bulk Upload</button>
+         <button class="source-tab active" id="tabSingleEntry" onclick="toggleEntryMode('single')" style="flex:1; text-align:center;">Single Entry</button>
+         <button class="source-tab" id="tabBulkEntry" onclick="toggleEntryMode('bulk')" style="flex:1; text-align:center;">Bulk Upload</button>
       </div>
 
       <div id="singleEntryForm">
@@ -1062,7 +1065,8 @@
                 
                 if (text.trim().startsWith('<')) {
                     if (attempt < retries) { 
-                        await new Promise(r => setTimeout(r, 1500)); 
+                        // Added backoff jitter for concurrency limit handling
+                        await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
                         continue; 
                     }
                     throw new Error("Google Server Error. Please wait a moment and try again.");
@@ -1076,7 +1080,7 @@
                 if (attempt === retries || err.message.includes('Unauthorized')) {
                     throw err; 
                 }
-                await new Promise(r => setTimeout(r, 1500)); 
+                await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
             }
         }
     }
@@ -1257,7 +1261,7 @@
       const toast = document.createElement('div');
       toast.id = 'mm-toast-alert';
       toast.innerText = msg;
-      toast.style.cssText = 'position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
+      toast.style.cssText = 'position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
       if (type === 'success') toast.style.backgroundColor = '#10b981';
       else if (type === 'warning') toast.style.backgroundColor = '#f59e0b';
       else toast.style.backgroundColor = '#ef4444'; 
@@ -1364,14 +1368,14 @@
 
     function initTelnyx() {
       addLog('Authenticating with Telnyx via Google API...');
-      document.getElementById('telnyxToast').style.display = 'block';
+      document.getElementById('phoneStatusToast').style.display = 'flex';
       
       callGoogleAPI('getTelnyxToken').then(res => {
           if (!res || res.success === false) { 
               addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); 
-              showToast('Phone system authentication failed.', 'danger'); 
-              document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
-              document.getElementById('telnyxToast').innerText = '☎️ Phone System Disconnected';
+              document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
+              document.getElementById('phoneStatusIcon').innerText = '❌';
+              document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected';
               return; 
           }
           let tokenStr = typeof res.token === 'string' ? res.token : (res.token ? res.token.toString() : '');
@@ -1385,20 +1389,29 @@
           telnyxClient.on('telnyx.ready', () => { 
               isTelnyxReady = true; 
               addLog("Telnyx WebRTC connected and ready."); 
-              document.getElementById('telnyxToast').style.display = 'none';
+              document.getElementById('phoneStatusToast').style.background = 'var(--safe-color)';
+              document.getElementById('phoneStatusIcon').innerText = '✅';
+              document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
+              document.getElementById('phoneStatusText').innerText = 'Phone System Connected';
+              setTimeout(() => { document.getElementById('phoneStatusToast').style.opacity = '0'; }, 3000);
+              setTimeout(() => { document.getElementById('phoneStatusToast').style.display = 'none'; document.getElementById('phoneStatusToast').style.opacity = '1'; }, 3500);
           });
           telnyxClient.on('telnyx.error', (error) => {
             if (error && error.error && error.error.fatal === false) { addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event.")); return; }
             addLog("Telnyx Socket Error: " + JSON.stringify(error)); isTelnyxReady = false;
-            document.getElementById('telnyxToast').style.display = 'block';
-            document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
-            document.getElementById('telnyxToast').innerText = '☎️ Phone System Disconnected';
+            document.getElementById('phoneStatusToast').style.display = 'flex';
+            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
+            document.getElementById('phoneStatusIcon').innerText = '❌';
+            document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
+            document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected';
             
             setTimeout(() => { 
                 if (!isTelnyxReady && telnyxClient) { 
                     addLog("Attempting Telnyx background reconnect..."); 
-                    document.getElementById('telnyxToast').style.background = 'var(--warning-color)';
-                    document.getElementById('telnyxToast').innerText = '☎️ Reconnecting to Phone System...';
+                    document.getElementById('phoneStatusToast').style.background = 'var(--warning-color)';
+                    document.getElementById('phoneStatusIcon').innerText = '⏳';
+                    document.getElementById('phoneStatusIcon').classList.add('icon-spin');
+                    document.getElementById('phoneStatusText').innerText = 'Reconnecting to Phone System...';
                     telnyxClient.connect(); 
                 } 
             }, 3000);
@@ -1450,8 +1463,10 @@
           telnyxClient.connect();
         }).catch(err => { 
             addLog(`Telnyx Auth Error: ${err.message}`); 
-            document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
-            document.getElementById('telnyxToast').innerText = '☎️ Phone System Initialization Failed';
+            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
+            document.getElementById('phoneStatusIcon').innerText = '❌';
+            document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
+            document.getElementById('phoneStatusText').innerText = 'Phone System Initialization Failed';
         });
     }
 
@@ -2014,11 +2029,14 @@
        setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
-    function fetchData() {
-      document.getElementById('table-container').style.display = 'none'; document.getElementById('loader').style.display = 'flex';
-      const refreshIcon = document.getElementById('refreshIcon'); if(refreshIcon) refreshIcon.classList.add('icon-spin');
+    async function fetchDataAsync() {
+      document.getElementById('table-container').style.display = 'none'; 
+      document.getElementById('loader').style.display = 'flex';
+      const refreshIcon = document.getElementById('refreshIcon'); 
+      if(refreshIcon) refreshIcon.classList.add('icon-spin');
       
-      callGoogleAPI('getSurveyData').then(data => {
+      try {
+          const data = await callGoogleAPI('getSurveyData');
           rawData = data.rows || []; 
           if(refreshIcon) refreshIcon.classList.remove('icon-spin');
           document.getElementById('loader').style.display = 'none'; 
@@ -2028,32 +2046,21 @@
           document.getElementById('statsFooter').style.display = 'block'; 
           document.getElementById('table-container').style.display = 'block';
           
-          setTimeout(() => {
-              try {
-                  populateExecFilter(); 
-                  currentPaginationLimit = 50; 
-                  filterData();
-                  
-                  // FIRE TELNYX AFTER SHEET DATA LOADS TO PREVENT GOOGLE SERVER LOCK
-                  if (!window.telnyxInitStarted) {
-                      window.telnyxInitStarted = true;
-                      initTelnyx();
-                  }
-                  
-              } catch(err) {
-                  console.error("UI Rendering Error: ", err);
-                  showToast("UI Error: " + err.message, "danger");
-              }
-          }, 0);
-      }).catch(err => { 
+          populateExecFilter(); 
+          currentPaginationLimit = 50; 
+          filterData();
+      } catch (err) {
           showToast("API Error: " + err.message, "danger"); 
           if(refreshIcon) refreshIcon.classList.remove('icon-spin'); 
           
-          // DO NOT GHOST THE USER IF GOOGLE RETURNS A 502 ERROR. OFFER A RETRY BUTTON.
-          document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message}. <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
+          document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message} <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
           const spin = document.querySelector('.spinner');
           if (spin) spin.style.display = 'none';
-      });
+      }
+    }
+
+    function fetchData() {
+        fetchDataAsync();
     }
 
     function submitZohoSync() {
@@ -2173,10 +2180,10 @@
       
       window.lastFilteredData = searchFiltered;
 
-      document.getElementById('kpi-total').innerHTML = `${searchFiltered.length} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${new Set(searchFiltered.map(r => r.client)).size} Clients</span>`; 
-      document.getElementById('kpi-completed').innerHTML = `${completed} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${completedClients.size} Clients</span>`; 
-      document.getElementById('kpi-attempted').innerHTML = `${attempted} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${attemptedClients.size} Clients</span>`; 
-      document.getElementById('kpi-pending').innerHTML = `${pending} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${pendingClients.size} Clients</span>`;
+      document.getElementById('kpi-total').innerHTML = `${new Set(searchFiltered.map(r => r.client)).size} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">Clients (${searchFiltered.length} POCs)</span>`; 
+      document.getElementById('kpi-completed').innerHTML = `${completedClients.size} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">Clients (${completed} POCs)</span>`; 
+      document.getElementById('kpi-attempted').innerHTML = `${attemptedClients.size} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">Clients (${attempted} POCs)</span>`; 
+      document.getElementById('kpi-pending').innerHTML = `${pendingClients.size} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">Clients (${pending} POCs)</span>`;
 
       document.getElementById('footerPocCount').textContent = searchFiltered.length; 
       document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
@@ -2276,12 +2283,22 @@
         if (window.isAdmin) {
             document.getElementById('btnRollover').style.display = 'flex';
             document.getElementById('btnSyncCRM').style.display = 'flex';
+        } else {
+            document.getElementById('btnRollover').style.display = 'none';
+            document.getElementById('btnSyncCRM').style.display = 'none';
         }
         
-        setTimeout(() => {
-            document.getElementById('mm-login-screen').style.display = 'none'; document.getElementById('app-components').style.display = 'block';
+        setTimeout(async () => {
+            document.getElementById('mm-login-screen').style.display = 'none'; 
+            document.getElementById('app-components').style.display = 'block';
             populateOutcomeDropdowns(); 
-            fetchData(); 
+            
+            await fetchDataAsync(); 
+            
+            if (!window.telnyxInitStarted) {
+                window.telnyxInitStarted = true;
+                initTelnyx();
+            }
             
             presenceInterval = setInterval(() => {
                 const activeRow = document.getElementById('actionWorkspace').classList.contains('active') ? document.getElementById('ws-row-id').value : null;
