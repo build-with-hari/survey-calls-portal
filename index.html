@@ -262,6 +262,9 @@
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
 
+  <!-- PERSISTENT TELNYX TOAST -->
+  <div id="telnyxToast" style="display:none; position:fixed; bottom: 20px; left: 20px; background: var(--warning-color); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: bold; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">☎️ Connecting to Phone System...</div>
+
   <!-- ADMIN BULK ACTION BAR -->
   <div id="adminBulkBar" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--modal-bg); border:1px solid var(--glass-border); padding:1rem 2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:999999; align-items:center; gap:1rem;"> 
       <span id="adminBulkCount" style="font-weight: 600; color: var(--text-main);">0 Selected</span> 
@@ -361,7 +364,6 @@
               </div>
             </div>
             
-            <!-- CLEANED UP ICON ACTION BAR -->
             <div class="action-group">
               <span style="font-size: 0.85rem; color: var(--text-muted); margin-right: 10px; display: inline-block;">Logged in as: <strong id="loggedInUser" style="color: var(--text-main);"></strong></span>
               
@@ -373,7 +375,7 @@
               
               <button class="theme-toggle" onclick="openAnalytics()" data-tooltip-bottom="Visual Analytics">📊</button>
               <button class="theme-toggle" onclick="openModal('addEntryModal')" data-tooltip-bottom="Add Manual Entry">➕</button>
-              <button class="theme-toggle" onclick="openPinModal()" data-tooltip-bottom="Sync Zoho CRM">☁️</button>
+              <button id="btnSyncCRM" class="theme-toggle" style="display:none;" onclick="openPinModal()" data-tooltip-bottom="Sync Zoho CRM">☁️</button>
               <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" data-tooltip-bottom="Toggle Theme">🌙</button>
               
               <button class="theme-toggle" onclick="logout()" data-tooltip-bottom="Sign Out">
@@ -417,7 +419,10 @@
             </div>
           </div>
 
-          <div id="loader" class="loader-container"><div class="spinner"></div><div id="loaderText">Loading client contacts...</div></div>
+          <div id="loader" class="loader-container">
+              <div class="spinner"></div>
+              <div id="loaderText">Loading client contacts...</div>
+          </div>
           
           <div class="table-container" id="table-container" style="display: none;">
             <table id="mainTable">
@@ -875,15 +880,29 @@
   </div>
 
   <div class="modal-overlay" id="addEntryModal" onclick="closeOnBackgroundClick(event, 'addEntryModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 600px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Add Manual Entry</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Add a contact manually outside of Zoho CRM.</p>
-      <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Client Name</label><input type="text" id="addClientInput" class="modal-input" placeholder="Acme Corp"></div><div style="flex:1;"><label class="input-label">Assigned Exec</label><input type="text" id="addExecInput" class="modal-input" placeholder="Jane Doe"></div></div>
-      <label class="input-label">POC Name</label><input type="text" id="addPocInput" class="modal-input" placeholder="John Smith">
-      <label class="input-label">Email Address</label><input type="email" id="addEmailInput" class="modal-input" placeholder="john@acme.com">
-      <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Phone</label><input type="text" id="addPhoneInput" class="modal-input" placeholder="+1 555-0000"></div><div style="flex:1;"><label class="input-label">Mobile</label><input type="text" id="addMobileInput" class="modal-input" placeholder="+1 555-1111"></div></div>
-      <p id="addErrorText" class="error-text">Client, POC, and Email are required.</p>
-      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('addEntryModal')">Cancel</button><button class="btn-primary" id="saveEntryBtn" onclick="submitAddEntry()">Add Contact</button></div>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+         <button class="source-tab active" id="tabSingleEntry" onclick="toggleEntryMode('single')" style="flex:1;">Single Entry</button>
+         <button class="source-tab" id="tabBulkEntry" onclick="toggleEntryMode('bulk')" style="flex:1;">Bulk Upload</button>
+      </div>
+
+      <div id="singleEntryForm">
+        <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Client Name</label><input type="text" id="addClientInput" class="modal-input" placeholder="Acme Corp"></div><div style="flex:1;"><label class="input-label">Assigned Exec</label><input type="text" id="addExecInput" class="modal-input" placeholder="Jane Doe"></div></div>
+        <label class="input-label">POC Name</label><input type="text" id="addPocInput" class="modal-input" placeholder="John Smith">
+        <label class="input-label">Email Address</label><input type="email" id="addEmailInput" class="modal-input" placeholder="john@acme.com">
+        <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Phone</label><input type="text" id="addPhoneInput" class="modal-input" placeholder="+1 555-0000"></div><div style="flex:1;"><label class="input-label">Mobile</label><input type="text" id="addMobileInput" class="modal-input" placeholder="+1 555-1111"></div></div>
+      </div>
+
+      <div id="bulkEntryForm" style="display:none;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-bottom: 0.5rem;">Paste comma-separated values. One contact per line.<br><strong>Format:</strong> Client Name, Exec Name, POC Name, Email Address, Phone, Mobile</p>
+        <textarea id="bulkEntryInput" class="modal-input" style="min-height: 150px; font-family: monospace; font-size: 0.85rem; white-space: pre;" placeholder="Acme Corp, Jane Doe, John Smith, john@acme.com, +1 555-0000, +1 555-1111"></textarea>
+      </div>
+
+      <p id="addErrorText" class="error-text"></p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('addEntryModal')">Cancel</button><button class="btn-primary" id="saveEntryBtn" onclick="submitAddEntry()">Add Contact(s)</button></div>
     </div>
   </div>
 
@@ -980,6 +999,7 @@
     window.isUnlistedCall = false;
     window.unlistedPhoneNum = "";
     window.lastFilteredData = [];
+    window.entryMode = 'single';
 
     // System Logs Shortcut (Shift + L) & Admin Features
     document.addEventListener('keydown', function(e) {
@@ -1344,8 +1364,16 @@
 
     function initTelnyx() {
       addLog('Authenticating with Telnyx via Google API...');
+      document.getElementById('telnyxToast').style.display = 'block';
+      
       callGoogleAPI('getTelnyxToken').then(res => {
-          if (!res || res.success === false) { addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); showToast('Phone system authentication failed.', 'danger'); return; }
+          if (!res || res.success === false) { 
+              addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); 
+              showToast('Phone system authentication failed.', 'danger'); 
+              document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
+              document.getElementById('telnyxToast').innerText = '☎️ Phone System Disconnected';
+              return; 
+          }
           let tokenStr = typeof res.token === 'string' ? res.token : (res.token ? res.token.toString() : '');
           if (!tokenStr) { addLog('Telnyx Auth Failed: Empty token.'); return; }
           telnyxCallerId = res.callerId;
@@ -1354,11 +1382,26 @@
           telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: tokenStr });
           telnyxClient.remoteElement = 'remoteMedia'; 
 
-          telnyxClient.on('telnyx.ready', () => { isTelnyxReady = true; addLog("Telnyx WebRTC connected and ready."); });
+          telnyxClient.on('telnyx.ready', () => { 
+              isTelnyxReady = true; 
+              addLog("Telnyx WebRTC connected and ready."); 
+              document.getElementById('telnyxToast').style.display = 'none';
+          });
           telnyxClient.on('telnyx.error', (error) => {
             if (error && error.error && error.error.fatal === false) { addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event.")); return; }
             addLog("Telnyx Socket Error: " + JSON.stringify(error)); isTelnyxReady = false;
-            setTimeout(() => { if (!isTelnyxReady && telnyxClient) { addLog("Attempting Telnyx background reconnect..."); telnyxClient.connect(); } }, 3000);
+            document.getElementById('telnyxToast').style.display = 'block';
+            document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
+            document.getElementById('telnyxToast').innerText = '☎️ Phone System Disconnected';
+            
+            setTimeout(() => { 
+                if (!isTelnyxReady && telnyxClient) { 
+                    addLog("Attempting Telnyx background reconnect..."); 
+                    document.getElementById('telnyxToast').style.background = 'var(--warning-color)';
+                    document.getElementById('telnyxToast').innerText = '☎️ Reconnecting to Phone System...';
+                    telnyxClient.connect(); 
+                } 
+            }, 3000);
           });
           telnyxClient.on('telnyx.notification', (notification) => {
             if (notification.type === 'callUpdate') {
@@ -1405,7 +1448,11 @@
             }
           });
           telnyxClient.connect();
-        }).catch(err => { addLog(`Telnyx Auth Error: ${err.message}`); });
+        }).catch(err => { 
+            addLog(`Telnyx Auth Error: ${err.message}`); 
+            document.getElementById('telnyxToast').style.background = 'var(--danger-color)';
+            document.getElementById('telnyxToast').innerText = '☎️ Phone System Initialization Failed';
+        });
     }
 
     function handleCallNowClick() {
@@ -1485,13 +1532,6 @@
         if (audioCtx.state === 'suspended') await audioCtx.resume();
         audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
         
-        if(!window.isUnlistedCall) {
-            const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-            const wsSubmitBtn = document.getElementById('ws-submit-btn');
-            if(postCallBtn) { postCallBtn.disabled = true; postCallBtn.innerText = "⏳ Generating AI Summary..."; }
-            if(wsSubmitBtn) { wsSubmitBtn.disabled = true; wsSubmitBtn.innerText = "⏳ Generating AI Summary..."; }
-        }
-        
         mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
         mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
         recSeconds = 0; document.getElementById('recIndicator').classList.add('active'); document.getElementById('recTimerText').innerText = "REC 00:00";
@@ -1537,8 +1577,6 @@
       const rowId = document.getElementById('ws-row-id').value;
       const reader = new FileReader(); reader.readAsDataURL(audioBlob);
       
-      const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-      const wsSubmitBtn = document.getElementById('ws-submit-btn');
       const attemptVal = document.getElementById('ws-call-attempt-val') ? document.getElementById('ws-call-attempt-val').value : 'Attempt';
       
       reader.onloadend = function() {
@@ -1567,17 +1605,11 @@
                 rawData = updateRes.rows || []; filterData();
                 showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success");
                 addLog(`AI Summary attached to row ${rowId}`);
-                if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-                if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
             }).catch(err => {
                 addLog(`AI append error: ${err.message}`);
-                if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-                if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
             });
          }).catch(err => {
             addLog(`Upload error: ${err.message}`);
-            if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-            if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
          });
       };
     }
@@ -1702,12 +1734,6 @@
           setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
           document.getElementById('ws-recording-url').value = ''; 
           document.getElementById('ws-ai-summary').value = '';
-          
-          // Reset UI buttons
-          const postCallBtn = document.querySelector('#postCallModal .btn-primary');
-          const wsSubmitBtn = document.getElementById('ws-submit-btn');
-          if(postCallBtn) { postCallBtn.disabled = false; postCallBtn.innerText = "Save & Submit Log"; }
-          if(wsSubmitBtn) { wsSubmitBtn.disabled = false; wsSubmitBtn.innerText = "Submit Survey & Save Log"; }
           
           openScriptTab('ws-live-call', document.querySelector('.script-tab'));
 
@@ -1857,6 +1883,14 @@
         body = "Hi " + firstName + ",\n\nI hope you're doing well.\n\nWe are beginning our periodic survey calls to better understand how your team is using the portal and to identify opportunities to improve your overall experience. This will include a short series of questions regarding portal usage, challenges, and any enhancements you'd like to see.\n\nCould you please share your availability for a quick call (20 - 30 minutes) sometime this week or next week? We'll schedule it at a time convenient for you.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nLooking forward to your response.";
       }
       document.getElementById('email-subject-val').value = subj; document.getElementById('email-body-val').value = body; openModal('emailModal');
+    }
+
+    function toggleEntryMode(mode) {
+       window.entryMode = mode;
+       document.getElementById('tabSingleEntry').classList.toggle('active', mode === 'single');
+       document.getElementById('tabBulkEntry').classList.toggle('active', mode === 'bulk');
+       document.getElementById('singleEntryForm').style.display = mode === 'single' ? 'block' : 'none';
+       document.getElementById('bulkEntryForm').style.display = mode === 'bulk' ? 'block' : 'none';
     }
 
     function openFocusMode(sourceEl, title) { focusTargetElement = sourceEl; document.getElementById('focus-title').innerText = title; const focusTextarea = document.getElementById('focus-textarea'); focusTextarea.value = sourceEl.value; focusTextarea.oninput = function() { focusTargetElement.value = this.value; }; openModal('focusModal'); setTimeout(() => focusTextarea.focus(), 100); }
@@ -2014,6 +2048,11 @@
       }).catch(err => { 
           showToast("API Error: " + err.message, "danger"); 
           if(refreshIcon) refreshIcon.classList.remove('icon-spin'); 
+          
+          // DO NOT GHOST THE USER IF GOOGLE RETURNS A 502 ERROR. OFFER A RETRY BUTTON.
+          document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message}. <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
+          const spin = document.querySelector('.spinner');
+          if (spin) spin.style.display = 'none';
       });
     }
 
@@ -2023,7 +2062,9 @@
       
       callGoogleAPI('secureZohoSync', { pin }).then(response => {
            rawData = response.data || []; document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
-           populateExecFilter(); currentPaginationLimit = 50; filterData(); document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts.`; openModal('syncResultModal');
+           populateExecFilter(); currentPaginationLimit = 50; filterData(); 
+           document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts and updated <strong>${response.updated}</strong> existing contacts.`; 
+           openModal('syncResultModal');
         }).catch(err => {
            document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
            openPinModal(); document.getElementById('pinErrorText').textContent = err.message; document.getElementById('pinErrorText').style.display = 'block';
@@ -2031,14 +2072,40 @@
     }
 
     function submitAddEntry() {
-      const client = document.getElementById('addClientInput').value, exec = document.getElementById('addExecInput').value, poc = document.getElementById('addPocInput').value, email = document.getElementById('addEmailInput').value, phone = document.getElementById('addPhoneInput').value, mobile = document.getElementById('addMobileInput').value;
-      if (!client.trim() || !poc.trim() || !email.trim()) { document.getElementById('addErrorText').style.display = 'block'; return; }
-      const btn = document.getElementById('saveEntryBtn'); btn.innerText = "Adding..."; btn.disabled = true;
+       const btn = document.getElementById('saveEntryBtn'); btn.innerText = "Processing..."; btn.disabled = true;
 
-      callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile }).then(data => {
-          btn.innerText = "Add Contact"; btn.disabled = false; closeModal('addEntryModal');
-          rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
-        }).catch(err => { btn.innerText = "Add Contact"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+       if (window.entryMode === 'single') {
+           const client = document.getElementById('addClientInput').value, exec = document.getElementById('addExecInput').value, poc = document.getElementById('addPocInput').value, email = document.getElementById('addEmailInput').value, phone = document.getElementById('addPhoneInput').value, mobile = document.getElementById('addMobileInput').value;
+           if (!client.trim() || !poc.trim() || !email.trim()) { document.getElementById('addErrorText').innerText = 'Client, POC, and Email are required.'; document.getElementById('addErrorText').style.display = 'block'; btn.innerText = "Add Contact"; btn.disabled = false; return; }
+           
+           callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile }).then(data => {
+               btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
+               rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
+           }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+       } else {
+           const lines = document.getElementById('bulkEntryInput').value.split('\n');
+           const entries = [];
+           for (let line of lines) {
+               if(!line.trim()) continue;
+               const parts = line.split(',');
+               if (parts.length >= 4) {
+                   entries.push({
+                       client: parts[0] ? parts[0].trim() : "",
+                       exec: parts[1] ? parts[1].trim() : "",
+                       poc: parts[2] ? parts[2].trim() : "",
+                       email: parts[3] ? parts[3].trim() : "",
+                       phone: parts[4] ? parts[4].trim() : "",
+                       mobile: parts[5] ? parts[5].trim() : ""
+                   });
+               }
+           }
+           if (entries.length === 0) { document.getElementById('addErrorText').innerText = 'Invalid format. Ensure fields are comma-separated.'; document.getElementById('addErrorText').style.display = 'block'; btn.innerText = "Add Contact(s)"; btn.disabled = false; return; }
+           
+           callGoogleAPI('addBulkEntries', { entries: entries }).then(data => {
+               btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
+               rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast(entries.length + ' contacts added in bulk.', 'success');
+           }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+       }
     }
 
     function toggleClient(clientName) { 
@@ -2083,7 +2150,9 @@
       tbody.innerHTML = ''; document.getElementById('bulkToggleIcon').innerHTML = window.collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; updateSortIcons();
 
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
+      
       let completed = 0, attempted = 0, pending = 0;
+      let completedClients = new Set(), attemptedClients = new Set(), pendingClients = new Set();
       
       const completedStatuses = ['Completed', 'Meeting Scheduled', 'Exploring / Learning'];
       const pendingStatuses = ['Pending'];
@@ -2095,19 +2164,20 @@
         const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase(), cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
         const match = (row.client || "").toLowerCase().includes(query) || (row.poc || "").toLowerCase().includes(query) || (row.email || "").toLowerCase().includes(query) || cleanPhoneSearch.includes(query) || cleanMobileSearch.includes(query);
         if (match) { 
-           if (completedStatuses.includes(row.status)) completed++; 
-           else if (pendingStatuses.includes(row.status)) pending++; 
-           else attempted++; 
+           if (completedStatuses.includes(row.status)) { completed++; completedClients.add(row.client); }
+           else if (pendingStatuses.includes(row.status)) { pending++; pendingClients.add(row.client); }
+           else { attempted++; attemptedClients.add(row.client); }
         }
         return match;
       });
       
       window.lastFilteredData = searchFiltered;
 
-      document.getElementById('kpi-total').textContent = searchFiltered.length; 
-      document.getElementById('kpi-completed').textContent = completed; 
-      document.getElementById('kpi-attempted').textContent = attempted; 
-      document.getElementById('kpi-pending').textContent = pending;
+      document.getElementById('kpi-total').innerHTML = `${searchFiltered.length} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${new Set(searchFiltered.map(r => r.client)).size} Clients</span>`; 
+      document.getElementById('kpi-completed').innerHTML = `${completed} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${completedClients.size} Clients</span>`; 
+      document.getElementById('kpi-attempted').innerHTML = `${attempted} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${attemptedClients.size} Clients</span>`; 
+      document.getElementById('kpi-pending').innerHTML = `${pending} <span style="font-size:1rem; opacity:0.7; font-weight:normal;">/ ${pendingClients.size} Clients</span>`;
+
       document.getElementById('footerPocCount').textContent = searchFiltered.length; 
       document.getElementById('footerClientCount').textContent = new Set(searchFiltered.map(r => r.client)).size;
 
@@ -2205,6 +2275,7 @@
         window.isAdmin = (email === 'hariharan.iyer@mindmatrix.net');
         if (window.isAdmin) {
             document.getElementById('btnRollover').style.display = 'flex';
+            document.getElementById('btnSyncCRM').style.display = 'flex';
         }
         
         setTimeout(() => {
