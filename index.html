@@ -823,7 +823,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
       
@@ -1009,7 +1009,6 @@
     let activePresence = {}; 
     let telnyxInitStarted = false;
     
-    // --- RESTORED GLOBAL VARIABLES ---
     let rawData = [];
     let currentSourceTab = 'ALL';
     let currentSortColumn = 'client';
@@ -1027,7 +1026,7 @@
     window.lastFilteredData = [];
     window.entryMode = 'single';
 
-    // System Logs Shortcut (Shift + L) & Admin Features
+    // Shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
             e.preventDefault();
@@ -1037,7 +1036,6 @@
             setTimeout(() => document.getElementById('logsPinInput').focus(), 150);
         }
         
-        // ADMIN ONLY: Alt+S (Toggle Hidden POCs)
         if (e.altKey && (e.key === 's' || e.key === 'S') && window.isAdmin) {
             e.preventDefault();
             window.showHidden = !window.showHidden;
@@ -1045,7 +1043,6 @@
             showToast(window.showHidden ? "Hidden POCs Visible 👁️" : "Hidden POCs Concealed 🙈", "warning");
         }
         
-        // UNLISTED DIALER: Alt+C
         if (e.altKey && (e.key === 'c' || e.key === 'C')) {
             e.preventDefault();
             document.getElementById('unlistedPhoneInput').value = '';
@@ -1077,7 +1074,7 @@
     }
 
     // ==========================================
-    // SMART API FETCH WITH AUTO-RETRY ENGINE
+    // SMART API FETCH WITH RESPONSE VALIDATION
     // ==========================================
     async function callGoogleAPI(action, payload = {}, retries = 2) {
         const session = JSON.parse(localStorage.getItem("mm_cx_portal_session") || "{}");
@@ -1093,14 +1090,15 @@
                 });
                 
                 const text = await response.text();
+                var trimmed = text.trim();
                 
-                if (text.trim().startsWith('<')) {
+                // If response is HTML or plain string starting with "Mindmatrix..." (redirect/glitch)
+                if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
                     if (attempt < retries) { 
-                        // Added backoff jitter for concurrency limit handling
-                        await new Promise(r => setTimeout(r, 3000 + Math.random() * 2000)); 
+                        await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
                         continue; 
                     }
-                    throw new Error("Google Server Error. Please wait a moment and try again.");
+                    throw new Error("Server returned non-JSON response.");
                 }
                 
                 const result = JSON.parse(text);
@@ -1108,10 +1106,10 @@
                 return result.data;
                 
             } catch (err) { 
-                if (attempt === retries || err.message.includes('Unauthorized')) {
+                if (attempt === retries || (err.message && err.message.includes('Unauthorized'))) {
                     throw err; 
                 }
-                await new Promise(r => setTimeout(r, 3000 + Math.random() * 2000)); 
+                await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
             }
         }
     }
@@ -1390,7 +1388,6 @@
       document.getElementById('callOverlayStatus').style.color = "var(--warning-color)"; document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
       document.getElementById('callOverlayDuration').innerText = "00:00"; document.getElementById('dtmfDisplay').innerText = ""; 
       
-      // Reset Mute state
       isMuted = false;
       document.getElementById('muteIcon').innerHTML = `<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>`;
       document.getElementById('muteCallBtn').style.background = "var(--glass-bg)";
@@ -1479,7 +1476,7 @@
                 if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
 
                 if(window.isUnlistedCall) {
-                   return; // Cleanly abort for unlisted calls, skip sheet log modal entirely.
+                   return;
                 }
 
                 document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
@@ -1647,13 +1644,14 @@
             return;
          }
          
-         // Standard mapped client upload
          callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
          .then(res => {
             addLog(`Recording saved. Generating AI Summary...`);
             callGoogleAPI('appendAIToNotes', { rowId: rowId, recordingUrl: res.fileUrl, aiSummary: res.aiSummary, attempt: attemptVal })
             .then(updateRes => {
-                rawData = updateRes.rows || []; filterData();
+                rawData = updateRes.rows || []; 
+                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+                filterData();
                 showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success");
                 addLog(`AI Summary attached to row ${rowId}`);
             }).catch(err => {
@@ -1893,7 +1891,9 @@
        callGoogleAPI('updateContactDetails', { rowId, pocName: document.getElementById('editPocNameInput').value, timezone: document.getElementById('editTzIana').value, customNote: document.getElementById('editNoteInput').value, tags: tagsArr.join(','), attemptDates: attDates, status: statusVal })
          .then(data => {
             btn.innerText = "Save Changes"; btn.disabled = false; closeModal('editPocModal');
-            rawData = data.rows || []; currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
+            rawData = data.rows || []; 
+            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+            currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
          }).catch(err => { btn.innerText = "Save Changes"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
     }
 
@@ -1919,6 +1919,7 @@
         
         callGoogleAPI('hidePOCs', { rowIds: ids, hideState: hideState }).then(res => {
             rawData = res.rows || []; 
+            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
             filterData(); 
             showToast("Visibility successfully updated.", "success");
         }).catch(err => showToast("Error updating visibility: " + err.message, "danger"));
@@ -1939,6 +1940,7 @@
             showToast("Initiating Monthly Rollover...", "warning");
             callGoogleAPI('rolloverMonth', {}).then(res => {
                 rawData = res.rows || []; 
+                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
                 filterData(); 
                 showToast("Monthly Rollover Complete! Ready for new calls.", "success");
             }).catch(err => showToast("Rollover Error: " + err.message, "danger"));
@@ -2019,7 +2021,9 @@
       callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
         .then(data => {
           btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast('Log successfully saved to sheet!', 'success');
-          rawData = data.rows || []; currentPaginationLimit = 50; filterData();
+          rawData = data.rows || []; 
+          localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+          currentPaginationLimit = 50; filterData();
           document.getElementById('ws-internal-notes').value = '';
         }).catch(err => { btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast("Network Error: " + err.message, 'danger'); });
     }
@@ -2110,15 +2114,34 @@
        setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
+    // Instant load from Cache, followed by silent background revalidation
     async function fetchDataAsync() {
-      document.getElementById('table-container').style.display = 'none'; 
-      document.getElementById('loader').style.display = 'flex';
+      const cachedData = localStorage.getItem("mm_contacts_cache");
+      if (cachedData && rawData.length === 0) {
+          try {
+              rawData = JSON.parse(cachedData);
+              document.getElementById('loader').style.display = 'none'; 
+              document.getElementById('kpi-container').style.display = 'flex'; 
+              document.getElementById('source-tabs').style.display = 'flex'; 
+              document.getElementById('controls-bar').style.display = 'flex'; 
+              document.getElementById('statsFooter').style.display = 'block'; 
+              document.getElementById('table-container').style.display = 'block';
+              populateExecFilter(); 
+              filterData();
+          } catch(e){}
+      } else if (rawData.length === 0) {
+          document.getElementById('table-container').style.display = 'none'; 
+          document.getElementById('loader').style.display = 'flex';
+      }
+
       const refreshIcon = document.getElementById('refreshIcon'); 
       if(refreshIcon) refreshIcon.classList.add('icon-spin');
       
       try {
           const data = await callGoogleAPI('getSurveyData');
           rawData = data.rows || []; 
+          localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+          
           if(refreshIcon) refreshIcon.classList.remove('icon-spin');
           document.getElementById('loader').style.display = 'none'; 
           document.getElementById('kpi-container').style.display = 'flex'; 
@@ -2131,12 +2154,14 @@
           currentPaginationLimit = 50; 
           filterData();
       } catch (err) {
-          showToast("API Error: " + err.message, "danger"); 
-          if(refreshIcon) refreshIcon.classList.remove('icon-spin'); 
-          
-          document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message} <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
-          const spin = document.querySelector('.spinner');
-          if (spin) spin.style.display = 'none';
+          if (refreshIcon) refreshIcon.classList.remove('icon-spin'); 
+          if (rawData.length === 0) {
+              document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message} <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
+              const spin = document.querySelector('.spinner');
+              if (spin) spin.style.display = 'none';
+          } else {
+              showToast("Sync paused: " + err.message, "warning");
+          }
       }
     }
 
@@ -2149,7 +2174,9 @@
       document.getElementById('table-container').style.display = 'none'; document.getElementById('loader').style.display = 'flex'; document.getElementById('loaderText').textContent = 'Syncing Zoho CRM...';
       
       callGoogleAPI('secureZohoSync', { pin }).then(response => {
-           rawData = response.data || []; document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
+           rawData = response.data || []; 
+           localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+           document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
            populateExecFilter(); currentPaginationLimit = 50; filterData(); 
            document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts and updated <strong>${response.updated}</strong> existing contacts.`; 
            openModal('syncResultModal');
@@ -2168,7 +2195,9 @@
            
            callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile }).then(data => {
                btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
-               rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
+               rawData = data.rows || []; 
+               localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+               populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
            }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
        } else {
            const lines = document.getElementById('bulkEntryInput').value.split('\n');
@@ -2191,7 +2220,9 @@
            
            callGoogleAPI('addBulkEntries', { entries: entries }).then(data => {
                btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
-               rawData = data.rows || []; populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast(entries.length + ' contacts added in bulk.', 'success');
+               rawData = data.rows || []; 
+               localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+               populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast(entries.length + ' contacts added in bulk.', 'success');
            }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
        }
     }
@@ -2359,7 +2390,6 @@
     function loadDashboard(email) {
         document.getElementById('mm-login-screen').style.opacity = '0'; document.getElementById('loggedInUser').innerText = email;
         
-        // Setup Admin features
         window.isAdmin = (email === 'hariharan.iyer@mindmatrix.net');
         if (window.isAdmin) {
             document.getElementById('btnRollover').style.display = 'flex';
@@ -2390,8 +2420,6 @@
 
     function logout() {
         localStorage.removeItem("mm_cx_portal_session");
-        
-        // Clear Google's opt-out cookie manually to ensure the button never stays hidden
         document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         
         try {
