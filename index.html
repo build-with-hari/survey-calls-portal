@@ -131,17 +131,15 @@
     
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
-    /* MODERNIZED, PERSISTENT ADMIN CHECKBOX */
     .admin-hide-cb { 
       appearance: none; -webkit-appearance: none; 
-      width: 18px; height: 18px; 
+      width: 18px; height: 18px; min-width: 18px; min-height: 18px;
       border: 2px solid var(--glass-border); 
       border-radius: 4px; 
       background: transparent; 
       cursor: pointer; 
       opacity: 0; pointer-events: none; transition: all 0.2s ease; 
-      display: inline-flex; align-items: center; justify-content: center;
-      margin: 0;
+      margin: 0; position: relative; box-sizing: border-box;
     }
     .admin-hide-cb:checked { 
       background: var(--danger-color); 
@@ -154,7 +152,7 @@
       border: solid white; 
       border-width: 0 2px 2px 0; 
       transform: rotate(45deg); 
-      margin-bottom: 2px;
+      position: absolute; top: 1px; left: 4px;
     }
     tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; border-color: var(--text-muted); }
     tr:hover .admin-hide-cb:checked { border-color: var(--danger-color); }
@@ -390,7 +388,7 @@
 
         <!-- KPI DASHBOARD -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
-          <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Contacts</div><div class="kpi-value" id="kpi-total">0</div></div>
+          <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Clients</div><div class="kpi-value" id="kpi-total">0</div></div>
           <div class="kpi-card" id="kpi-card-completed" onclick="toggleKpiFilter('Completed')"><div class="kpi-label">Successful / Completed</div><div class="kpi-value safe" id="kpi-completed">0</div></div>
           <div class="kpi-card" id="kpi-card-attempted" onclick="toggleKpiFilter('Attempted')"><div class="kpi-label">Attempted / Reached</div><div class="kpi-value" id="kpi-attempted" style="color: var(--accent-primary);">0</div></div>
           <div class="kpi-card" id="kpi-card-pending" onclick="toggleKpiFilter('Pending')"><div class="kpi-label">Pending</div><div class="kpi-value warning" id="kpi-pending" style="color: var(--text-muted);">0</div></div>
@@ -505,6 +503,7 @@
              </span>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: var(--input-bg); border: 1px solid var(--input-border);" data-tooltip-top="Edit POC Details / Tags" onclick="openEditModal()">✏️ Edit Details</button>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56,189,248,0.3);" onclick="openTimeline()">🕒 View Timeline & Recordings</button>
+             <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3);" onclick="openCrmNotes()">📝 View CRM Notes</button>
           </div>
           
           <!-- Tags Display injected dynamically -->
@@ -751,7 +750,20 @@
     </div>
   </div>
 
-  <!-- UNLISTED DIALER MODAL -->
+  <!-- CRM NOTES MODAL -->
+  <div class="modal-overlay" id="crmNotesModal" onclick="closeOnBackgroundClick(event, 'crmNotesModal')">
+    <div class="modal-content" style="max-width: 600px; text-align: left;">
+      <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">Zoho CRM Notes</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Latest 10 notes for <span id="crmNotesPoc" style="font-weight:600; color:var(--text-main);"></span></p>
+      
+      <div id="crmNotesContainer" class="timeline-container" style="max-height: 400px; overflow-y: auto;">
+          <!-- Injected via JS -->
+      </div>
+      
+      <div style="margin-top: 1.5rem; text-align: center;"><button class="btn-outline" onclick="closeModal('crmNotesModal')">Close Notes</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="unlistedCallModal" onclick="closeOnBackgroundClick(event, 'unlistedCallModal')">
     <div class="modal-content" style="max-width: 400px;">
       <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Manual Dialer</h2>
@@ -781,7 +793,7 @@
   </div>
 
   <div class="modal-overlay" id="postCallModal">
-    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Call Ended</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Log the outcome of your call with <span id="postCallPocName" style="font-weight:bold; color:var(--accent-primary);"></span>.</p>
       
@@ -811,7 +823,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
       
@@ -871,6 +883,17 @@
       <input type="password" id="logsPinInput" class="modal-input" placeholder="Enter PIN..." style="text-align: center; letter-spacing: 5px; font-size: 1.25rem;">
       <p id="logsPinErrorText" class="error-text">Incorrect PIN.</p>
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;"><button class="btn-outline" onclick="closeModal('logsPinModal')">Cancel</button><button class="btn-primary" onclick="verifyLogsPin()">View Logs</button></div>
+    </div>
+  </div>
+
+  <!-- ROLLOVER PIN MODAL -->
+  <div class="modal-overlay" id="rolloverPinModal" onclick="closeOnBackgroundClick(event, 'rolloverPinModal')">
+    <div class="modal-content" style="max-width: 400px;">
+      <h2 style="font-size:1.5rem; font-weight:700;">Admin Authorization</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem;">Enter Admin PIN to initiate Monthly Rollover.</p>
+      <input type="password" id="rolloverPinInput" class="modal-input" placeholder="Enter PIN..." style="text-align: center; letter-spacing: 5px; font-size: 1.25rem;">
+      <p id="rolloverPinErrorText" class="error-text">Incorrect PIN.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;"><button class="btn-outline" onclick="closeModal('rolloverPinModal')">Cancel</button><button class="btn-primary" onclick="verifyRolloverPin()">Rollover</button></div>
     </div>
   </div>
 
@@ -1035,6 +1058,14 @@
         if (e.key === 'Enter') verifyLogsPin();
     });
 
+    document.getElementById('syncPinInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitZohoSync();
+    });
+    
+    document.getElementById('rolloverPinInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') verifyRolloverPin();
+    });
+
     function verifyLogsPin() {
         if (document.getElementById('logsPinInput').value === "4274") {
             closeModal('logsPinModal');
@@ -1066,7 +1097,7 @@
                 if (text.trim().startsWith('<')) {
                     if (attempt < retries) { 
                         // Added backoff jitter for concurrency limit handling
-                        await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
+                        await new Promise(r => setTimeout(r, 3000 + Math.random() * 2000)); 
                         continue; 
                     }
                     throw new Error("Google Server Error. Please wait a moment and try again.");
@@ -1080,7 +1111,7 @@
                 if (attempt === retries || err.message.includes('Unauthorized')) {
                     throw err; 
                 }
-                await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
+                await new Promise(r => setTimeout(r, 3000 + Math.random() * 2000)); 
             }
         }
     }
@@ -1273,7 +1304,11 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; setTimeout(() => document.getElementById(id).classList.add('active'), 10); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); setTimeout(() => document.getElementById(id).style.display = 'none', 300); }
     function closeOnBackgroundClick(event, id) { if (event.target.id === id) closeModal(id); }
-    function openPinModal() { openModal('pinModal'); }
+    
+    function openPinModal() { 
+        openModal('pinModal'); 
+        setTimeout(() => document.getElementById('syncPinInput').focus(), 150); 
+    }
 
     // ==========================================
     // EMAIL DISPATCH (Client-Side Natively via Gmail)
@@ -1375,6 +1410,7 @@
               addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); 
               document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
               document.getElementById('phoneStatusIcon').innerText = '❌';
+              document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
               document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected';
               return; 
           }
@@ -1680,6 +1716,35 @@
         openModal('timelineModal');
     }
 
+    function openCrmNotes() {
+        const email = document.getElementById('ws-email-val').value;
+        const pocName = document.getElementById('ws-poc').value;
+        document.getElementById('crmNotesPoc').innerText = pocName;
+        const container = document.getElementById('crmNotesContainer');
+        container.innerHTML = '<div class="loader-container"><div class="spinner"></div><div style="font-size:0.85rem;">Fetching CRM Notes...</div></div>';
+        openModal('crmNotesModal');
+
+        callGoogleAPI('getZohoNotes', { email: email }).then(notes => {
+            if (!notes || notes.length === 0) {
+                container.innerHTML = "<p style='color:var(--text-muted); padding:1rem;'>No notes found in Zoho CRM for this contact.</p>";
+                return;
+            }
+            let html = "";
+            notes.forEach(n => {
+                html += `<div class="timeline-item">
+                            <div class="tl-date">${n.time} - ${n.owner}</div>
+                            <div class="tl-content" style="background:var(--glass-highlight); padding:0.8rem;">
+                                <strong style="display:block; margin-bottom:4px; color:var(--accent-primary);">${n.title}</strong>
+                                ${n.content}
+                            </div>
+                         </div>`;
+            });
+            container.innerHTML = html;
+        }).catch(err => {
+            container.innerHTML = `<p class="error-text" style="display:block;">Error fetching notes: ${err.message}</p>`;
+        });
+    }
+
     function triggerWorkspaceByData(row) {
       try {
           document.getElementById('ws-row-id').value = row.id;
@@ -1858,14 +1923,27 @@
     }
 
     function triggerRollover() {
-        if(!confirm("Are you sure? This will archive your current Active Clients sheet and clear all Attempt Dates, Statuses, and Notes for the new month!")) return;
-        
-        showToast("Initiating Monthly Rollover...", "warning");
-        callGoogleAPI('rolloverMonth', {}).then(res => {
-            rawData = res.rows || []; 
-            filterData(); 
-            showToast("Monthly Rollover Complete! Ready for new calls.", "success");
-        }).catch(err => showToast("Rollover Error: " + err.message, "danger"));
+        openModal('rolloverPinModal');
+        setTimeout(() => document.getElementById('rolloverPinInput').focus(), 150);
+    }
+    
+    function verifyRolloverPin() {
+        if (document.getElementById('rolloverPinInput').value === "4274") {
+            closeModal('rolloverPinModal');
+            document.getElementById('rolloverPinInput').value = '';
+            
+            if(!confirm("Are you sure? This will archive your current Active Clients sheet and clear all Attempt Dates, Statuses, and Notes for the new month!")) return;
+            
+            showToast("Initiating Monthly Rollover...", "warning");
+            callGoogleAPI('rolloverMonth', {}).then(res => {
+                rawData = res.rows || []; 
+                filterData(); 
+                showToast("Monthly Rollover Complete! Ready for new calls.", "success");
+            }).catch(err => showToast("Rollover Error: " + err.message, "danger"));
+
+        } else {
+            document.getElementById('rolloverPinErrorText').style.display = 'block';
+        }
     }
 
     function closeWorkspace() {
@@ -1939,7 +2017,8 @@
       callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
         .then(data => {
           btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast('Log successfully saved to sheet!', 'success');
-          closeWorkspace(); rawData = data.rows || []; currentPaginationLimit = 50; filterData();
+          rawData = data.rows || []; currentPaginationLimit = 50; filterData();
+          document.getElementById('ws-internal-notes').value = '';
         }).catch(err => { btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast("Network Error: " + err.message, 'danger'); });
     }
 
