@@ -823,7 +823,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
       
@@ -1731,11 +1731,12 @@
             }
             let html = "";
             notes.forEach(n => {
-                // Using string concatenation to prevent the white-space formatting trap!
                 html += '<div class="timeline-item">' +
-                            '<div class="tl-date">' + n.time + ' - ' + n.owner + '</div>' +
+                            '<div class="tl-date" style="display:flex; align-items:center; gap:6px;">' +
+                                '<span style="font-size:1.1rem;">' + n.icon + '</span> ' +
+                                '<span>' + n.time + ' - ' + n.owner + '</span>' +
+                            '</div>' +
                             '<div class="tl-content" style="background:var(--input-bg); padding:1rem; text-align:left; border: 1px solid var(--glass-border); border-radius:12px;">' +
-                                '<strong style="display:block; margin-bottom:8px; color:var(--accent-primary); font-size:1rem;">' + n.title + '</strong>' +
                                 '<div style="white-space: pre-wrap; font-size:0.95rem; line-height:1.6; color:var(--text-main); margin:0;">' + (n.content || "").trim() + '</div>' +
                             '</div>' +
                         '</div>';
