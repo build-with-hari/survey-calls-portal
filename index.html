@@ -34,8 +34,8 @@
     }
 
     .flatpickr-calendar { z-index: 999999 !important; font-family: inherit; box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; border: 1px solid var(--glass-border) !important; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; scroll-behavior: smooth; }
-    html, body { overflow: hidden !important; background-color: var(--bg-color); height: 100vh; width: 100vw; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
+    html, body { overflow: hidden !important; margin: 0; padding: 0; background-color: var(--bg-color); height: 100vh; width: 100vw; }
     
     .app-scroll-container { height: 100vh; width: 100vw; overflow-y: auto; overflow-x: hidden; padding: 2rem 2rem 6rem 2rem; position: relative; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent; transition: background-color 0.4s ease, color 0.4s ease; color: var(--text-main); }
     .app-scroll-container::-webkit-scrollbar, .workspace-left::-webkit-scrollbar, .workspace-right::-webkit-scrollbar, .modal-content::-webkit-scrollbar, .select-options::-webkit-scrollbar { width: 8px; }
@@ -45,14 +45,13 @@
     .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index:-1; animation: float 20s infinite ease-in-out; }
     .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); animation-delay: 0s; }
     .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); animation-delay: -5s; }
-    
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(5%, 10%) scale(1.1); } 66% { transform: translate(-5%, -5%) scale(0.9); } }
 
     [data-tooltip-bottom], [data-tooltip-top] { position: relative; cursor: pointer; }
-    [data-tooltip-bottom]::after, [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
-    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); top: calc(100% + 8px); transform: translateX(-50%) translateY(-5px); }
-    [data-tooltip-top]::after { bottom: calc(100% + 8px); }
-    [data-tooltip-bottom]:hover::after, [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
+    [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
+    [data-tooltip-bottom]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
     .liquid-glass { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight); border-left: 1px solid var(--glass-highlight); border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); padding: 1.5rem 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease; }
     .header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
@@ -110,7 +109,7 @@
     .search-wrapper { position: relative; flex: 1; min-width: 240px; display: flex; align-items: center; }
     .search-input { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); padding: 0.75rem 2.5rem 0.75rem 1.25rem; border-radius: 16px; font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .search-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
-    .search-clear { position: absolute; right: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; display: none; padding: 0; outline: none; border-radius: 50%; width: 24px; height: 24px; align-items: center; justify-content: center; }
+    .search-clear { position: absolute; right: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; display: none; padding: 0; line-height: 1; outline: none; border-radius: 50%; width: 24px; height: 24px; align-items: center; justify-content: center; }
     .search-clear:hover { color: var(--accent-primary); background: var(--glass-highlight); }
 
     .table-container { overflow-x: auto; padding-bottom: 1rem; }
@@ -129,11 +128,32 @@
     .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.3); }
     .badge-crm { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; margin-left: 0.5rem; vertical-align: middle; }
     .badge-note { background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; vertical-align: middle; cursor: help; display: inline-flex; align-items: center; }
+    
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
-    .admin-hide-cb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; min-width: 18px; min-height: 18px; border: 2px solid var(--glass-border); border-radius: 4px; background: transparent; cursor: pointer; opacity: 0; pointer-events: none; transition: all 0.2s ease; margin: 0; position: relative; box-sizing: border-box; }
-    .admin-hide-cb:checked { background: var(--danger-color); border-color: var(--danger-color); opacity: 1; pointer-events: auto; }
-    .admin-hide-cb:checked::after { content: ''; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); position: absolute; top: 1px; left: 4px; }
+    .admin-hide-cb { 
+      appearance: none; -webkit-appearance: none; 
+      width: 18px; height: 18px; min-width: 18px; min-height: 18px;
+      border: 2px solid var(--glass-border); 
+      border-radius: 4px; 
+      background: transparent; 
+      cursor: pointer; 
+      opacity: 0; pointer-events: none; transition: all 0.2s ease; 
+      margin: 0; position: relative; box-sizing: border-box;
+    }
+    .admin-hide-cb:checked { 
+      background: var(--danger-color); 
+      border-color: var(--danger-color); 
+      opacity: 1; pointer-events: auto; 
+    }
+    .admin-hide-cb:checked::after { 
+      content: ''; 
+      width: 4px; height: 8px; 
+      border: solid white; 
+      border-width: 0 2px 2px 0; 
+      transform: rotate(45deg); 
+      position: absolute; top: 1px; left: 4px;
+    }
     tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; border-color: var(--text-muted); }
     tr:hover .admin-hide-cb:checked { border-color: var(--danger-color); }
 
@@ -147,7 +167,7 @@
     .nav-arrow { width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.2s; font-size: 1.2rem; }
     .nav-arrow:hover { background: var(--accent-primary); color: white; border-color: var(--accent-primary); transform: scale(1.05); }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.active { display: flex; opacity: 1; }
     .modal-content { max-height: 90vh; overflow-y: auto; overflow-x: hidden; max-width: 480px; width: 92%; text-align: center; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35); border-radius: 20px; padding: 2rem; color: var(--text-main); transform: scale(0.95); transition: transform 0.3s ease; }
     .modal-overlay.active .modal-content { transform: scale(1); }
@@ -210,7 +230,11 @@
     .rec-indicator.active { animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    .active-call-overlay { position: fixed; bottom: 2rem; right: 5rem; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center; gap: 1.5rem; z-index: 100000; min-width: 280px; transform: translateY(150%); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .active-call-overlay {
+      position: fixed; bottom: 2rem; right: 5rem; background: var(--modal-bg); border: 1px solid var(--modal-border);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center;
+      gap: 1.5rem; z-index: 100000; min-width: 280px; transform: translateY(150%); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
     .active-call-overlay.active { transform: translateY(0); opacity: 1; }
     .call-pulse { width: 12px; height: 12px; background: var(--warning-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); animation: pulse 1.5s infinite; }
     
@@ -257,7 +281,12 @@
         <div id="callOverlayDuration" style="font-size: 1.5rem; font-weight: 300; font-family: monospace; color: var(--text-main);">00:00</div>
       </div>
       <button id="muteCallBtn" class="btn-icon" style="background: var(--glass-bg); color: var(--text-main); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--glass-border);" onclick="toggleMuteCall()" data-tooltip-top="Mute Mic">
-        <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
       </button>
       <button class="btn-icon" style="background: var(--danger-color); color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);" onclick="hangupCall()" data-tooltip-top="End Call">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
@@ -1740,13 +1769,14 @@
                 return; 
             }
             let html = "";
-            notes.forEach(n => { 
+            notes.forEach(n => {
                 html += '<div class="timeline-item">' +
                             '<div class="tl-date" style="display:flex; align-items:center; gap:6px;">' +
                                 '<span style="font-size:1.1rem;">' + n.icon + '</span> ' +
                                 '<span>' + n.time + ' - ' + n.owner + '</span>' +
                             '</div>' +
                             '<div class="tl-content" style="background:var(--input-bg); padding:1rem; text-align:left; border: 1px solid var(--glass-border); border-radius:12px;">' +
+                                '<strong style="display:block; margin-bottom:8px; color:var(--accent-primary); font-size:1rem;">' + n.title + '</strong>' +
                                 '<div style="white-space: pre-wrap; font-size:0.95rem; line-height:1.6; color:var(--text-main); margin:0;">' + (n.content || "").trim() + '</div>' +
                             '</div>' +
                         '</div>'; 
