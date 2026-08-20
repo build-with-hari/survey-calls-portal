@@ -34,8 +34,8 @@
     }
 
     .flatpickr-calendar { z-index: 999999 !important; font-family: inherit; box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important; border: 1px solid var(--glass-border) !important; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
-    html, body { overflow: hidden !important; margin: 0; padding: 0; background-color: var(--bg-color); height: 100vh; width: 100vw; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; scroll-behavior: smooth; }
+    html, body { overflow: hidden !important; background-color: var(--bg-color); height: 100vh; width: 100vw; }
     
     .app-scroll-container { height: 100vh; width: 100vw; overflow-y: auto; overflow-x: hidden; padding: 2rem 2rem 6rem 2rem; position: relative; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent; transition: background-color 0.4s ease, color 0.4s ease; color: var(--text-main); }
     .app-scroll-container::-webkit-scrollbar, .workspace-left::-webkit-scrollbar, .workspace-right::-webkit-scrollbar, .modal-content::-webkit-scrollbar, .select-options::-webkit-scrollbar { width: 8px; }
@@ -45,13 +45,14 @@
     .blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index:-1; animation: float 20s infinite ease-in-out; }
     .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); animation-delay: 0s; }
     .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: var(--blob-2); animation-delay: -5s; }
+    
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(5%, 10%) scale(1.1); } 66% { transform: translate(-5%, -5%) scale(0.9); } }
 
     [data-tooltip-bottom], [data-tooltip-top] { position: relative; cursor: pointer; }
-    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
-    [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
-    [data-tooltip-bottom]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-    [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    [data-tooltip-bottom]::after, [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
+    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); top: calc(100% + 8px); transform: translateX(-50%) translateY(-5px); }
+    [data-tooltip-top]::after { bottom: calc(100% + 8px); }
+    [data-tooltip-bottom]:hover::after, [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
     .liquid-glass { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight); border-left: 1px solid var(--glass-highlight); border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); padding: 1.5rem 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease; }
     .header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
@@ -109,7 +110,7 @@
     .search-wrapper { position: relative; flex: 1; min-width: 240px; display: flex; align-items: center; }
     .search-input { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); padding: 0.75rem 2.5rem 0.75rem 1.25rem; border-radius: 16px; font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .search-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
-    .search-clear { position: absolute; right: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; display: none; padding: 0; line-height: 1; outline: none; border-radius: 50%; width: 24px; height: 24px; align-items: center; justify-content: center; }
+    .search-clear { position: absolute; right: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; display: none; padding: 0; outline: none; border-radius: 50%; width: 24px; height: 24px; align-items: center; justify-content: center; }
     .search-clear:hover { color: var(--accent-primary); background: var(--glass-highlight); }
 
     .table-container { overflow-x: auto; padding-bottom: 1rem; }
@@ -128,32 +129,11 @@
     .badge-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.3); }
     .badge-crm { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; margin-left: 0.5rem; vertical-align: middle; }
     .badge-note { background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.65rem; vertical-align: middle; cursor: help; display: inline-flex; align-items: center; }
-    
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
-    .admin-hide-cb { 
-      appearance: none; -webkit-appearance: none; 
-      width: 18px; height: 18px; min-width: 18px; min-height: 18px;
-      border: 2px solid var(--glass-border); 
-      border-radius: 4px; 
-      background: transparent; 
-      cursor: pointer; 
-      opacity: 0; pointer-events: none; transition: all 0.2s ease; 
-      margin: 0; position: relative; box-sizing: border-box;
-    }
-    .admin-hide-cb:checked { 
-      background: var(--danger-color); 
-      border-color: var(--danger-color); 
-      opacity: 1; pointer-events: auto; 
-    }
-    .admin-hide-cb:checked::after { 
-      content: ''; 
-      width: 4px; height: 8px; 
-      border: solid white; 
-      border-width: 0 2px 2px 0; 
-      transform: rotate(45deg); 
-      position: absolute; top: 1px; left: 4px;
-    }
+    .admin-hide-cb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; min-width: 18px; min-height: 18px; border: 2px solid var(--glass-border); border-radius: 4px; background: transparent; cursor: pointer; opacity: 0; pointer-events: none; transition: all 0.2s ease; margin: 0; position: relative; box-sizing: border-box; }
+    .admin-hide-cb:checked { background: var(--danger-color); border-color: var(--danger-color); opacity: 1; pointer-events: auto; }
+    .admin-hide-cb:checked::after { content: ''; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); position: absolute; top: 1px; left: 4px; }
     tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; border-color: var(--text-muted); }
     tr:hover .admin-hide-cb:checked { border-color: var(--danger-color); }
 
@@ -167,7 +147,7 @@
     .nav-arrow { width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.2s; font-size: 1.2rem; }
     .nav-arrow:hover { background: var(--accent-primary); color: white; border-color: var(--accent-primary); transform: scale(1.05); }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.active { display: flex; opacity: 1; }
     .modal-content { max-height: 90vh; overflow-y: auto; overflow-x: hidden; max-width: 480px; width: 92%; text-align: center; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35); border-radius: 20px; padding: 2rem; color: var(--text-main); transform: scale(0.95); transition: transform 0.3s ease; }
     .modal-overlay.active .modal-content { transform: scale(1); }
@@ -230,11 +210,7 @@
     .rec-indicator.active { animation: blink 1s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    .active-call-overlay {
-      position: fixed; bottom: 2rem; right: 5rem; background: var(--modal-bg); border: 1px solid var(--modal-border);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center;
-      gap: 1.5rem; z-index: 100000; min-width: 280px; transform: translateY(150%); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+    .active-call-overlay { position: fixed; bottom: 2rem; right: 5rem; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center; gap: 1.5rem; z-index: 100000; min-width: 280px; transform: translateY(150%); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .active-call-overlay.active { transform: translateY(0); opacity: 1; }
     .call-pulse { width: 12px; height: 12px; background: var(--warning-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); animation: pulse 1.5s infinite; }
     
@@ -254,9 +230,8 @@
 </head>
 <body>
 
-  <!-- Invisible Audio Element for Telnyx SDK (Remote Audio) -->
+  <!-- Invisible Audio Element for Telnyx SDK -->
   <audio id="remoteMedia" autoplay></audio>
-
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
 
@@ -282,22 +257,14 @@
         <div id="callOverlayDuration" style="font-size: 1.5rem; font-weight: 300; font-family: monospace; color: var(--text-main);">00:00</div>
       </div>
       <button id="muteCallBtn" class="btn-icon" style="background: var(--glass-bg); color: var(--text-main); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--glass-border);" onclick="toggleMuteCall()" data-tooltip-top="Mute Mic">
-        <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-          <line x1="12" y1="19" x2="12" y2="23"></line>
-          <line x1="8" y1="23" x2="16" y2="23"></line>
-        </svg>
+        <svg id="muteIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
       </button>
       <button class="btn-icon" style="background: var(--danger-color); color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);" onclick="hangupCall()" data-tooltip-top="End Call">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
       </button>
     </div>
-    <!-- DTMF Display & Toggle -->
     <div id="dtmfDisplay" style="font-family: monospace; letter-spacing: 3px; height: 20px; color: var(--accent-primary); font-size: 1.1rem; text-align: center; margin-top: 5px;"></div>
     <button id="toggleDialpadBtn" class="btn-outline" style="width: 100%; margin-top: 5px; font-size: 0.8rem; padding: 0.4rem; justify-content: center;" onclick="toggleDialpad()">🎛️ Show Keypad</button>
-    
-    <!-- Mini Dialpad for IVR -->
     <div id="ivrDialpad" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 10px;">
         <button class="btn-outline" style="padding: 0.4rem; justify-content: center;" onclick="sendDTMF('1')">1</button>
         <button class="btn-outline" style="padding: 0.4rem; justify-content: center;" onclick="sendDTMF('2')">2</button>
@@ -345,15 +312,12 @@
 
   <!-- MAIN DASHBOARD -->
   <div id="app-components" style="display: none;">
-      
-      <!-- FLOATING NAV ARROWS -->
       <div class="floating-nav" id="global-nav-arrows">
         <button class="nav-arrow" onclick="scrollActiveView('up')" data-tooltip-top="Scroll Top">↑</button>
         <button class="nav-arrow" onclick="scrollActiveView('down')" data-tooltip-top="Scroll Bottom">↓</button>
       </div>
 
       <div class="app-scroll-container" id="mainDashboard">
-
         <div class="liquid-glass">
           <div class="header-bar">
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -364,29 +328,22 @@
               </div>
             </div>
             
-            <!-- CLEANED UP ICON ACTION BAR -->
             <div class="action-group">
-              <span style="font-size: 0.85rem; color: var(--text-muted); margin-right: 10px; display: inline-block;">Logged in as: <strong id="loggedInUser" style="color: var(--text-main);"></strong></span>
-              
+              <div style="display:flex; flex-direction:column; text-align:right; margin-right:10px;">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Logged in as: <strong id="loggedInUser" style="color: var(--text-main);"></strong></span>
+                <span id="crmSyncTimeDisplay" style="font-size: 0.75rem; color: var(--accent-primary);">CRM Synced: Never</span>
+              </div>
               <button id="btnRollover" class="theme-toggle" style="display:none;" onclick="triggerRollover()" data-tooltip-bottom="Rollover Month">🔄</button>
-              
-              <button class="theme-toggle" onclick="fetchData()" id="refreshBtn" data-tooltip-bottom="Reload Data">
-                <svg id="refreshIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
-              </button>
-              
+              <button class="theme-toggle" onclick="fetchData()" id="refreshBtn" data-tooltip-bottom="Reload Data"><svg id="refreshIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg></button>
               <button class="theme-toggle" onclick="openAnalytics()" data-tooltip-bottom="Visual Analytics">📊</button>
               <button class="theme-toggle" onclick="openModal('addEntryModal')" data-tooltip-bottom="Add Manual Entry">➕</button>
               <button id="btnSyncCRM" class="theme-toggle" style="display:none;" onclick="openPinModal()" data-tooltip-bottom="Sync Zoho CRM">☁️</button>
               <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" data-tooltip-bottom="Toggle Theme">🌙</button>
-              
-              <button class="theme-toggle" onclick="logout()" data-tooltip-bottom="Sign Out">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              </button>
+              <button class="theme-toggle" onclick="logout()" data-tooltip-bottom="Sign Out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
             </div>
           </div>
         </div>
 
-        <!-- KPI DASHBOARD -->
         <div class="kpi-container" id="kpi-container" style="display: none;">
           <div class="kpi-card" id="kpi-card-total" onclick="toggleKpiFilter(null)"><div class="kpi-label">Total Clients</div><div class="kpi-value" id="kpi-total">0</div></div>
           <div class="kpi-card" id="kpi-card-completed" onclick="toggleKpiFilter('Completed')"><div class="kpi-label">Successful / Completed</div><div class="kpi-value safe" id="kpi-completed">0</div></div>
@@ -394,9 +351,7 @@
           <div class="kpi-card" id="kpi-card-pending" onclick="toggleKpiFilter('Pending')"><div class="kpi-label">Pending</div><div class="kpi-value warning" id="kpi-pending" style="color: var(--text-muted);">0</div></div>
         </div>
 
-        <!-- Data Panel -->
         <div class="liquid-glass" style="min-height: 400px;">
-          
           <div class="source-tabs" id="source-tabs" style="display: none;">
              <button class="source-tab active" data-source="ALL" onclick="switchSourceTab('ALL')">All Contacts</button>
              <button class="source-tab" data-source="Manual" onclick="switchSourceTab('Manual')">Manual Entries</button>
@@ -408,8 +363,6 @@
               <input type="text" id="searchInput" class="search-input" placeholder="Search by Client, POC, Email or Phone..." oninput="handleSearchInput()">
               <button id="searchClear" class="search-clear" onclick="clearSearch()" data-tooltip-top="Clear Search">&times;</button>
             </div>
-            
-            <!-- Custom Filter by Executive -->
             <div class="custom-select" id="exec-dropdown" style="width: 250px; flex: none;">
                <div class="select-trigger dash-filter-trigger" onclick="toggleDropdown('exec-dropdown')">
                    <span id="exec-display">All Executives</span>
@@ -420,18 +373,14 @@
             </div>
           </div>
 
-          <div id="loader" class="loader-container">
-              <div class="spinner"></div>
-              <div id="loaderText">Loading client contacts...</div>
-          </div>
+          <div id="loader" class="loader-container"><div class="spinner"></div><div id="loaderText">Loading client contacts...</div></div>
           
           <div class="table-container" id="table-container" style="display: none;">
             <table id="mainTable">
               <thead>
                 <tr>
                   <th class="sortable" onclick="setSort('client')" data-tooltip-top="Sort by Client Name">
-                    <button class="btn-icon" style="padding: 2px; margin-right: 6px; color: var(--text-muted);" onclick="event.stopPropagation(); toggleAllClients();" data-tooltip-top="Expand/Collapse All" id="bulkToggleIcon"></button>
-                    Client & Contact Details <span id="sort-icon-client"></span>
+                    <button class="btn-icon" style="padding: 2px; margin-right: 6px; color: var(--text-muted);" onclick="event.stopPropagation(); toggleAllClients();" data-tooltip-top="Expand/Collapse All" id="bulkToggleIcon"></button> Client & Contact Details <span id="sort-icon-client"></span>
                   </th>
                   <th class="sortable" onclick="setSort('contact')" data-tooltip-top="Sort by Contact Info">Phone / Email <span id="sort-icon-contact"></span></th>
                   <th class="sortable" onclick="setSort('date')" data-tooltip-top="Sort by Date">Last Attempt Date <span id="sort-icon-date"></span></th>
@@ -441,32 +390,18 @@
               </thead>
               <tbody id="table-body"></tbody>
             </table>
-            
-            <!-- Pagination Controls -->
-            <div id="paginationControls" style="text-align: center; margin-top: 1rem; display: none;">
-               <button class="btn-outline" onclick="loadMoreData()">Load More Records ↓</button>
-            </div>
+            <div id="paginationControls" style="text-align: center; margin-top: 1rem; display: none;"><button class="btn-outline" onclick="loadMoreData()">Load More Records ↓</button></div>
           </div>
-          
-          <div id="statsFooter" style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: none;">
-              Total Clients: <span id="footerClientCount" style="color: var(--text-main);">0</span> &nbsp;|&nbsp; Total POCs: <span id="footerPocCount" style="color: var(--text-main);">0</span>
-          </div>
-
+          <div id="statsFooter" style="text-align: center; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: none;">Total Clients: <span id="footerClientCount" style="color: var(--text-main);">0</span> &nbsp;|&nbsp; Total POCs: <span id="footerPocCount" style="color: var(--text-main);">0</span></div>
         </div>
       </div>
 
       <!-- ACTION WORKSPACE -->
       <div id="actionWorkspace">
-        
         <!-- LEFT PANE: SCRIPT -->
         <div class="workspace-left">
           <div class="ws-header-area">
-            <button class="back-btn" onclick="closeWorkspace()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> 
-              Back to Dashboard
-            </button>
-            
-            <!-- CUSTOM POC SWITCHER -->
+            <button class="back-btn" onclick="closeWorkspace()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Dashboard</button>
             <div class="poc-custom-select" id="ws-poc-dropdown" style="max-width: 280px;">
                <div class="poc-select-trigger" onclick="togglePocDropdown()">
                  <span id="ws-poc-selected-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Select POC...</span>
@@ -477,47 +412,30 @@
           </div>
 
           <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span>Call Script</span>
-                <span id="ws-top-attempt-badge" class="badge badge-attempt" style="display:none; font-size: 0.75rem;"></span>
-            </div>
+            <div style="display: flex; align-items: center; gap: 10px;"><span>Call Script</span><span id="ws-top-attempt-badge" class="badge badge-attempt" style="display:none; font-size: 0.75rem;"></span></div>
             <button class="btn-primary" id="callActionBtn" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;" onclick="handleCallNowClick()">📞 Call Now</button>
           </h2>
 
-          <!-- RECORDING CONTROL BAR -->
           <div class="rec-bar">
             <div class="rec-indicator" id="recIndicator"></div>
             <span id="recTimerText" style="font-size: 0.85rem; font-weight: 600; font-family: monospace; flex: 1;">Recording Standby</span>
-            
-            <!-- Hidden inputs to hold generated AI data -->
-            <input type="hidden" id="ws-recording-url">
-            <input type="hidden" id="ws-ai-summary">
-            
+            <input type="hidden" id="ws-recording-url"><input type="hidden" id="ws-ai-summary">
             <button class="btn-outline" id="recToggleBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="toggleRecordingPause()">⏸️ Pause</button>
             <button class="btn-outline" id="recStopBtn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-color: var(--danger-color); color: var(--danger-color);" onclick="stopRecordingAndUpload()">🛑 Stop & Save</button>
           </div>
           
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap;">
-             <span style="color: var(--text-muted); font-size: 0.95rem;">
-                Speaking with: <strong class="dyn-client-name" style="color: var(--accent-primary);">[Name]</strong> at <strong class="dyn-company-name">[Company]</strong>
-             </span>
+             <span style="color: var(--text-muted); font-size: 0.95rem;">Speaking with: <strong class="dyn-client-name" style="color: var(--accent-primary);">[Name]</strong> at <strong class="dyn-company-name">[Company]</strong></span>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: var(--input-bg); border: 1px solid var(--input-border);" data-tooltip-top="Edit POC Details / Tags" onclick="openEditModal()">✏️ Edit Details</button>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(56, 189, 248, 0.1); color: var(--accent-primary); border: 1px solid rgba(56,189,248,0.3);" onclick="openTimeline()">🕒 View Timeline & Recordings</button>
              <button class="btn-icon" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3);" onclick="openCrmNotes()">📝 View CRM Notes</button>
           </div>
           
-          <!-- Tags Display injected dynamically -->
           <div id="ws-tags-display" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;"></div>
 
-          <!-- Persistent Info Area (Timezone & Note) -->
           <div id="ws-persistent-info" style="background: var(--glass-highlight); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; border: 1px solid var(--glass-border); display: none;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-               <span><strong>Timezone:</strong> <span id="ws-tz-display"></span></span>
-               <span id="ws-live-time" style="color: var(--accent-primary); font-weight: 600; font-family: monospace;"></span>
-            </div>
-            <div id="ws-note-wrapper" style="margin-top: 0.5rem;">
-               <strong>Custom Note:</strong> <span id="ws-note-display" style="color: var(--warning-color);"></span>
-            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;"><span><strong>Timezone:</strong> <span id="ws-tz-display"></span></span><span id="ws-live-time" style="color: var(--accent-primary); font-weight: 600; font-family: monospace;"></span></div>
+            <div id="ws-note-wrapper" style="margin-top: 0.5rem;"><strong>Custom Note:</strong> <span id="ws-note-display" style="color: var(--warning-color);"></span></div>
           </div>
 
           <div class="script-tabs">
@@ -527,67 +445,43 @@
             <button class="script-tab" onclick="openScriptTab('ws-email', this)">✉️ Email Outreach</button>
           </div>
 
-          <!-- Live Call Script -->
           <div id="ws-live-call" class="script-content active">
             <p>“Hi, this is <strong style="color: var(--accent-primary);" class="dyn-exec-name">[Exec]</strong> from Mindmatrix. Am I speaking with <strong style="color: var(--accent-primary);" class="dyn-client-name">[Name]</strong>?”</p>
             <p><b>If yes:</b><br>“Hi <strong style="color: var(--accent-primary);" class="dyn-client-first-name">[First Name]</strong>, how are you today?”<br><i>(Pause)</i></p>
-            <p>“I’m calling as part of our ongoing effort to ensure your success with Mindmatrix Bridge. We want to make sure everything is working smoothly, and that the platform continues to support your channel network effectively.</p>
-            <p>Do you have a few minutes? I’d love to hear how your experience has been so far and gather any feedback you might have.”</p>
-            
+            <p>“I’m calling as part of our ongoing effort to ensure your success with Mindmatrix Bridge. We want to make sure everything is working smoothly, and that the platform continues to support your channel network effectively. Do you have a few minutes? I’d love to hear how your experience has been so far and gather any feedback you might have.”</p>
             <hr style="border: 0; border-top: 1px dashed var(--glass-border); margin: 1.5rem 0;">
             <p style="color: var(--danger-color); font-weight: bold;">If they don't have time:</p>
             <p>“I completely understand. I don’t want to keep you. Would there be a better time I can give you a quick call back?” <i>(Note preferred time below)</i></p>
             <p><b>If they won't commit:</b><br>“No problem. I can also send you a quick email with a short feedback link so you can share your thoughts at your convenience. Would that work better?”</p>
-            <div class="template-card">
-              <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Follow-up Email (CC TL/Mgr)</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('notime')">Preview & Send</button>
-            </div>
+            <div class="template-card"><span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Follow-up Email (CC TL/Mgr)</span><button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('notime')">Preview & Send</button></div>
           </div>
-
-          <!-- Voicemail Script -->
+          
           <div id="ws-voicemail" class="script-content">
             <p>“Hello <strong style="color: var(--accent-primary);" class="dyn-client-name">[Name]</strong>, this is <strong style="color: var(--accent-primary);" class="dyn-exec-name">[Exec]</strong> from Mindmatrix.”</p>
-            <p>“I’m reaching out to understand your experience with Mindmatrix Bridge and gather your feedback. Our aim is to ensure the platform is supporting you well in areas like onboarding, partner engagement, and automation.</p>
-            <p>When you get a moment, please review the email we sent and share your feedback. If you prefer to schedule a call, reply to the email or write to <a style="color: var(--accent-primary);" href="mailto:support@mindmatrix.net">support@mindmatrix.net</a>.</p>
-            <p>Thank you, and have a wonderful day!”</p>
-            <div class="template-card">
-              <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Voicemail Follow-up</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('voicemail')">Preview & Send</button>
-            </div>
+            <p>“I’m reaching out to understand your experience with Mindmatrix Bridge and gather your feedback. Our aim is to ensure the platform is supporting you well in areas like onboarding, partner engagement, and automation. When you get a moment, please review the email we sent and share your feedback. If you prefer to schedule a call, reply to the email or write to <a style="color: var(--accent-primary);" href="mailto:support@mindmatrix.net">support@mindmatrix.net</a>. Thank you, and have a wonderful day!”</p>
+            <div class="template-card"><span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Voicemail Follow-up</span><button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('voicemail')">Preview & Send</button></div>
           </div>
-
-          <!-- Not Engaging Script -->
+          
           <div id="ws-not-engaging" class="script-content">
             <p>Could you let us know the primary reason you are not actively engaging with the portal?</p>
             <p><b>Training Support</b><br>“Would it be helpful to schedule a session with a software trainer to walk you through the portal or specific features?”</p>
             <p><b>Account Management Support</b><br>“Would you like additional support from an account manager to help with setup, usage, or best practices?”</p>
             <p><b>Consultant Follow-Up</b><br>“Would you like us to review this topic in more detail during your next monthly call with your consultant?”</p>
           </div>
-
-          <!-- Email Outreach Script -->
+          
           <div id="ws-email" class="script-content">
-            <p style="font-weight: 600;">Use this template if:</p>
-            <ul style="color: var(--text-muted); margin-bottom: 1rem;">
-              <li>The client does not have a phone number.</li>
-              <li>The call drops or goes blank without voicemail.</li>
-            </ul>
-            <div class="template-card">
-              <span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Initial Outreach Email</span>
-              <button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('unreachable')">Preview & Send</button>
-            </div>
+            <p style="font-weight: 600;">Use this template if:</p><ul style="color: var(--text-muted); margin-bottom: 1rem;"><li>The client does not have a phone number.</li><li>The call drops or goes blank without voicemail.</li></ul>
+            <div class="template-card"><span style="font-size: 0.85rem; color: var(--text-muted);">📧 Send Initial Outreach Email</span><button class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openEmailTemplate('unreachable')">Preview & Send</button></div>
           </div>
         </div>
 
         <!-- RIGHT PANE: FORM & LOGGING -->
         <div class="workspace-right" id="workspace-form-area">
-          
           <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Feedback & Call Log</h2>
-          
-          <!-- Hidden form inputs -->
           <input type="hidden" id="ws-row-id">
           <input type="hidden" id="ws-phone-work">
           <input type="hidden" id="ws-phone-mobile">
-          <input type="hidden" id="ws-client-display"> 
+          <input type="hidden" id="ws-client-display">
           <input type="hidden" id="ws-client" name="entry.944856988">
           <input type="hidden" id="ws-exec" name="entry.1071857762">
           <input type="hidden" id="ws-poc" name="entry.2115264353">
@@ -597,7 +491,6 @@
 
           <!-- THE UNBREAKABLE FORM WRAPPER -->
           <div style="position: relative;" id="survey-form-container">
-            
             <div id="form-overlay" class="form-overlay">
               <div class="form-overlay-card">
                 <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🎙️</span>
@@ -606,8 +499,7 @@
                 <button class="btn-outline" style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="scrollActiveView('down')">Go to Call Log</button>
               </div>
             </div>
-
-            <!-- Survey Form Elements -->
+            
             <div class="form-group">
               <label class="form-group-label">What features do you use most?</label>
               <div id="feature-checkboxes" style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -617,7 +509,6 @@
                 <label class="checkbox-label"><input type="checkbox" name="entry.2102672062" value="Asset / Content Management"> Asset / Content Management</label>
                 <label class="checkbox-label"><input type="checkbox" name="entry.2102672062" value="Reporting & Analytics"> Reporting & Analytics</label>
                 <label class="checkbox-label"><input type="checkbox" name="entry.2102672062" value="Contact Import/ CRM"> Contact Import/ CRM</label>
-                
                 <div style="display: flex; align-items: center; margin-top: 0.25rem;">
                   <label class="checkbox-label" style="margin-bottom: 0; white-space: nowrap;">
                     <input type="checkbox" name="entry.2102672062" value="__other_option__" id="feature-other-check"> Other:
@@ -626,10 +517,10 @@
                 </div>
               </div>
             </div>
-
-            <!-- Rating Containers -->
+            
             <div class="form-group"><label class="form-group-label">Rate the features you use (1-10)</label><div class="rating-container" id="rating-1"></div></div>
             <div class="form-group"><label class="form-group-label">Rate the look and ease of use (1-10)</label><div class="rating-container" id="rating-2"></div></div>
+            
             <div class="form-group">
               <label class="form-group-label">Enhancements or new features you’d like to see?</label>
               <div style="position: relative;">
@@ -637,8 +528,9 @@
                 <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Enhancements')">⤢</button>
               </div>
             </div>
-
+            
             <div class="form-group"><label class="form-group-label">Rate the support provided by our team (1-10)</label><div class="rating-container" id="rating-3"></div></div>
+            
             <div class="form-group">
               <label class="form-group-label">Suggestions to help Support improve?</label>
               <div style="position: relative;">
@@ -646,8 +538,9 @@
                 <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Support Suggestions')">⤢</button>
               </div>
             </div>
-
+            
             <div class="form-group"><label class="form-group-label">Rate your monthly calls with your consultant (1-10)</label><div class="rating-container" id="rating-4"></div></div>
+            
             <div class="form-group">
               <label class="form-group-label">Suggestions to improve monthly meetings?</label>
               <div style="position: relative;">
@@ -655,8 +548,9 @@
                 <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Meeting Suggestions')">⤢</button>
               </div>
             </div>
-
+            
             <div class="form-group"><label class="form-group-label">Rate the timelines for escalated production tickets (1-10)</label><div class="rating-container" id="rating-5"></div></div>
+            
             <div class="form-group">
               <label class="form-group-label">Additional feedback regarding production timelines?</label>
               <div style="position: relative;">
@@ -664,13 +558,14 @@
                 <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Timeline Feedback')">⤢</button>
               </div>
             </div>
-
+            
             <div class="form-group">
               <label class="form-group-label">Would you like us to prioritize any active tickets?</label>
               <input type="text" class="modal-input" name="entry.38474104" placeholder="Ticket numbers or details...">
             </div>
-
+            
             <div class="form-group"><label class="form-group-label">Rate your overall experience with Mindmatrix Bridge (1-10)</label><div class="rating-container" id="rating-6"></div></div>
+            
             <div class="form-group">
               <label class="form-group-label">Any final thoughts or suggestions?</label>
               <div style="position: relative;">
@@ -678,13 +573,11 @@
                 <button class="btn-icon" style="position: absolute; top: 10px; right: 10px; background: var(--glass-bg);" data-tooltip-bottom="Focus Mode" onclick="openFocusMode(this.previousElementSibling, 'Final Thoughts')">⤢</button>
               </div>
             </div>
-
           </div>
 
           <!-- MANUAL CALL LOGGING SECTION -->
           <div class="form-group" style="border: 2px solid var(--accent-primary); background: var(--bg-color); margin-top: 2rem;" id="ws-outcome-section">
             <h3 style="margin-top:0; color: var(--accent-primary); margin-bottom: 1rem;">📝 Manual Call Log</h3>
-            
             <label class="input-label">Call Attempt</label>
             <div class="custom-select" id="attempt-dropdown" style="margin-bottom: 1.25rem;">
                <div class="select-trigger" onclick="toggleDropdown('attempt-dropdown')">
@@ -711,14 +604,12 @@
                    <span id="status-display">Select Outcome...</span>
                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </div>
-               <!-- Populated via Javascript -->
                <div class="select-options" id="status-dropdown-opts"></div>
                <input type="hidden" id="ws-call-status-val" value="">
             </div>
-
-            <button class="btn-primary" id="ws-submit-btn" style="width: 100%; justify-content: center; padding: 1rem; font-size: 1.1rem; margin-top: 1.5rem;" onclick="submitWorkspace()">Submit Survey & Save Log</button>
+            
+            <button class="btn-primary" id="ws-submit-btn" style="width: 100%; justify-content: center; padding: 1rem; font-size: 1.1rem; margin-top: 1.5rem;" onclick="submitWorkspace(false)">Submit Survey & Save Log</button>
           </div>
-
         </div>
       </div>
   </div>
@@ -727,13 +618,8 @@
   <div class="modal-overlay" id="analyticsModal" onclick="closeOnBackgroundClick(event, 'analyticsModal')">
     <div class="modal-content" style="max-width: 600px; width: 90%;">
       <h2 style="font-size:1.5rem; font-weight:700; margin-bottom: 1.5rem;">Visual Analytics</h2>
-      <div style="position: relative; height: 350px; width: 100%;">
-          <canvas id="outcomeChart"></canvas>
-      </div>
-      <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
-          <button class="btn-outline" onclick="closeModal('analyticsModal')">Close Dashboard</button>
-          <button class="btn-primary" onclick="exportCSV()">📥 Export to CSV</button>
-      </div>
+      <div style="position: relative; height: 350px; width: 100%;"><canvas id="outcomeChart"></canvas></div>
+      <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;"><button class="btn-outline" onclick="closeModal('analyticsModal')">Close Dashboard</button><button class="btn-primary" onclick="exportCSV()">📥 Export to CSV</button></div>
     </div>
   </div>
 
@@ -741,25 +627,16 @@
     <div class="modal-content" style="max-width: 550px; text-align: left;">
       <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">Historical Timeline</h2>
       <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Past interactions and AI summaries with this contact.</p>
-      
-      <div id="timelineContainer" class="timeline-container">
-          <!-- Injected via JS -->
-      </div>
-      
+      <div id="timelineContainer" class="timeline-container"></div>
       <div style="margin-top: 1.5rem; text-align: center;"><button class="btn-outline" onclick="closeModal('timelineModal')">Close Timeline</button></div>
     </div>
   </div>
 
-  <!-- CRM NOTES MODAL -->
   <div class="modal-overlay" id="crmNotesModal" onclick="closeOnBackgroundClick(event, 'crmNotesModal')">
     <div class="modal-content" style="max-width: 600px; text-align: left;">
       <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">Zoho CRM Notes</h2>
       <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Latest 10 notes for <span id="crmNotesPoc" style="font-weight:600; color:var(--text-main);"></span></p>
-      
-      <div id="crmNotesContainer" class="timeline-container" style="max-height: 400px; overflow-y: auto;">
-          <!-- Injected via JS -->
-      </div>
-      
+      <div id="crmNotesContainer" class="timeline-container" style="max-height: 400px; overflow-y: auto;"></div>
       <div style="margin-top: 1.5rem; text-align: center;"><button class="btn-outline" onclick="closeModal('crmNotesModal')">Close Notes</button></div>
     </div>
   </div>
@@ -769,10 +646,7 @@
       <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Manual Dialer</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Dial an unlisted number. Recordings will be sent to Drive.</p>
       <input type="text" id="unlistedPhoneInput" class="modal-input" placeholder="+1 555-555-5555" style="text-align: center; font-size: 1.25rem;">
-      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
-        <button class="btn-outline" onclick="closeModal('unlistedCallModal')">Cancel</button>
-        <button class="btn-primary" onclick="startUnlistedCall()">📞 Call Now</button>
-      </div>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('unlistedCallModal')">Cancel</button><button class="btn-primary" onclick="startUnlistedCall()">📞 Call Now</button></div>
     </div>
   </div>
 
@@ -780,15 +654,11 @@
     <div class="modal-content" style="max-width: 420px;">
       <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Choose Phone Number</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select which line you would like to dial via Telnyx WebRTC.</p>
-      
       <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <button class="btn-primary" id="btnDialWork" style="justify-content: center; padding: 1rem;" onclick="executeDial('work')">🏢 Dial Work: <span id="lblWorkNum"></span></button>
-        <button class="btn-primary" id="btnDialMobile" style="justify-content: center; padding: 1rem; background: var(--safe-color);" onclick="executeDial('mobile')">📱 Dial Mobile: <span id="lblMobileNum"></span></button>
+          <button class="btn-primary" id="btnDialWork" style="justify-content: center; padding: 1rem;" onclick="executeDial('work')">🏢 Dial Work: <span id="lblWorkNum"></span></button>
+          <button class="btn-primary" id="btnDialMobile" style="justify-content: center; padding: 1rem; background: var(--safe-color);" onclick="executeDial('mobile')">📱 Dial Mobile: <span id="lblMobileNum"></span></button>
       </div>
-
-      <div style="margin-top: 1.5rem;">
-        <button class="btn-outline" onclick="closeModal('selectPhoneModal')">Cancel</button>
-      </div>
+      <div style="margin-top: 1.5rem;"><button class="btn-outline" onclick="closeModal('selectPhoneModal')">Cancel</button></div>
     </div>
   </div>
 
@@ -796,7 +666,6 @@
     <div class="modal-content" style="max-width: 500px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Call Ended</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Log the outcome of your call with <span id="postCallPocName" style="font-weight:bold; color:var(--accent-primary);"></span>.</p>
-      
       <label class="input-label">Which attempt was this?</label>
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
          <button class="btn-outline attempt-btn" data-val="Attempt 1" onclick="selectAttempt(this)">Attempt 1</button>
@@ -804,7 +673,6 @@
          <button class="btn-outline attempt-btn" data-val="Attempt 3" onclick="selectAttempt(this)">Attempt 3</button>
          <input type="hidden" id="postCallAttemptVal" value="Attempt 1">
       </div>
-
       <label class="input-label">Call Outcome</label>
       <div class="custom-select" id="postCallOutcomeDropdown" style="margin-bottom: 1.25rem; width: 100%;">
          <div class="select-trigger" onclick="toggleDropdown('postCallOutcomeDropdown')">
@@ -814,21 +682,16 @@
          <div class="select-options" id="postCallOutcomeDropdown-opts" style="max-height: 200px;"></div>
          <input type="hidden" id="postCallOutcomeVal">
       </div>
-
-      <label class="input-label">Call Notes</label>
-      <textarea id="postCallNotes" class="modal-input" style="min-height: 80px;" placeholder="Add any specific notes about this call..."></textarea>
-      
+      <label class="input-label">Call Notes</label><textarea id="postCallNotes" class="modal-input" style="min-height: 80px;" placeholder="Add any specific notes about this call..."></textarea>
       <button class="btn-primary" style="width: 100%; justify-content: center; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;" onclick="submitPostCallLog()">Save & Submit Log</button>
     </div>
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <h2 style="font-size:1.5rem; font-weight:700;">Edit POC Details</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Changes save directly to your Google Sheet.</p>
-      
       <label class="input-label">POC Name</label><input type="text" id="editPocNameInput" class="modal-input">
-
       <label class="input-label">Call Status / Outcome</label>
       <div class="custom-select" id="edit-status-dropdown" style="margin-bottom: 1.25rem; width: 100%;">
          <div class="select-trigger" onclick="toggleDropdown('edit-status-dropdown')">
@@ -838,40 +701,25 @@
          <div class="select-options" id="edit-status-dropdown-opts" style="max-height: 200px;"></div>
          <input type="hidden" id="edit-status-val">
       </div>
-      
-      <!-- FLATPICKR INPUTS -->
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
-        <div style="flex:1;">
-          <label class="input-label">Attempt 1 Date</label>
-          <input type="text" id="editAttempt1" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
-        </div>
-        <div style="flex:1;">
-          <label class="input-label">Attempt 2 Date</label>
-          <input type="text" id="editAttempt2" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
-        </div>
-        <div style="flex:1;">
-          <label class="input-label">Attempt 3 Date</label>
-          <input type="text" id="editAttempt3" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);">
-        </div>
+          <div style="flex:1;"><label class="input-label">Attempt 1 Date</label><input type="text" id="editAttempt1" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);"></div>
+          <div style="flex:1;"><label class="input-label">Attempt 2 Date</label><input type="text" id="editAttempt2" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);"></div>
+          <div style="flex:1;"><label class="input-label">Attempt 3 Date</label><input type="text" id="editAttempt3" class="modal-input date-picker" placeholder="MMM dd, yyyy" style="margin:0; background: var(--input-bg); color: var(--text-main);"></div>
       </div>
-
       <label class="input-label">Predefined Tags</label>
       <div id="editTagsContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
-        <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Not Interested"> Not Interested</label>
-        <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Deferred"> Deferred</label>
-        <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Escalated"> Escalated</label>
-        <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="VIP"> VIP</label>
+          <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Not Interested"> Not Interested</label>
+          <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Deferred"> Deferred</label>
+          <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="Escalated"> Escalated</label>
+          <label class="checkbox-label" style="margin:0;"><input type="checkbox" value="VIP"> VIP</label>
       </div>
-
       <label class="input-label">Timezone (Powers Live Clock)</label>
       <div class="custom-select" id="tz-custom-dropdown" style="width: 100%; margin: 0.25rem 0 1.25rem 0;">
          <input type="text" id="editTzInput" class="modal-input" style="margin:0;" placeholder="Search or select timezone..." onfocus="openTzDropdown()" oninput="filterTzDropdown()">
          <div class="select-options" id="tz-options" style="max-height: 200px;"></div>
          <input type="hidden" id="editTzIana">
       </div>
-      
       <label class="input-label">Persistent Custom Note</label><textarea id="editNoteInput" class="modal-input" style="min-height: 80px;" placeholder="Does not like early morning calls..."></textarea>
-      
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('editPocModal')">Cancel</button><button class="btn-primary" id="saveEditBtn" onclick="submitPocEdits()">Save Changes</button></div>
     </div>
   </div>
@@ -886,7 +734,6 @@
     </div>
   </div>
 
-  <!-- ROLLOVER PIN MODAL -->
   <div class="modal-overlay" id="rolloverPinModal" onclick="closeOnBackgroundClick(event, 'rolloverPinModal')">
     <div class="modal-content" style="max-width: 400px;">
       <h2 style="font-size:1.5rem; font-weight:700;">Admin Authorization</h2>
@@ -909,24 +756,14 @@
     <div class="modal-content" style="max-width: 600px; text-align: left;">
       <h2 style="font-size:1.5rem; font-weight:700;">Add Manual Entry</h2>
       <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Add a contact manually outside of Zoho CRM.</p>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
-         <button class="source-tab active" id="tabSingleEntry" onclick="toggleEntryMode('single')" style="flex:1; text-align:center;">Single Entry</button>
-         <button class="source-tab" id="tabBulkEntry" onclick="toggleEntryMode('bulk')" style="flex:1; text-align:center;">Bulk Upload</button>
-      </div>
-
+      <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;"><button class="source-tab active" id="tabSingleEntry" onclick="toggleEntryMode('single')" style="flex:1; text-align:center;">Single Entry</button><button class="source-tab" id="tabBulkEntry" onclick="toggleEntryMode('bulk')" style="flex:1; text-align:center;">Bulk Upload</button></div>
       <div id="singleEntryForm">
         <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Client Name</label><input type="text" id="addClientInput" class="modal-input" placeholder="Acme Corp"></div><div style="flex:1;"><label class="input-label">Assigned Exec</label><input type="text" id="addExecInput" class="modal-input" placeholder="Jane Doe"></div></div>
         <label class="input-label">POC Name</label><input type="text" id="addPocInput" class="modal-input" placeholder="John Smith">
         <label class="input-label">Email Address</label><input type="email" id="addEmailInput" class="modal-input" placeholder="john@acme.com">
         <div style="display: flex; gap: 10px;"><div style="flex:1;"><label class="input-label">Phone</label><input type="text" id="addPhoneInput" class="modal-input" placeholder="+1 555-0000"></div><div style="flex:1;"><label class="input-label">Mobile</label><input type="text" id="addMobileInput" class="modal-input" placeholder="+1 555-1111"></div></div>
       </div>
-
-      <div id="bulkEntryForm" style="display:none;">
-        <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-bottom: 0.5rem;">Paste comma-separated values. One contact per line.<br><strong>Format:</strong> Client Name, Exec Name, POC Name, Email Address, Phone, Mobile</p>
-        <textarea id="bulkEntryInput" class="modal-input" style="min-height: 150px; font-family: monospace; font-size: 0.85rem; white-space: pre;" placeholder="Acme Corp, Jane Doe, John Smith, john@acme.com, +1 555-0000, +1 555-1111"></textarea>
-      </div>
-
+      <div id="bulkEntryForm" style="display:none;"><p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-bottom: 0.5rem;">Paste comma-separated values. One contact per line.<br><strong>Format:</strong> Client Name, Exec Name, POC Name, Email Address, Phone, Mobile</p><textarea id="bulkEntryInput" class="modal-input" style="min-height: 150px; font-family: monospace; font-size: 0.85rem; white-space: pre;" placeholder="Acme Corp, Jane Doe, John Smith, john@acme.com, +1 555-0000, +1 555-1111"></textarea></div>
       <p id="addErrorText" class="error-text"></p>
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;"><button class="btn-outline" onclick="closeModal('addEntryModal')">Cancel</button><button class="btn-primary" id="saveEntryBtn" onclick="submitAddEntry()">Add Contact(s)</button></div>
     </div>
@@ -945,14 +782,19 @@
   <div class="modal-overlay" id="emailModal" onclick="closeOnBackgroundClick(event, 'emailModal')">
     <div class="modal-content" style="max-width: 600px; text-align: left;">
       <h2 style="font-size:1.4rem; font-weight:700; margin-bottom: 1rem;">📋 Preview Outreach Email</h2>
-      
       <label class="input-label">CC (Optional - Comma Separated)</label>
       <input type="text" id="email-cc-val" class="modal-input" placeholder="manager@mindmatrix.net">
       
-      <label class="input-label">Subject</label>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+         <label class="input-label" style="margin:0;">Subject</label>
+         <button class="btn-icon" style="padding: 2px 8px; font-size: 0.8rem; border: 1px solid var(--glass-border);" onclick="copyToClipboard('email-subject-val')">📋 Copy</button>
+      </div>
       <input type="text" id="email-subject-val" class="modal-input">
       
-      <label class="input-label">Body</label>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+         <label class="input-label" style="margin:0;">Body</label>
+         <button class="btn-icon" style="padding: 2px 8px; font-size: 0.8rem; border: 1px solid var(--glass-border);" onclick="copyToClipboard('email-body-val')">📋 Copy</button>
+      </div>
       <textarea id="email-body-val" class="modal-input" style="min-height: 200px; resize: vertical; width: 100%;"></textarea>
       
       <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
@@ -979,9 +821,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx9CElrTL_8oYs_CTmCf6LOap7-FQP6y4SYeDmb8dBdpZ2jprZ7XvX-AGW7814m6ekdOw/exec"; 
     const GOOGLE_CLIENT_ID = "992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"; 
 
@@ -991,171 +830,173 @@
       "Unsuccessful", "Declined / Not Interested", "Not Launched Yet", "Recently Launched", "Requesting Cancellation"
     ];
 
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let recSeconds = 0;
+    let mediaRecorder = null; 
+    let audioChunks = []; 
+    let recSeconds = 0; 
     let recTimerInterval = null;
-    let callDurationInterval = null;
-    let callDurationSeconds = 0;
-    let telnyxClient = null;
+    let callDurationInterval = null; 
+    let callDurationSeconds = 0; 
+    let telnyxClient = null; 
     let activeCall = null;
-    let isTelnyxReady = false;
-    let telnyxCallerId = '';
+    let isTelnyxReady = false; 
+    let telnyxCallerId = ''; 
     let isMuted = false;
-
-    let presenceInterval = null;
-    let currentPaginationLimit = 50;
+    let presenceInterval = null; 
+    let currentPaginationLimit = 50; 
     let analyticsChart = null;
     let activePresence = {}; 
-    let telnyxInitStarted = false;
-    
-    let rawData = [];
+    let telnyxInitStarted = false; 
+    let rawData = []; 
     let currentSourceTab = 'ALL';
-    let currentSortColumn = 'client';
-    let currentSortAsc = true;
+    let currentSortColumn = 'client'; 
+    let currentSortAsc = true; 
     let focusTargetElement = null; 
     let activeKpiFilter = null;
-    let appLogs = [];
-    let clockInterval;
+    let appLogs = []; 
+    let clockInterval; 
     
-    window.collapsedClients = new Set();
+    window.collapsedClients = new Set(); 
     window.isAdmin = false;
-    window.showHidden = false;
-    window.isUnlistedCall = false;
-    window.unlistedPhoneNum = "";
+    window.showHidden = false; 
+    window.isUnlistedCall = false; 
+    window.unlistedPhoneNum = ""; 
     window.lastFilteredData = [];
     window.entryMode = 'single';
 
-    // Shortcuts
     document.addEventListener('keydown', function(e) {
-        if (e.shiftKey && (e.key === 'L' || e.key === 'l')) {
-            e.preventDefault();
-            document.getElementById('logsPinInput').value = '';
-            document.getElementById('logsPinErrorText').style.display = 'none';
-            openModal('logsPinModal');
-            setTimeout(() => document.getElementById('logsPinInput').focus(), 150);
+        if (e.shiftKey && (e.key === 'L' || e.key === 'l')) { 
+            e.preventDefault(); 
+            document.getElementById('logsPinInput').value = ''; 
+            document.getElementById('logsPinErrorText').style.display = 'none'; 
+            openModal('logsPinModal'); 
+            setTimeout(() => document.getElementById('logsPinInput').focus(), 150); 
         }
-        
-        if (e.altKey && (e.key === 's' || e.key === 'S') && window.isAdmin) {
-            e.preventDefault();
-            window.showHidden = !window.showHidden;
-            filterData();
-            showToast(window.showHidden ? "Hidden POCs Visible 👁️" : "Hidden POCs Concealed 🙈", "warning");
+        if (e.altKey && (e.key === 's' || e.key === 'S') && window.isAdmin) { 
+            e.preventDefault(); 
+            window.showHidden = !window.showHidden; 
+            filterData(); 
+            showToast(window.showHidden ? "Hidden POCs Visible 👁️" : "Hidden POCs Concealed 🙈", "warning"); 
         }
-        
-        if (e.altKey && (e.key === 'c' || e.key === 'C')) {
-            e.preventDefault();
-            document.getElementById('unlistedPhoneInput').value = '';
-            openModal('unlistedCallModal');
-            setTimeout(() => document.getElementById('unlistedPhoneInput').focus(), 150);
+        if (e.altKey && (e.key === 'c' || e.key === 'C')) { 
+            e.preventDefault(); 
+            document.getElementById('unlistedPhoneInput').value = ''; 
+            openModal('unlistedCallModal'); 
+            setTimeout(() => document.getElementById('unlistedPhoneInput').focus(), 150); 
         }
     });
 
-    document.getElementById('logsPinInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') verifyLogsPin();
-    });
-
-    document.getElementById('syncPinInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') submitZohoSync();
+    document.getElementById('logsPinInput').addEventListener('keypress', function(e) { 
+        if (e.key === 'Enter') verifyLogsPin(); 
     });
     
-    document.getElementById('rolloverPinInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') verifyRolloverPin();
+    document.getElementById('syncPinInput').addEventListener('keypress', function(e) { 
+        if (e.key === 'Enter') submitZohoSync(); 
+    });
+    
+    document.getElementById('rolloverPinInput').addEventListener('keypress', function(e) { 
+        if (e.key === 'Enter') verifyRolloverPin(); 
     });
 
     function verifyLogsPin() {
-        if (document.getElementById('logsPinInput').value === "4274") {
-            closeModal('logsPinModal');
-            document.getElementById('logsPinInput').value = '';
-            setTimeout(() => openModal('logsModal'), 300);
-        } else {
-            document.getElementById('logsPinErrorText').style.display = 'block';
+        if (document.getElementById('logsPinInput').value === "4274") { 
+            closeModal('logsPinModal'); 
+            document.getElementById('logsPinInput').value = ''; 
+            setTimeout(() => openModal('logsModal'), 300); 
+        } else { 
+            document.getElementById('logsPinErrorText').style.display = 'block'; 
         }
     }
 
-    // ==========================================
-    // SMART API FETCH WITH RESPONSE VALIDATION
-    // ==========================================
+    function copyToClipboard(elementId) {
+        const el = document.getElementById(elementId);
+        if (navigator.clipboard) { 
+            navigator.clipboard.writeText(el.value).then(() => { 
+                showToast('Copied to clipboard!', 'success'); 
+            }); 
+        } else { 
+            el.select(); 
+            document.execCommand('copy'); 
+            showToast('Copied to clipboard!', 'success'); 
+        }
+    }
+
     async function callGoogleAPI(action, payload = {}, retries = 2) {
         const session = JSON.parse(localStorage.getItem("mm_cx_portal_session") || "{}");
-        payload.authToken = session.token;
+        payload.authToken = session.token; 
         payload.action = action;
         
         for (let attempt = 0; attempt <= retries; attempt++) {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
+                const response = await fetch(API_URL, { 
+                    method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload) 
                 });
                 
                 const text = await response.text();
                 var trimmed = text.trim();
                 
-                // If response is HTML or plain string starting with "Mindmatrix..." (redirect/glitch)
-                if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+                if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) { 
                     if (attempt < retries) { 
                         await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
                         continue; 
-                    }
-                    throw new Error("Server returned non-JSON response.");
+                    } 
+                    throw new Error("Server returned non-JSON response."); 
                 }
                 
-                const result = JSON.parse(text);
+                const result = JSON.parse(text); 
                 if (result.status === 'error') throw new Error(result.message);
                 return result.data;
-                
             } catch (err) { 
-                if (attempt === retries || (err.message && err.message.includes('Unauthorized'))) {
+                if (attempt === retries || (err.message && err.message.includes('Unauthorized'))) { 
                     throw err; 
-                }
+                } 
                 await new Promise(r => setTimeout(r, 2000 + Math.random() * 1000)); 
             }
         }
     }
 
-    // ==========================================
-    // SSO TOKEN PARSING & LOGIN HANDLER
-    // ==========================================
     function parseJwt(token) {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { 
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); 
             }).join(''));
             return JSON.parse(jsonPayload);
-        } catch(e) { return null; }
+        } catch(e) { 
+            return null; 
+        }
     }
 
     function handleSSOResponse(response) {
         const token = response.credential;
         const payload = parseJwt(token);
-        const errMsg = document.getElementById('mm-error-msg');
+        const errMsg = document.getElementById('mm-error-msg'); 
         errMsg.style.display = 'none';
-
-        if (!payload || !payload.email) {
-            errMsg.textContent = "Invalid login token. Please try again.";
-            errMsg.style.display = 'block';
-            return;
+        
+        if (!payload || !payload.email) { 
+            errMsg.textContent = "Invalid login token. Please try again."; 
+            errMsg.style.display = 'block'; 
+            return; 
         }
         
         const email = payload.email.toLowerCase();
         
-        if (!email.endsWith('@mindmatrix.net')) {
-            errMsg.textContent = "Unauthorized: Must use an @mindmatrix.net account.";
-            errMsg.style.display = 'block';
-            return;
+        if (!email.endsWith('@mindmatrix.net')) { 
+            errMsg.textContent = "Unauthorized: Must use an @mindmatrix.net account."; 
+            errMsg.style.display = 'block'; 
+            return; 
         }
-        if (email === 'accountteam@mindmatrix.net') {
-            errMsg.textContent = "Unauthorized: Account team access is restricted.";
-            errMsg.style.display = 'block';
-            return;
-        }
-
-        const expiryTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); 
-        localStorage.setItem("mm_cx_portal_session", JSON.stringify({ token: token, expiry: expiryTime, email: email }));
         
+        if (email === 'accountteam@mindmatrix.net') { 
+            errMsg.textContent = "Unauthorized: Account team access is restricted."; 
+            errMsg.style.display = 'block'; 
+            return; 
+        }
+        
+        const expiryTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000); 
+        localStorage.setItem("mm_cx_portal_session", JSON.stringify({ token: token, expiry: expiryTime, email: email })); 
         loadDashboard(email);
     }
 
@@ -1165,18 +1006,24 @@
     const SVG_SORT_DOWN = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 4px; opacity: 0.8;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`;
 
     const tzList = [
-      { label: "US Eastern (EST/EDT)", iana: "America/New_York" }, { label: "US Central (CST/CDT)", iana: "America/Chicago" },
-      { label: "US Mountain (MST/MDT)", iana: "America/Denver" }, { label: "US Mountain - Arizona (No DST)", iana: "America/Phoenix" },
-      { label: "US Pacific (PST/PDT)", iana: "America/Los_Angeles" }, { label: "UK (GMT/BST)", iana: "Europe/London" },
-      { label: "Central Europe (CET/CEST)", iana: "Europe/Paris" }, { label: "Eastern Europe (EET/EEST)", iana: "Europe/Bucharest" },
-      { label: "India (IST)", iana: "Asia/Kolkata" }, { label: "Japan (JST)", iana: "Asia/Tokyo" },
-      { label: "Australia - Sydney (AEST/AEDT)", iana: "Australia/Sydney" }, { label: "UTC", iana: "UTC" }
+      { label: "US Eastern (EST/EDT)", iana: "America/New_York" }, 
+      { label: "US Central (CST/CDT)", iana: "America/Chicago" }, 
+      { label: "US Mountain (MST/MDT)", iana: "America/Denver" }, 
+      { label: "US Mountain - Arizona (No DST)", iana: "America/Phoenix" }, 
+      { label: "US Pacific (PST/PDT)", iana: "America/Los_Angeles" }, 
+      { label: "UK (GMT/BST)", iana: "Europe/London" }, 
+      { label: "Central Europe (CET/CEST)", iana: "Europe/Paris" }, 
+      { label: "Eastern Europe (EET/EEST)", iana: "Europe/Bucharest" }, 
+      { label: "India (IST)", iana: "Asia/Kolkata" }, 
+      { label: "Japan (JST)", iana: "Asia/Tokyo" }, 
+      { label: "Australia - Sydney (AEST/AEDT)", iana: "Australia/Sydney" }, 
+      { label: "UTC", iana: "UTC" }
     ];
 
     function addLog(msg) {
-        const time = new Date().toLocaleTimeString();
+        const time = new Date().toLocaleTimeString(); 
         appLogs.unshift(`<div class="log-entry"><span class="log-time">[${time}]</span> ${msg}</div>`);
-        if(appLogs.length > 50) appLogs.pop();
+        if(appLogs.length > 50) appLogs.pop(); 
         document.getElementById('logsContainer').innerHTML = appLogs.join('');
     }
 
@@ -1184,34 +1031,34 @@
        const isWs = document.getElementById('actionWorkspace').classList.contains('active');
        const target = isWs ? document.querySelector('.workspace-right') : document.getElementById('mainDashboard');
        if (direction === 'up') target.scrollTo({ top: 0, behavior: 'smooth' });
-       else {
-          if (isWs) document.getElementById('ws-outcome-section').scrollIntoView({ behavior: 'smooth' });
-          else target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+       else { 
+           if (isWs) document.getElementById('ws-outcome-section').scrollIntoView({ behavior: 'smooth' }); 
+           else target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' }); 
        }
     }
 
-    function toggleDropdown(wrapperId) {
+    function toggleDropdown(wrapperId) { 
         document.querySelectorAll('.select-options.open, .poc-select-options.open').forEach(el => { 
             if (el.id !== wrapperId + '-opts' && el.id !== wrapperId) el.classList.remove('open'); 
-        });
-        const opts = document.getElementById(wrapperId + '-opts');
-        if (opts) opts.classList.toggle('open');
+        }); 
+        const opts = document.getElementById(wrapperId + '-opts'); 
+        if (opts) opts.classList.toggle('open'); 
     }
-
-    function selectDropdownVal(wrapperId, hiddenId, displayId, val, display) {
-        document.getElementById(hiddenId).value = val;
-        document.getElementById(displayId).innerHTML = display;
-        document.getElementById(wrapperId + '-opts').classList.remove('open');
-        if (hiddenId === 'execFilterVal') { currentPaginationLimit = 50; filterData(); }
+    
+    function selectDropdownVal(wrapperId, hiddenId, displayId, val, display) { 
+        document.getElementById(hiddenId).value = val; 
+        document.getElementById(displayId).innerHTML = display; 
+        document.getElementById(wrapperId + '-opts').classList.remove('open'); 
+        if (hiddenId === 'execFilterVal') { currentPaginationLimit = 50; filterData(); } 
     }
-
-    function setDropdownValueSafe(wrapperId, hiddenId, displayId, val) {
-        document.getElementById(hiddenId).value = val;
-        let displayText = val;
-        document.querySelectorAll(`#${wrapperId}-opts .select-option`).forEach(opt => {
-             if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes(`'${val}'`)) displayText = opt.innerText;
-        });
-        document.getElementById(displayId).innerHTML = displayText || val;
+    
+    function setDropdownValueSafe(wrapperId, hiddenId, displayId, val) { 
+        document.getElementById(hiddenId).value = val; 
+        let displayText = val; 
+        document.querySelectorAll(`#${wrapperId}-opts .select-option`).forEach(opt => { 
+            if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes(`'${val}'`)) displayText = opt.innerText; 
+        }); 
+        document.getElementById(displayId).innerHTML = displayText || val; 
     }
 
     function populateOutcomeDropdowns() {
@@ -1219,8 +1066,8 @@
         const manualOpts = document.getElementById('status-dropdown-opts');
         const editOpts = document.getElementById('edit-status-dropdown-opts');
         
-        modalOpts.innerHTML = '';
-        manualOpts.innerHTML = '';
+        modalOpts.innerHTML = ''; 
+        manualOpts.innerHTML = ''; 
         if(editOpts) editOpts.innerHTML = '';
         
         OUTCOMES.forEach(out => {
@@ -1231,19 +1078,31 @@
     }
 
     function togglePocDropdown() { document.getElementById('ws-poc-options').classList.toggle('open'); }
-    function openTzDropdown() { const o = document.getElementById('tz-options'); o.classList.add('open'); renderTzList(tzList); }
-    function filterTzDropdown() {
-      const q = document.getElementById('editTzInput').value.toLowerCase();
-      renderTzList(tzList.filter(t => t.label.toLowerCase().includes(q) || t.iana.toLowerCase().includes(q)));
+    
+    function openTzDropdown() { 
+        const o = document.getElementById('tz-options'); 
+        o.classList.add('open'); 
+        renderTzList(tzList); 
     }
+    
+    function filterTzDropdown() { 
+        const q = document.getElementById('editTzInput').value.toLowerCase(); 
+        renderTzList(tzList.filter(t => t.label.toLowerCase().includes(q) || t.iana.toLowerCase().includes(q))); 
+    }
+    
     function renderTzList(list) {
-      const optContainer = document.getElementById('tz-options');
+      const optContainer = document.getElementById('tz-options'); 
       optContainer.innerHTML = '';
-      list.forEach(t => {
-         const div = document.createElement('div');
-         div.className = 'select-option'; div.innerHTML = t.label;
-         div.onclick = function() { document.getElementById('editTzInput').value = t.label; document.getElementById('editTzIana').value = t.iana; optContainer.classList.remove('open'); };
-         optContainer.appendChild(div);
+      list.forEach(t => { 
+          const div = document.createElement('div'); 
+          div.className = 'select-option'; 
+          div.innerHTML = t.label; 
+          div.onclick = function() { 
+              document.getElementById('editTzInput').value = t.label; 
+              document.getElementById('editTzIana').value = t.iana; 
+              optContainer.classList.remove('open'); 
+          }; 
+          optContainer.appendChild(div); 
       });
       if(list.length === 0) optContainer.innerHTML = `<div class="select-option" style="color:var(--text-muted)">No matches found</div>`;
     }
@@ -1257,66 +1116,99 @@
 
     function updateLiveClock() {
        const iana = document.getElementById('ws-timezone-val').value;
-       const display = document.getElementById('ws-live-time');
+       const display = document.getElementById('ws-live-time'); 
        if (!iana || !display) return;
-       try { display.textContent = `(${new Date().toLocaleTimeString('en-US', { timeZone: iana, hour: '2-digit', minute: '2-digit', second: '2-digit' })} local time)`; } catch(e) { display.textContent = ""; }
+       try { 
+           display.textContent = `(${new Date().toLocaleTimeString('en-US', { timeZone: iana, hour: '2-digit', minute: '2-digit', second: '2-digit' })} local time)`; 
+       } catch(e) { 
+           display.textContent = ""; 
+       }
     }
 
     function initRatings() {
        const ratingGroups = [ 
-           { id: 'rating-1', name: 'entry.695001045' }, { id: 'rating-2', name: 'entry.1538619285' }, 
-           { id: 'rating-3', name: 'entry.1376447678' }, { id: 'rating-4', name: 'entry.1432157009' }, 
-           { id: 'rating-5', name: 'entry.522456438' }, { id: 'rating-6', name: 'entry.1393320595' } 
+           { id: 'rating-1', name: 'entry.695001045' }, 
+           { id: 'rating-2', name: 'entry.1538619285' }, 
+           { id: 'rating-3', name: 'entry.1376447678' }, 
+           { id: 'rating-4', name: 'entry.1432157009' }, 
+           { id: 'rating-5', name: 'entry.522456438' }, 
+           { id: 'rating-6', name: 'entry.1393320595' } 
        ];
-       ratingGroups.forEach(g => {
-         const container = document.getElementById(g.id);
-         if(container) { 
-             container.innerHTML = ''; 
-             for(let i=1; i<=10; i++) container.innerHTML += `<label class="rating-label"><input type="radio" name="${g.name}" value="${i}"><span class="rating-span">${i}</span></label>`; 
-         }
+       ratingGroups.forEach(g => { 
+           const container = document.getElementById(g.id); 
+           if(container) { 
+               container.innerHTML = ''; 
+               for(let i=1; i<=10; i++) {
+                   container.innerHTML += `<label class="rating-label"><input type="radio" name="${g.name}" value="${i}"><span class="rating-span">${i}</span></label>`; 
+               }
+           } 
        });
     }
 
     document.addEventListener('click', function(e) {
        if(e.target && e.target.type === 'radio' && e.target.closest('.rating-container')) {
-           if(e.target.dataset.wasChecked === 'true') { e.target.checked = false; e.target.dataset.wasChecked = 'false'; } 
-           else { document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false'); e.target.dataset.wasChecked = 'true'; }
+           if(e.target.dataset.wasChecked === 'true') { 
+               e.target.checked = false; 
+               e.target.dataset.wasChecked = 'false'; 
+           } else { 
+               document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.dataset.wasChecked = 'false'); 
+               e.target.dataset.wasChecked = 'true'; 
+           }
        }
     });
 
     function showToast(msg, type) {
-      const existing = document.getElementById('mm-toast-alert');
+      const existing = document.getElementById('mm-toast-alert'); 
       if (existing) existing.remove();
-      const toast = document.createElement('div');
-      toast.id = 'mm-toast-alert';
+      
+      const toast = document.createElement('div'); 
+      toast.id = 'mm-toast-alert'; 
       toast.innerText = msg;
       toast.style.cssText = 'position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 16px 32px; border-radius: 8px; color: white; font-weight: 600; font-size: 1.05rem; z-index: 2147483647; opacity: 0; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; text-align: center; max-width: 80%;';
-      if (type === 'success') toast.style.backgroundColor = '#10b981';
-      else if (type === 'warning') toast.style.backgroundColor = '#f59e0b';
+      
+      if (type === 'success') toast.style.backgroundColor = '#10b981'; 
+      else if (type === 'warning') toast.style.backgroundColor = '#f59e0b'; 
       else toast.style.backgroundColor = '#ef4444'; 
-      document.body.appendChild(toast);
-      setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
-      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)'; setTimeout(() => toast.remove(), 400); }, 4500);
+      
+      document.body.appendChild(toast); 
+      
+      setTimeout(() => { 
+          toast.style.opacity = '1'; 
+          toast.style.transform = 'translateX(-50%) translateY(0)'; 
+      }, 10);
+      
+      setTimeout(() => { 
+          toast.style.opacity = '0'; 
+          toast.style.transform = 'translateX(-50%) translateY(20px)'; 
+          setTimeout(() => toast.remove(), 400); 
+      }, 4500);
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; setTimeout(() => document.getElementById(id).classList.add('active'), 10); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); setTimeout(() => document.getElementById(id).style.display = 'none', 300); }
-    function closeOnBackgroundClick(event, id) { if (event.target.id === id) closeModal(id); }
+    function openModal(id) { 
+        document.getElementById(id).style.display = 'flex'; 
+        setTimeout(() => document.getElementById(id).classList.add('active'), 10); 
+    }
+    
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+        setTimeout(() => document.getElementById(id).style.display = 'none', 300); 
+    }
+    
+    function closeOnBackgroundClick(event, id) { 
+        if (event.target.id === id) closeModal(id); 
+    }
     
     function openPinModal() { 
         openModal('pinModal'); 
         setTimeout(() => document.getElementById('syncPinInput').focus(), 150); 
     }
 
-    // ==========================================
-    // EMAIL DISPATCH (Client-Side Natively via Gmail)
-    // ==========================================
     function dispatchEmail() {
         const rawTo = document.getElementById('ws-email-val').value;
         const rawCc = document.getElementById('email-cc-val').value;
         const rawSubject = document.getElementById('email-subject-val').value;
         const rawBody = document.getElementById('email-body-val').value;
-
+        
         if (!rawTo) { 
             showToast("No email address found for this contact.", "danger"); 
             return; 
@@ -1326,20 +1218,17 @@
         const cc = encodeURIComponent(rawCc);
         const subject = encodeURIComponent(rawSubject);
         const body = encodeURIComponent(rawBody);
-
-        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&cc=${cc}&su=${subject}&body=${body}`;
         
-        window.open(gmailUrl, 'MindmatrixGmailTab');
+        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${to}&cc=${cc}&su=${subject}&body=${body}`, 'MindmatrixGmailTab');
         
-        showToast("Opening Google Workspace Mail...", "success");
-        closeModal('emailModal');
+        showToast("Opening Google Workspace Mail...", "success"); 
+        closeModal('emailModal'); 
         addLog(`Opened email draft for ${rawTo}`);
     }
 
-    // ==========================================
-    // TELNYX SDK INTEGRATION & UNLISTED DIALER
-    // ==========================================
-    function hangupCall() { if (activeCall) activeCall.hangup(); }
+    function hangupCall() { 
+        if (activeCall) activeCall.hangup(); 
+    }
     
     function toggleMuteCall() {
       if (activeCall) {
@@ -1347,169 +1236,246 @@
         const muteIcon = document.getElementById('muteIcon');
         
         if (isMuted) {
-          activeCall.unmuteAudio();
-          isMuted = false;
+          activeCall.unmuteAudio(); 
+          isMuted = false; 
           muteIcon.innerHTML = `<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>`;
-          muteBtn.style.background = "var(--glass-bg)";
-          muteBtn.style.color = "var(--text-main)";
+          muteBtn.style.background = "var(--glass-bg)"; 
+          muteBtn.style.color = "var(--text-main)"; 
           addLog("Microphone unmuted.");
         } else {
-          activeCall.muteAudio();
-          isMuted = true;
+          activeCall.muteAudio(); 
+          isMuted = true; 
           muteIcon.innerHTML = `<line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>`;
-          muteBtn.style.background = "rgba(245, 158, 11, 0.2)";
-          muteBtn.style.color = "var(--warning-color)";
+          muteBtn.style.background = "rgba(245, 158, 11, 0.2)"; 
+          muteBtn.style.color = "var(--warning-color)"; 
           addLog("Microphone muted.");
         }
       }
     }
 
-    function toggleDialpad() {
-        const dp = document.getElementById('ivrDialpad'), btn = document.getElementById('toggleDialpadBtn');
-        if (dp.style.display === 'none') { dp.style.display = 'grid'; btn.innerHTML = '🔼 Hide Keypad'; } 
-        else { dp.style.display = 'none'; btn.innerHTML = '🎛️ Show Keypad'; }
+    function toggleDialpad() { 
+        const dp = document.getElementById('ivrDialpad');
+        const btn = document.getElementById('toggleDialpadBtn'); 
+        
+        if (dp.style.display === 'none') { 
+            dp.style.display = 'grid'; 
+            btn.innerHTML = '🔼 Hide Keypad'; 
+        } else { 
+            dp.style.display = 'none'; 
+            btn.innerHTML = '🎛️ Show Keypad'; 
+        } 
     }
-    function sendDTMF(digit) { if (activeCall) { activeCall.dtmf(digit); document.getElementById('dtmfDisplay').innerText += digit; addLog(`Sent DTMF Tone: ${digit}`); } }
+    
+    function sendDTMF(digit) { 
+        if (activeCall) { 
+            activeCall.dtmf(digit); 
+            document.getElementById('dtmfDisplay').innerText += digit; 
+            addLog(`Sent DTMF Tone: ${digit}`); 
+        } 
+    }
     
     function startCallTimer() {
-      if (callDurationInterval) clearInterval(callDurationInterval);
-      callDurationSeconds = 0; document.getElementById('callOverlayDuration').innerText = "00:00";
-      callDurationInterval = setInterval(() => {
-        callDurationSeconds++;
-        const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0'), secs = String(callDurationSeconds % 60).padStart(2, '0');
-        document.getElementById('callOverlayDuration').innerText = `${mins}:${secs}`;
+      if (callDurationInterval) clearInterval(callDurationInterval); 
+      
+      callDurationSeconds = 0; 
+      document.getElementById('callOverlayDuration').innerText = "00:00";
+      
+      callDurationInterval = setInterval(() => { 
+          callDurationSeconds++; 
+          const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0');
+          const secs = String(callDurationSeconds % 60).padStart(2, '0'); 
+          document.getElementById('callOverlayDuration').innerText = `${mins}:${secs}`; 
       }, 1000);
     }
     
-    function stopCallTimer() { if (callDurationInterval) clearInterval(callDurationInterval); }
+    function stopCallTimer() { 
+        if (callDurationInterval) clearInterval(callDurationInterval); 
+    }
     
     function showCallOverlay(pocName) {
-      document.getElementById('callOverlayName').innerText = pocName || "Unknown Contact"; document.getElementById('callOverlayStatus').innerText = "Dialing...";
-      document.getElementById('callOverlayStatus').style.color = "var(--warning-color)"; document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
-      document.getElementById('callOverlayDuration').innerText = "00:00"; document.getElementById('dtmfDisplay').innerText = ""; 
+      document.getElementById('callOverlayName').innerText = pocName || "Unknown Contact"; 
+      document.getElementById('callOverlayStatus').innerText = "Dialing...";
+      document.getElementById('callOverlayStatus').style.color = "var(--warning-color)"; 
+      document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
+      document.getElementById('callOverlayDuration').innerText = "00:00"; 
+      document.getElementById('dtmfDisplay').innerText = ""; 
       
-      isMuted = false;
+      isMuted = false; 
       document.getElementById('muteIcon').innerHTML = `<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>`;
-      document.getElementById('muteCallBtn').style.background = "var(--glass-bg)";
+      document.getElementById('muteCallBtn').style.background = "var(--glass-bg)"; 
       document.getElementById('muteCallBtn').style.color = "var(--text-main)";
-
+      
       document.getElementById('activeCallOverlay').classList.add('active');
     }
     
-    function hideCallOverlay() { document.getElementById('activeCallOverlay').classList.remove('active'); stopCallTimer(); }
+    function hideCallOverlay() { 
+        document.getElementById('activeCallOverlay').classList.remove('active'); 
+        stopCallTimer(); 
+    }
 
     function initTelnyx() {
-      addLog('Authenticating with Telnyx via Google API...');
+      addLog('Authenticating with Telnyx via Google API...'); 
       document.getElementById('phoneStatusToast').style.display = 'flex';
       
       callGoogleAPI('getTelnyxToken').then(res => {
           if (!res || res.success === false) { 
               addLog(`Telnyx API Error: ${res ? res.error : 'Empty'}`); 
-              document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
-              document.getElementById('phoneStatusIcon').innerText = '❌';
-              document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
-              document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected';
+              document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)'; 
+              document.getElementById('phoneStatusIcon').innerText = '❌'; 
+              document.getElementById('phoneStatusIcon').classList.remove('icon-spin'); 
+              document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected'; 
               return; 
           }
+          
           let tokenStr = typeof res.token === 'string' ? res.token : (res.token ? res.token.toString() : '');
-          if (!tokenStr) { addLog('Telnyx Auth Failed: Empty token.'); return; }
+          if (!tokenStr) { 
+              addLog('Telnyx Auth Failed: Empty token.'); 
+              return; 
+          } 
+          
           telnyxCallerId = res.callerId;
           
-          if (typeof TelnyxWebRTC === 'undefined') { showToast('Phone SDK failed to load. Disable adblockers.', 'danger'); return; }
-          telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: tokenStr });
+          if (typeof TelnyxWebRTC === 'undefined') { 
+              showToast('Phone SDK failed to load. Disable adblockers.', 'danger'); 
+              return; 
+          }
+          
+          telnyxClient = new TelnyxWebRTC.TelnyxRTC({ login_token: tokenStr }); 
           telnyxClient.remoteElement = 'remoteMedia'; 
 
           telnyxClient.on('telnyx.ready', () => { 
               isTelnyxReady = true; 
               addLog("Telnyx WebRTC connected and ready."); 
-              document.getElementById('phoneStatusToast').style.background = 'var(--safe-color)';
-              document.getElementById('phoneStatusIcon').innerText = '✅';
-              document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
+              
+              document.getElementById('phoneStatusToast').style.background = 'var(--safe-color)'; 
+              document.getElementById('phoneStatusIcon').innerText = '✅'; 
+              document.getElementById('phoneStatusIcon').classList.remove('icon-spin'); 
               document.getElementById('phoneStatusText').innerText = 'Phone System Connected';
-              setTimeout(() => { document.getElementById('phoneStatusToast').style.opacity = '0'; }, 3000);
+              
+              setTimeout(() => { document.getElementById('phoneStatusToast').style.opacity = '0'; }, 3000); 
               setTimeout(() => { document.getElementById('phoneStatusToast').style.display = 'none'; document.getElementById('phoneStatusToast').style.opacity = '1'; }, 3500);
           });
+          
           telnyxClient.on('telnyx.error', (error) => {
-            if (error && error.error && error.error.fatal === false) { addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event.")); return; }
-            addLog("Telnyx Socket Error: " + JSON.stringify(error)); isTelnyxReady = false;
-            document.getElementById('phoneStatusToast').style.display = 'flex';
-            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
-            document.getElementById('phoneStatusIcon').innerText = '❌';
-            document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
+            if (error && error.error && error.error.fatal === false) { 
+                addLog("Telnyx Notice: " + (error.error.message || "Non-fatal event.")); 
+                return; 
+            }
+            
+            addLog("Telnyx Socket Error: " + JSON.stringify(error)); 
+            isTelnyxReady = false;
+            
+            document.getElementById('phoneStatusToast').style.display = 'flex'; 
+            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)'; 
+            document.getElementById('phoneStatusIcon').innerText = '❌'; 
+            document.getElementById('phoneStatusIcon').classList.remove('icon-spin'); 
             document.getElementById('phoneStatusText').innerText = 'Phone System Disconnected';
             
             setTimeout(() => { 
                 if (!isTelnyxReady && telnyxClient) { 
                     addLog("Attempting Telnyx background reconnect..."); 
-                    document.getElementById('phoneStatusToast').style.background = 'var(--warning-color)';
-                    document.getElementById('phoneStatusIcon').innerText = '⏳';
-                    document.getElementById('phoneStatusIcon').classList.add('icon-spin');
-                    document.getElementById('phoneStatusText').innerText = 'Reconnecting to Phone System...';
+                    document.getElementById('phoneStatusToast').style.background = 'var(--warning-color)'; 
+                    document.getElementById('phoneStatusIcon').innerText = '⏳'; 
+                    document.getElementById('phoneStatusIcon').classList.add('icon-spin'); 
+                    document.getElementById('phoneStatusText').innerText = 'Reconnecting to Phone System...'; 
                     telnyxClient.connect(); 
                 } 
             }, 3000);
           });
+          
           telnyxClient.on('telnyx.notification', (notification) => {
             if (notification.type === 'callUpdate') {
-              activeCall = notification.call;
+              activeCall = notification.call; 
               const btn = document.getElementById('callActionBtn');
+              
               if (activeCall.state === 'ringing') {
                 if(btn && !window.isUnlistedCall) btn.innerHTML = '🔔 Ringing...';
-                document.getElementById('callOverlayStatus').innerText = "Ringing...";
-                document.getElementById('callOverlayStatus').style.color = "var(--warning-color)";
+                document.getElementById('callOverlayStatus').innerText = "Ringing..."; 
+                document.getElementById('callOverlayStatus').style.color = "var(--warning-color)"; 
                 document.getElementById('callPulseIndicator').style.background = "var(--warning-color)";
               } else if (activeCall.state === 'active') {
                 showToast('Call Connected!', 'success');
                 if(btn && !window.isUnlistedCall) btn.innerHTML = '🛑 End Call';
-                document.getElementById('callOverlayStatus').innerText = "Connected";
-                document.getElementById('callOverlayStatus').style.color = "var(--safe-color)";
+                
+                document.getElementById('callOverlayStatus').innerText = "Connected"; 
+                document.getElementById('callOverlayStatus').style.color = "var(--safe-color)"; 
                 document.getElementById('callPulseIndicator').style.background = "var(--safe-color)";
-                document.getElementById('ivrDialpad').style.display = 'none'; document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
-                startCallTimer();
+                document.getElementById('ivrDialpad').style.display = 'none'; 
+                document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad'; 
+                
+                startCallTimer(); 
                 startAutoRecording();
               } else if (activeCall.state === 'destroy') {
-                showToast('Call Ended.', 'warning');
+                showToast('Call Ended.', 'warning'); 
                 activeCall = null;
                 if(btn && !window.isUnlistedCall) btn.innerHTML = '📞 Call Now';
-                hideCallOverlay();
-                document.getElementById('ivrDialpad').style.display = 'none'; document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
+                
+                hideCallOverlay(); 
+                document.getElementById('ivrDialpad').style.display = 'none'; 
+                document.getElementById('toggleDialpadBtn').innerHTML = '🎛️ Show Keypad';
+                
                 if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
-
-                if(window.isUnlistedCall) {
-                   return;
+                
+                if(window.isUnlistedCall) { 
+                    return; 
                 }
-
-                document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value;
-                document.getElementById('postCallNotes').value = '';
-                setDropdownValueSafe('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', '');
+                
+                document.getElementById('postCallPocName').innerText = document.getElementById('ws-poc').value; 
+                document.getElementById('postCallNotes').value = ''; 
+                setDropdownValueSafe('postCallOutcomeDropdown', 'postCallOutcomeVal', 'postCallOutcomeDisplay', ''); 
                 document.getElementById('postCallOutcomeDisplay').innerText = 'Select Outcome...';
                 
-                const wsAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1';
-                document.querySelectorAll('.attempt-btn').forEach(el => {
-                    if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active'); else el.classList.remove('active');
-                });
-                document.getElementById('postCallAttemptVal').value = wsAttempt;
+                const wsAttempt = document.getElementById('ws-call-attempt-val').value || 'Attempt 1'; 
+                document.querySelectorAll('.attempt-btn').forEach(el => { 
+                    if (el.getAttribute('data-val') === wsAttempt) el.classList.add('active'); 
+                    else el.classList.remove('active'); 
+                }); 
+                
+                document.getElementById('postCallAttemptVal').value = wsAttempt; 
                 openModal('postCallModal');
               }
             }
           });
+          
           telnyxClient.connect();
+          
         }).catch(err => { 
             addLog(`Telnyx Auth Error: ${err.message}`); 
-            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)';
-            document.getElementById('phoneStatusIcon').innerText = '❌';
-            document.getElementById('phoneStatusIcon').classList.remove('icon-spin');
-            document.getElementById('phoneStatusText').innerText = 'Phone System Initialization Failed';
+            document.getElementById('phoneStatusToast').style.background = 'var(--danger-color)'; 
+            document.getElementById('phoneStatusIcon').innerText = '❌'; 
+            document.getElementById('phoneStatusIcon').classList.remove('icon-spin'); 
+            document.getElementById('phoneStatusText').innerText = 'Phone System Initialization Failed'; 
         });
     }
 
     function handleCallNowClick() {
-      if (activeCall) { activeCall.hangup(); document.getElementById('callActionBtn').innerHTML = '📞 Call Now'; activeCall = null; return; }
-      if (!telnyxClient) { showToast('Phone system disconnected. Check logs (Shift+L).', 'danger'); return; }
-      if (!isTelnyxReady) { showToast('Phone system is connecting. Please wait.', 'warning'); return; }
-      const workNum = document.getElementById('ws-phone-work').value, mobileNum = document.getElementById('ws-phone-mobile').value;
-      const validWork = workNum && !workNum.toLowerCase().includes('no phone'), validMobile = mobileNum && !mobileNum.toLowerCase().includes('no mobile');
-      if (validWork && validMobile) { document.getElementById('lblWorkNum').innerText = workNum; document.getElementById('lblMobileNum').innerText = mobileNum; openModal('selectPhoneModal'); } 
+      if (activeCall) { 
+          activeCall.hangup(); 
+          document.getElementById('callActionBtn').innerHTML = '📞 Call Now'; 
+          activeCall = null; 
+          return; 
+      }
+      
+      if (!telnyxClient) { 
+          showToast('Phone system disconnected. Check logs (Shift+L).', 'danger'); 
+          return; 
+      }
+      
+      if (!isTelnyxReady) { 
+          showToast('Phone system is connecting. Please wait.', 'warning'); 
+          return; 
+      }
+      
+      const workNum = document.getElementById('ws-phone-work').value;
+      const mobileNum = document.getElementById('ws-phone-mobile').value;
+      const validWork = workNum && !workNum.toLowerCase().includes('no phone');
+      const validMobile = mobileNum && !mobileNum.toLowerCase().includes('no mobile');
+      
+      if (validWork && validMobile) { 
+          document.getElementById('lblWorkNum').innerText = workNum; 
+          document.getElementById('lblMobileNum').innerText = mobileNum; 
+          openModal('selectPhoneModal'); 
+      } 
       else if (validWork) executeDial('work'); 
       else if (validMobile) executeDial('mobile'); 
       else showToast('No valid phone number for this contact.', 'warning');
@@ -1523,99 +1489,142 @@
       const pocName = document.getElementById('ws-poc').value;
       const btn = document.getElementById('callActionBtn');
 
-      addLog(`Dialing ${pocName} at ${cleanPhone} via Telnyx...`);
-      showToast(`Dialing ${pocName} (${client})...`, 'safe');
-      if(btn) btn.innerHTML = 'Dialing...';
+      addLog(`Dialing ${pocName} at ${cleanPhone} via Telnyx...`); 
+      showToast(`Dialing ${pocName} (${client})...`, 'safe'); 
+      
+      if(btn) btn.innerHTML = 'Dialing...'; 
       showCallOverlay(pocName);
 
-      try {
-          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false });
-      } catch(err) {
-          showToast('Call failed to initiate. Check logs.', 'danger'); addLog(`Dial Error: ${err.message}`);
-          if(btn) btn.innerHTML = '📞 Call Now';
-          hideCallOverlay(); activeCall = null;
+      try { 
+          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false }); 
+      } catch(err) { 
+          showToast('Call failed to initiate. Check logs.', 'danger'); 
+          addLog(`Dial Error: ${err.message}`); 
+          if(btn) btn.innerHTML = '📞 Call Now'; 
+          hideCallOverlay(); 
+          activeCall = null; 
       }
     }
 
     function startUnlistedCall() {
       const targetNum = document.getElementById('unlistedPhoneInput').value;
       const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
-      if (cleanPhone.length < 10) { showToast('Invalid phone number.', 'danger'); return; }
       
-      closeModal('unlistedCallModal');
-      window.isUnlistedCall = true;
+      if (cleanPhone.length < 10) { 
+          showToast('Invalid phone number.', 'danger'); 
+          return; 
+      }
+      
+      closeModal('unlistedCallModal'); 
+      window.isUnlistedCall = true; 
       window.unlistedPhoneNum = targetNum;
 
-      if (!telnyxClient || !isTelnyxReady) { showToast('Phone system not ready.', 'danger'); return; }
+      if (!telnyxClient || !isTelnyxReady) { 
+          showToast('Phone system not ready.', 'danger'); 
+          return; 
+      }
 
-      addLog(`Dialing Unlisted Number: ${cleanPhone}...`);
-      showToast(`Dialing unlisted number...`, 'safe');
-      showCallOverlay(targetNum);
+      addLog(`Dialing Unlisted Number: ${cleanPhone}...`); 
+      showToast(`Dialing unlisted number...`, 'safe'); 
+      showCallOverlay(targetNum); 
       document.getElementById('callOverlayName').innerText = "Unlisted Contact";
 
-      try {
-          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false });
-      } catch(err) {
-          showToast('Call failed to initiate. Check logs.', 'danger'); addLog(`Dial Error: ${err.message}`);
-          hideCallOverlay(); activeCall = null; window.isUnlistedCall = false;
+      try { 
+          activeCall = telnyxClient.newCall({ destinationNumber: cleanPhone, callerNumber: telnyxCallerId, audio: true, video: false }); 
+      } catch(err) { 
+          showToast('Call failed to initiate. Check logs.', 'danger'); 
+          addLog(`Dial Error: ${err.message}`); 
+          hideCallOverlay(); 
+          activeCall = null; 
+          window.isUnlistedCall = false; 
       }
     }
 
     async function startAutoRecording() {
-      let audioCtx;
       try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContextClass(); window.activeAudioCtx = audioCtx; 
-        const dest = audioCtx.createMediaStreamDestination();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext; 
+        window.activeAudioCtx = new AudioContextClass(); 
+        const dest = window.activeAudioCtx.createMediaStreamDestination();
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const localSource = audioCtx.createMediaStreamSource(localStream); localSource.connect(dest);
-
-        try {
-            const remoteAudioEl = document.getElementById('remoteMedia');
-            let remoteStream = remoteAudioEl.srcObject;
-            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
-            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
-            if (remoteStream && remoteStream.getAudioTracks().length > 0) { const remoteSource = audioCtx.createMediaStreamSource(remoteStream); remoteSource.connect(dest); }
-        } catch (remoteErr) { addLog(`Remote audio merge skipped: ${remoteErr.message}`); }
-
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        audioChunks = []; mediaRecorder = new MediaRecorder(dest.stream); mediaRecorder.localStreamToStop = localStream;
+        const localSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
+        localSource.connect(dest);
         
-        mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
-        mediaRecorder.onstop = uploadRecordingToDrive; mediaRecorder.start();
-        recSeconds = 0; document.getElementById('recIndicator').classList.add('active'); document.getElementById('recTimerText').innerText = "REC 00:00";
-        if (recTimerInterval) clearInterval(recTimerInterval);
-        recTimerInterval = setInterval(() => {
-           recSeconds++;
-           const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0'), secs = String(recSeconds % 60).padStart(2, '0');
-           document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
-        }, 1000);
+        try { 
+            const remoteAudioEl = document.getElementById('remoteMedia'); 
+            let remoteStream = remoteAudioEl.srcObject; 
+            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream(); 
+            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream(); 
+            if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
+                const remoteSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
+                remoteSource.connect(dest); 
+            } 
+        } catch (remoteErr) { 
+            addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
+        }
+        
+        if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
+        
+        audioChunks = []; 
+        mediaRecorder = new MediaRecorder(dest.stream); 
+        mediaRecorder.localStreamToStop = localStream; 
+        mediaRecorder.ondataavailable = event => { 
+            if (event.data.size > 0) audioChunks.push(event.data); 
+        }; 
+        mediaRecorder.onstop = uploadRecordingToDrive; 
+        mediaRecorder.start();
+        
+        recSeconds = 0; 
+        document.getElementById('recIndicator').classList.add('active'); 
+        document.getElementById('recTimerText').innerText = "REC 00:00"; 
+        
+        if (recTimerInterval) clearInterval(recTimerInterval); 
+        
+        recTimerInterval = setInterval(() => { 
+            recSeconds++; 
+            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+            const secs = String(recSeconds % 60).padStart(2, '0'); 
+            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`; 
+        }, 1000); 
+        
         addLog("Two-way call recording started.");
-      } catch (err) { addLog(`Microphone access error: ${err.message}`); }
+      } catch (err) { 
+          addLog(`Microphone access error: ${err.message}`); 
+      }
     }
 
     function toggleRecordingPause() {
-      if (!mediaRecorder) return;
+      if (!mediaRecorder) return; 
+      
       const btn = document.getElementById('recToggleBtn');
-      if (mediaRecorder.state === "recording") {
-         mediaRecorder.pause(); clearInterval(recTimerInterval); btn.innerText = "▶️ Resume"; document.getElementById('recIndicator').classList.remove('active'); addLog("Recording paused.");
-      } else if (mediaRecorder.state === "paused") {
-         mediaRecorder.resume();
-         recTimerInterval = setInterval(() => {
-            recSeconds++;
-            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0'), secs = String(recSeconds % 60).padStart(2, '0');
-            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
-         }, 1000);
-         btn.innerText = "⏸️ Pause"; document.getElementById('recIndicator').classList.add('active'); addLog("Recording resumed.");
+      if (mediaRecorder.state === "recording") { 
+          mediaRecorder.pause(); 
+          clearInterval(recTimerInterval); 
+          btn.innerText = "▶️ Resume"; 
+          document.getElementById('recIndicator').classList.remove('active'); 
+          addLog("Recording paused."); 
+      } else if (mediaRecorder.state === "paused") { 
+          mediaRecorder.resume(); 
+          recTimerInterval = setInterval(() => { 
+              recSeconds++; 
+              const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+              const secs = String(recSeconds % 60).padStart(2, '0'); 
+              document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`; 
+          }, 1000); 
+          btn.innerText = "⏸️ Pause"; 
+          document.getElementById('recIndicator').classList.add('active'); 
+          addLog("Recording resumed."); 
       }
     }
 
-    function stopRecordingAndUpload() {
-      if (mediaRecorder && mediaRecorder.state !== "inactive") {
-         if (mediaRecorder.localStreamToStop) mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
-         mediaRecorder.stop(); clearInterval(recTimerInterval);
-         document.getElementById('recIndicator').classList.remove('active'); document.getElementById('recTimerText').innerText = "Analyzing Audio & Uploading...";
-      }
-      if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') window.activeAudioCtx.close();
+    function stopRecordingAndUpload() { 
+        if (mediaRecorder && mediaRecorder.state !== "inactive") { 
+            if (mediaRecorder.localStreamToStop) mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop()); 
+            mediaRecorder.stop(); 
+            clearInterval(recTimerInterval); 
+            document.getElementById('recIndicator').classList.remove('active'); 
+            document.getElementById('recTimerText').innerText = "Analyzing Audio & Uploading..."; 
+        } 
+        if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') window.activeAudioCtx.close(); 
     }
 
     function uploadRecordingToDrive() {
@@ -1623,112 +1632,115 @@
       const clientName = window.isUnlistedCall ? "Unlisted Calls" : document.getElementById('ws-client-display').value;
       const pocName = window.isUnlistedCall ? window.unlistedPhoneNum : document.getElementById('ws-poc').value;
       const rowId = document.getElementById('ws-row-id').value;
-      const reader = new FileReader(); reader.readAsDataURL(audioBlob);
-      
+      const reader = new FileReader();
       const attemptVal = document.getElementById('ws-call-attempt-val') ? document.getElementById('ws-call-attempt-val').value : 'Attempt';
       
+      reader.readAsDataURL(audioBlob);
       reader.onloadend = function() {
-         const base64Data = reader.result.split(',')[1];
+         const base64Data = reader.result.split(',')[1]; 
          addLog(`Processing audio upload in background...`);
          
-         if (window.isUnlistedCall) {
-            callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
-            .then(res => {
-               document.getElementById('recTimerText').innerText = "Unlisted Call Saved ✅";
-               showToast("Unlisted call recording saved to Drive.", "success");
-               window.isUnlistedCall = false;
-            }).catch(err => {
-               document.getElementById('recTimerText').innerText = "Upload Failed ❌";
-               window.isUnlistedCall = false;
-            });
-            return;
+         if (window.isUnlistedCall) { 
+             callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
+             .then(res => { 
+                 document.getElementById('recTimerText').innerText = "Unlisted Call Saved ✅"; 
+                 showToast("Unlisted call recording saved to Drive.", "success"); 
+                 window.isUnlistedCall = false; 
+             }).catch(err => { 
+                 document.getElementById('recTimerText').innerText = "Upload Failed ❌"; 
+                 window.isUnlistedCall = false; 
+             }); 
+             return; 
          }
          
          callGoogleAPI('saveRecordingToDrive', { clientName: clientName, pocName: pocName, audioBase64: base64Data, fileType: audioBlob.type })
          .then(res => {
-            addLog(`Recording saved. Generating AI Summary...`);
+            addLog(`Recording saved. Generating AI Summary...`); 
             callGoogleAPI('appendAIToNotes', { rowId: rowId, recordingUrl: res.fileUrl, aiSummary: res.aiSummary, attempt: attemptVal })
-            .then(updateRes => {
+            .then(updateRes => { 
                 rawData = updateRes.rows || []; 
-                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-                filterData();
-                showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success");
-                addLog(`AI Summary attached to row ${rowId}`);
-            }).catch(err => {
-                addLog(`AI append error: ${err.message}`);
+                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData)); 
+                filterData(); 
+                showToast("🤖 AI Summary & Recording successfully attached to Call Notes!", "success"); 
+                addLog(`AI Summary attached to row ${rowId}`); 
+            }).catch(err => { 
+                addLog(`AI append error: ${err.message}`); 
             });
-         }).catch(err => {
-            addLog(`Upload error: ${err.message}`);
+         }).catch(err => { 
+             addLog(`Upload error: ${err.message}`); 
          });
       };
     }
 
-    // ==========================================
-    // TIMELINE RENDERING
-    // ==========================================
     function openTimeline() {
         const rowId = document.getElementById('ws-row-id').value;
         const pocData = rawData.find(r => r.id.toString() === rowId.toString());
-        const container = document.getElementById('timelineContainer');
+        const container = document.getElementById('timelineContainer'); 
         container.innerHTML = '';
-
-        if(!pocData) { container.innerHTML = "<p>No data found.</p>"; openModal('timelineModal'); return; }
-
-        let timelineHTML = "";
         
+        if(!pocData) { 
+            container.innerHTML = "<p>No data found.</p>"; 
+            openModal('timelineModal'); 
+            return; 
+        }
+        
+        let timelineHTML = ""; 
         const atts = [];
-        if(pocData.att1 && pocData.att1 !== "-") atts.push({ label: 'Attempt 1 Registered', date: pocData.att1 });
-        if(pocData.att2 && pocData.att2 !== "-") atts.push({ label: 'Attempt 2 Registered', date: pocData.att2 });
+        
+        if(pocData.att1 && pocData.att1 !== "-") atts.push({ label: 'Attempt 1 Registered', date: pocData.att1 }); 
+        if(pocData.att2 && pocData.att2 !== "-") atts.push({ label: 'Attempt 2 Registered', date: pocData.att2 }); 
         if(pocData.att3 && pocData.att3 !== "-") atts.push({ label: 'Attempt 3 Registered', date: pocData.att3 });
         
         let notesArr = [];
         if (pocData.notes) {
             const blocks = pocData.notes.split("--- [Log Separator] ---");
-            blocks.forEach(block => {
-                const b = block.trim();
-                if(b) {
-                    let recLink = "";
-                    const linkMatch = b.match(/🔗 Audio Recording: (https:\/\/[^\s]+)/);
-                    if (linkMatch) recLink = linkMatch[1];
-                    let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim();
-                    notesArr.push({ type: 'note', content: cleanNote, audio: recLink });
-                }
+            blocks.forEach(block => { 
+                const b = block.trim(); 
+                if(b) { 
+                    let recLink = ""; 
+                    const linkMatch = b.match(/🔗 Audio Recording: (https:\/\/[^\s]+)/); 
+                    if (linkMatch) recLink = linkMatch[1]; 
+                    let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim(); 
+                    notesArr.push({ type: 'note', content: cleanNote, audio: recLink }); 
+                } 
             });
         }
-
-        if(atts.length === 0 && notesArr.length === 0) {
-            container.innerHTML = "<p style='color:var(--text-muted)'>No history logged yet.</p>";
-            openModal('timelineModal'); return;
+        
+        if(atts.length === 0 && notesArr.length === 0) { 
+            container.innerHTML = "<p style='color:var(--text-muted)'>No history logged yet.</p>"; 
+            openModal('timelineModal'); 
+            return; 
         }
-
-        atts.forEach(a => {
-            timelineHTML += `<div class="timeline-item"><div class="tl-date">${a.date}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${a.label}</div></div>`;
+        
+        atts.forEach(a => { 
+            timelineHTML += `<div class="timeline-item"><div class="tl-date">${a.date}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${a.label}</div></div>`; 
         });
-
-        notesArr.reverse().forEach(n => {
-            let audioBtn = n.audio ? `<br><a href="${n.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : "";
-            timelineHTML += `<div class="timeline-item"><div class="tl-content">${n.content}${audioBtn}</div></div>`;
+        
+        notesArr.reverse().forEach(n => { 
+            let audioBtn = n.audio ? `<br><a href="${n.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : ""; 
+            timelineHTML += `<div class="timeline-item"><div class="tl-content">${n.content}${audioBtn}</div></div>`; 
         });
-
-        container.innerHTML = timelineHTML;
+        
+        container.innerHTML = timelineHTML; 
         openModal('timelineModal');
     }
 
     function openCrmNotes() {
         const email = document.getElementById('ws-email-val').value;
         const pocName = document.getElementById('ws-poc').value;
+        const container = document.getElementById('crmNotesContainer'); 
+        
         document.getElementById('crmNotesPoc').innerText = pocName;
-        const container = document.getElementById('crmNotesContainer');
-        container.innerHTML = '<div class="loader-container"><div class="spinner"></div><div style="font-size:0.85rem;">Fetching CRM Notes...</div></div>';
+        container.innerHTML = '<div class="loader-container"><div class="spinner"></div><div style="font-size:0.85rem;">Fetching CRM Notes...</div></div>'; 
         openModal('crmNotesModal');
 
         callGoogleAPI('getZohoNotes', { email: email }).then(notes => {
-            if (!notes || notes.length === 0) {
-                container.innerHTML = "<p style='color:var(--text-muted); padding:1rem;'>No notes found in Zoho CRM for this contact.</p>";
-                return;
+            if (!notes || notes.length === 0) { 
+                container.innerHTML = "<p style='color:var(--text-muted); padding:1rem;'>No notes found in Zoho CRM for this contact.</p>"; 
+                return; 
             }
             let html = "";
-            notes.forEach(n => {
+            notes.forEach(n => { 
                 html += '<div class="timeline-item">' +
                             '<div class="tl-date" style="display:flex; align-items:center; gap:6px;">' +
                                 '<span style="font-size:1.1rem;">' + n.icon + '</span> ' +
@@ -1737,295 +1749,433 @@
                             '<div class="tl-content" style="background:var(--input-bg); padding:1rem; text-align:left; border: 1px solid var(--glass-border); border-radius:12px;">' +
                                 '<div style="white-space: pre-wrap; font-size:0.95rem; line-height:1.6; color:var(--text-main); margin:0;">' + (n.content || "").trim() + '</div>' +
                             '</div>' +
-                        '</div>';
+                        '</div>'; 
             });
             container.innerHTML = html;
-        }).catch(err => {
-            container.innerHTML = '<p class="error-text" style="display:block; text-align:left;">Error fetching notes: ' + err.message + '</p>';
+        }).catch(err => { 
+            container.innerHTML = '<p class="error-text" style="display:block; text-align:left;">Error fetching notes: ' + err.message + '</p>'; 
         });
     }
 
     function triggerWorkspaceByData(row) {
       try {
-          document.getElementById('ws-row-id').value = row.id;
-          document.getElementById('ws-client').value = row.client;
-          document.getElementById('ws-client-display').value = row.client;
-          document.getElementById('ws-poc').value = row.poc;
-          document.getElementById('ws-email-val').value = row.email;
+          document.getElementById('ws-row-id').value = row.id; 
+          document.getElementById('ws-client').value = row.client; 
+          document.getElementById('ws-client-display').value = row.client; 
+          document.getElementById('ws-poc').value = row.poc; 
+          document.getElementById('ws-email-val').value = row.email; 
           document.getElementById('ws-exec').value = row.executive || 'Executive';
           
           const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
           const cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
-          document.getElementById('ws-phone-work').value = cleanPhone;
-          document.getElementById('ws-phone-mobile').value = cleanMobile;
-
-          document.getElementById('ws-timezone-val').value = row.timezone || '';
+          
+          document.getElementById('ws-phone-work').value = cleanPhone; 
+          document.getElementById('ws-phone-mobile').value = cleanMobile; 
+          document.getElementById('ws-timezone-val').value = row.timezone || ''; 
           document.getElementById('ws-customnote-val').value = row.customNote || '';
           
-          let logicalAttempt = 'Attempt 1';
-          if (row.att3 && row.att3 !== "-") logicalAttempt = 'Attempt 3';
-          else if (row.att2 && row.att2 !== "-") logicalAttempt = 'Attempt 3';
+          let logicalAttempt = 'Attempt 1'; 
+          if (row.att3 && row.att3 !== "-") logicalAttempt = 'Attempt 3'; 
+          else if (row.att2 && row.att2 !== "-") logicalAttempt = 'Attempt 3'; 
           else if (row.att1 && row.att1 !== "-") logicalAttempt = 'Attempt 2';
-
-          setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', logicalAttempt);
           
-          const attemptBadge = document.getElementById('ws-top-attempt-badge');
-          attemptBadge.innerText = logicalAttempt;
+          setDropdownValueSafe('attempt-dropdown', 'ws-call-attempt-val', 'attempt-display', logicalAttempt); 
+          const attemptBadge = document.getElementById('ws-top-attempt-badge'); 
+          attemptBadge.innerText = logicalAttempt; 
           attemptBadge.style.display = 'inline-block';
 
-          const firstName = row.poc.split(' ')[0] || '[First Name]';
-          document.querySelectorAll('.dyn-client-name').forEach(el => el.textContent = row.poc);
-          document.querySelectorAll('.dyn-company-name').forEach(el => el.textContent = row.client);
-          document.querySelectorAll('.dyn-client-first-name').forEach(el => el.textContent = firstName);
+          const firstName = row.poc.split(' ')[0] || '[First Name]'; 
+          document.querySelectorAll('.dyn-client-name').forEach(el => el.textContent = row.poc); 
+          document.querySelectorAll('.dyn-company-name').forEach(el => el.textContent = row.client); 
+          document.querySelectorAll('.dyn-client-first-name').forEach(el => el.textContent = firstName); 
           document.querySelectorAll('.dyn-exec-name').forEach(el => el.textContent = row.executive || 'Executive');
 
-          document.getElementById('ws-poc-selected-text').textContent = `${row.poc} (${row.status})`;
-          const optionsContainer = document.getElementById('ws-poc-options');
+          document.getElementById('ws-poc-selected-text').textContent = `${row.poc} (${row.status})`; 
+          const optionsContainer = document.getElementById('ws-poc-options'); 
           optionsContainer.innerHTML = '';
-          rawData.filter(r => r.client === row.client && r.hidden === false).forEach(p => {
-              const opt = document.createElement('div');
+          
+          rawData.filter(r => r.client === row.client && r.hidden === false).forEach(p => { 
+              const opt = document.createElement('div'); 
               opt.className = 'select-option poc-select-option'; 
-              opt.innerHTML = `<div class="poc-opt-name">${p.poc}</div><div class="poc-opt-status">Status: ${p.status}</div>`;
-              opt.onclick = function(e) { e.stopPropagation(); document.getElementById('ws-poc-options').classList.remove('open'); triggerPocSwitch(p.id); };
-              optionsContainer.appendChild(opt);
+              opt.innerHTML = `<div class="poc-opt-name">${p.poc}</div><div class="poc-opt-status">Status: ${p.status}</div>`; 
+              opt.onclick = function(e) { 
+                  e.stopPropagation(); 
+                  document.getElementById('ws-poc-options').classList.remove('open'); 
+                  triggerPocSwitch(p.id); 
+              }; 
+              optionsContainer.appendChild(opt); 
           });
 
-          const wsTags = document.getElementById('ws-tags-display');
-          if (row.tags) { wsTags.innerHTML = row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main);">${t.trim()}</span>`).join(''); wsTags.style.display = 'flex'; } 
-          else { wsTags.style.display = 'none'; }
+          const wsTags = document.getElementById('ws-tags-display'); 
+          if (row.tags) { 
+              wsTags.innerHTML = row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main);">${t.trim()}</span>`).join(''); 
+              wsTags.style.display = 'flex'; 
+          } else { 
+              wsTags.style.display = 'none'; 
+          }
 
           const infoBox = document.getElementById('ws-persistent-info');
           const noteWrapper = document.getElementById('ws-note-wrapper');
           
-          if(row.timezone || row.customNote) {
-             infoBox.style.display = 'block';
-             const tzMatch = tzList.find(t => t.iana === row.timezone);
-             document.getElementById('ws-tz-display').textContent = tzMatch ? tzMatch.label : (row.timezone || 'Not Set');
-             if(row.timezone) { document.getElementById('ws-live-time').style.display = 'inline'; if (clockInterval) clearInterval(clockInterval); clockInterval = setInterval(updateLiveClock, 1000); updateLiveClock(); } 
-             else { document.getElementById('ws-live-time').style.display = 'none'; if (clockInterval) clearInterval(clockInterval); }
-             if (row.customNote) { noteWrapper.style.display = 'block'; document.getElementById('ws-note-display').textContent = row.customNote; } 
-             else { noteWrapper.style.display = 'none'; }
-          } else { infoBox.style.display = 'none'; if (clockInterval) clearInterval(clockInterval); }
+          if(row.timezone || row.customNote) { 
+              infoBox.style.display = 'block'; 
+              const tzMatch = tzList.find(t => t.iana === row.timezone); 
+              document.getElementById('ws-tz-display').textContent = tzMatch ? tzMatch.label : (row.timezone || 'Not Set'); 
+              
+              if(row.timezone) { 
+                  document.getElementById('ws-live-time').style.display = 'inline'; 
+                  if (clockInterval) clearInterval(clockInterval); 
+                  clockInterval = setInterval(updateLiveClock, 1000); 
+                  updateLiveClock(); 
+              } else { 
+                  document.getElementById('ws-live-time').style.display = 'none'; 
+                  if (clockInterval) clearInterval(clockInterval); 
+              } 
+              
+              if (row.customNote) { 
+                  noteWrapper.style.display = 'block'; 
+                  document.getElementById('ws-note-display').textContent = row.customNote; 
+              } else { 
+                  noteWrapper.style.display = 'none'; 
+              } 
+          } else { 
+              infoBox.style.display = 'none'; 
+              if (clockInterval) clearInterval(clockInterval); 
+          }
 
-          document.querySelectorAll('#workspace-form-area input[type="radio"]').forEach(el => { el.checked = false; el.dataset.wasChecked = 'false'; });
-          document.querySelectorAll('#workspace-form-area input[type="checkbox"]').forEach(el => el.checked = false);
+          document.querySelectorAll('#workspace-form-area input[type="radio"]').forEach(el => { el.checked = false; el.dataset.wasChecked = 'false'; }); 
+          document.querySelectorAll('#workspace-form-area input[type="checkbox"]').forEach(el => el.checked = false); 
           document.querySelectorAll('#workspace-form-area textarea, #workspace-form-area input[type="text"]').forEach(el => el.value = '');
           
-          setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...');
+          setDropdownValueSafe('status-dropdown', 'ws-call-status-val', 'status-display', 'Select Outcome...'); 
           document.getElementById('ws-recording-url').value = ''; 
-          document.getElementById('ws-ai-summary').value = '';
+          document.getElementById('ws-ai-summary').value = ''; 
           
-          openScriptTab('ws-live-call', document.querySelector('.script-tab'));
-
-          document.getElementById('mainDashboard').style.display = 'none';
-          const ws = document.getElementById('actionWorkspace'); ws.style.display = 'flex'; setTimeout(() => ws.classList.add('active'), 10);
-          addLog(`Workspace opened for POC: ${row.poc}`);
+          openScriptTab('ws-live-call', document.querySelector('.script-tab')); 
+          document.getElementById('mainDashboard').style.display = 'none'; 
           
+          const ws = document.getElementById('actionWorkspace'); 
+          ws.style.display = 'flex'; 
+          setTimeout(() => ws.classList.add('active'), 10); 
+          
+          addLog(`Workspace opened for POC: ${row.poc}`); 
           callGoogleAPI('heartbeat', { activeRowId: row.id }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
           
-      } catch (err) { showToast('Failed to open workspace.', 'danger'); addLog(`UI CRASH: ${err.message}`); }
+      } catch (err) { 
+          showToast('Failed to open workspace.', 'danger'); 
+          addLog(`UI CRASH: ${err.message}`); 
+      }
     }
 
     function renderPresence() {
         const loggedIn = document.getElementById('loggedInUser').innerText;
+        const tbody = document.getElementById('table-body'); 
         document.querySelectorAll('.pulse-live').forEach(el => el.remove());
-        const tbody = document.getElementById('table-body');
         
-        Object.keys(activePresence).forEach(user => {
+        Object.keys(activePresence).forEach(user => { 
             if (user === loggedIn) return; 
-            const rowId = activePresence[user].rowId;
-            if(!rowId) return;
-            const r = rawData.find(x => x.id.toString() === rowId.toString());
-            if(r) {
-                const spans = tbody.querySelectorAll('span');
-                spans.forEach(span => {
-                    if (span.innerText === r.poc && span.style.fontWeight === "600") {
-                        span.innerHTML += `<span class="pulse-live" data-tooltip-top="Being viewed by ${user}"></span>`;
-                    }
-                });
-            }
+            const rowId = activePresence[user].rowId; 
+            if(!rowId) return; 
+            const r = rawData.find(x => x.id.toString() === rowId.toString()); 
+            if(r) { 
+                const spans = tbody.querySelectorAll('span'); 
+                spans.forEach(span => { 
+                    if (span.innerText === r.poc && span.style.fontWeight === "600") { 
+                        span.innerHTML += `<span class="pulse-live" data-tooltip-top="Being viewed by ${user}"></span>`; 
+                    } 
+                }); 
+            } 
         });
     }
 
-    function triggerPocSwitch(id) { const pocData = rawData.find(r => r.id.toString() === id.toString()); if(pocData) triggerWorkspaceByData(pocData); }
+    function triggerPocSwitch(id) { 
+        const pocData = rawData.find(r => r.id.toString() === id.toString()); 
+        if(pocData) triggerWorkspaceByData(pocData); 
+    }
 
     function openEditModal() {
        const rowId = document.getElementById('ws-row-id').value;
        const pocData = rawData.find(r => r.id.toString() === rowId.toString());
        
-       document.getElementById('editPocNameInput').value = document.getElementById('ws-poc').value;
+       document.getElementById('editPocNameInput').value = document.getElementById('ws-poc').value; 
+       
        const savedIana = document.getElementById('ws-timezone-val').value;
        const tzMatch = tzList.find(t => t.iana === savedIana);
-       document.getElementById('editTzInput').value = tzMatch ? tzMatch.label : savedIana;
-       document.getElementById('editTzIana').value = savedIana;
+       
+       document.getElementById('editTzInput').value = tzMatch ? tzMatch.label : savedIana; 
+       document.getElementById('editTzIana').value = savedIana; 
        document.getElementById('editNoteInput').value = document.getElementById('ws-customnote-val').value;
        
-       const currentStatus = pocData.status || 'Pending';
-       setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', currentStatus);
+       setDropdownValueSafe('edit-status-dropdown', 'edit-status-val', 'edit-status-display', pocData.status || 'Pending');
        
-       document.getElementById('editAttempt1')._flatpickr.setDate(pocData && pocData.att1 !== "-" ? pocData.att1 : "");
-       document.getElementById('editAttempt2')._flatpickr.setDate(pocData && pocData.att2 !== "-" ? pocData.att2 : "");
+       document.getElementById('editAttempt1')._flatpickr.setDate(pocData && pocData.att1 !== "-" ? pocData.att1 : ""); 
+       document.getElementById('editAttempt2')._flatpickr.setDate(pocData && pocData.att2 !== "-" ? pocData.att2 : ""); 
        document.getElementById('editAttempt3')._flatpickr.setDate(pocData && pocData.att3 !== "-" ? pocData.att3 : "");
-
-       document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
-       if(pocData && pocData.tags) {
-          const tagsArr = pocData.tags.split(',').map(t => t.trim());
-          document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => { if(tagsArr.includes(cb.value)) cb.checked = true; });
+       
+       document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => cb.checked = false); 
+       if(pocData && pocData.tags) { 
+           const tagsArr = pocData.tags.split(',').map(t => t.trim()); 
+           document.querySelectorAll('#editTagsContainer input[type="checkbox"]').forEach(cb => { 
+               if(tagsArr.includes(cb.value)) cb.checked = true; 
+           }); 
        }
        openModal('editPocModal');
     }
 
     function submitPocEdits() {
-       const btn = document.getElementById('saveEditBtn'); btn.innerText = "Saving..."; btn.disabled = true;
-       const rowId = document.getElementById('ws-row-id').value;
+       const btn = document.getElementById('saveEditBtn'); 
+       btn.innerText = "Saving..."; 
+       btn.disabled = true; 
        
-       const attDates = {
-           a1: document.getElementById('editAttempt1').value,
-           a2: document.getElementById('editAttempt2').value,
-           a3: document.getElementById('editAttempt3').value
+       const rowId = document.getElementById('ws-row-id').value;
+       const attDates = { 
+           a1: document.getElementById('editAttempt1').value, 
+           a2: document.getElementById('editAttempt2').value, 
+           a3: document.getElementById('editAttempt3').value 
        };
        const statusVal = document.getElementById('edit-status-val').value;
-
-       const tagsArr = []; document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
+       const tagsArr = []; 
        
-       callGoogleAPI('updateContactDetails', { rowId, pocName: document.getElementById('editPocNameInput').value, timezone: document.getElementById('editTzIana').value, customNote: document.getElementById('editNoteInput').value, tags: tagsArr.join(','), attemptDates: attDates, status: statusVal })
-         .then(data => {
-            btn.innerText = "Save Changes"; btn.disabled = false; closeModal('editPocModal');
-            rawData = data.rows || []; 
-            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-            currentPaginationLimit = 50; filterData(); triggerPocSwitch(rowId); showToast('POC details updated successfully!', 'success');
-         }).catch(err => { btn.innerText = "Save Changes"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+       document.querySelectorAll('#editTagsContainer input:checked').forEach(cb => tagsArr.push(cb.value));
+       
+       callGoogleAPI('updateContactDetails', { 
+           rowId, 
+           pocName: document.getElementById('editPocNameInput').value, 
+           timezone: document.getElementById('editTzIana').value, 
+           customNote: document.getElementById('editNoteInput').value, 
+           tags: tagsArr.join(','), 
+           attemptDates: attDates, 
+           status: statusVal 
+       }).then(data => { 
+           btn.innerText = "Save Changes"; 
+           btn.disabled = false; 
+           closeModal('editPocModal'); 
+           
+           rawData = data.rows || []; 
+           localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData)); 
+           currentPaginationLimit = 50; 
+           filterData(); 
+           triggerPocSwitch(rowId); 
+           showToast('POC details updated successfully!', 'success'); 
+       }).catch(err => { 
+           btn.innerText = "Save Changes"; 
+           btn.disabled = false; 
+           showToast("API Error: " + err.message, "danger"); 
+       });
     }
 
-    // ==========================================
-    // ADMIN FUNCTIONS (Hide & Archive)
-    // ==========================================
-    function updateBulkBar() {
+    function updateBulkBar() { 
         const checked = document.querySelectorAll('.admin-hide-cb:checked');
-        const bar = document.getElementById('adminBulkBar');
-        if (checked.length > 0) {
-            bar.style.display = 'flex';
-            document.getElementById('adminBulkCount').innerText = checked.length + " Selected";
-        } else {
-            bar.style.display = 'none';
-        }
+        const bar = document.getElementById('adminBulkBar'); 
+        if (checked.length > 0) { 
+            bar.style.display = 'flex'; 
+            document.getElementById('adminBulkCount').innerText = checked.length + " Selected"; 
+        } else { 
+            bar.style.display = 'none'; 
+        } 
     }
-
-    function submitBulkHide(hideState) {
+    
+    function submitBulkHide(hideState) { 
         const checked = document.querySelectorAll('.admin-hide-cb:checked');
-        const ids = Array.from(checked).map(cb => parseInt(cb.value));
-        document.getElementById('adminBulkBar').style.display = 'none';
-        showToast("Updating visibility...", "warning");
+        const ids = Array.from(checked).map(cb => parseInt(cb.value)); 
         
-        callGoogleAPI('hidePOCs', { rowIds: ids, hideState: hideState }).then(res => {
+        document.getElementById('adminBulkBar').style.display = 'none'; 
+        showToast("Updating visibility...", "warning"); 
+        
+        callGoogleAPI('hidePOCs', { rowIds: ids, hideState: hideState }).then(res => { 
             rawData = res.rows || []; 
-            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData)); 
             filterData(); 
-            showToast("Visibility successfully updated.", "success");
-        }).catch(err => showToast("Error updating visibility: " + err.message, "danger"));
+            showToast("Visibility successfully updated.", "success"); 
+        }).catch(err => showToast("Error updating visibility: " + err.message, "danger")); 
     }
 
-    function triggerRollover() {
-        openModal('rolloverPinModal');
-        setTimeout(() => document.getElementById('rolloverPinInput').focus(), 150);
+    function triggerRollover() { 
+        openModal('rolloverPinModal'); 
+        setTimeout(() => document.getElementById('rolloverPinInput').focus(), 150); 
     }
     
     function verifyRolloverPin() {
         if (document.getElementById('rolloverPinInput').value === "4274") {
-            closeModal('rolloverPinModal');
+            closeModal('rolloverPinModal'); 
             document.getElementById('rolloverPinInput').value = '';
             
             if(!confirm("Are you sure? This will archive your current Active Clients sheet and clear all Attempt Dates, Statuses, and Notes for the new month!")) return;
             
             showToast("Initiating Monthly Rollover...", "warning");
-            callGoogleAPI('rolloverMonth', {}).then(res => {
+            
+            callGoogleAPI('rolloverMonth', {}).then(res => { 
                 rawData = res.rows || []; 
-                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData)); 
                 filterData(); 
-                showToast("Monthly Rollover Complete! Ready for new calls.", "success");
+                showToast("Monthly Rollover Complete! Ready for new calls.", "success"); 
             }).catch(err => showToast("Rollover Error: " + err.message, "danger"));
-
-        } else {
-            document.getElementById('rolloverPinErrorText').style.display = 'block';
+        } else { 
+            document.getElementById('rolloverPinErrorText').style.display = 'block'; 
         }
     }
 
     function closeWorkspace() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") stopRecordingAndUpload();
-      if (activeCall) activeCall.hangup();
+      if (activeCall) activeCall.hangup(); 
       if (clockInterval) clearInterval(clockInterval);
-      const ws = document.getElementById('actionWorkspace'); ws.classList.remove('active');
-      setTimeout(() => { ws.style.display = 'none'; document.getElementById('mainDashboard').style.display = 'block'; }, 300);
       
-      callGoogleAPI('heartbeat', { activeRowId: null }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
+      const ws = document.getElementById('actionWorkspace'); 
+      ws.classList.remove('active'); 
+      
+      setTimeout(() => { 
+          ws.style.display = 'none'; 
+          document.getElementById('mainDashboard').style.display = 'block'; 
+      }, 300);
+      
+      callGoogleAPI('heartbeat', { activeRowId: null }).then(res => { 
+          activePresence = res; 
+          renderPresence(); 
+      }).catch(e=>{});
     }
 
     function openScriptTab(tabId, btn) {
-      document.querySelectorAll('.script-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.script-tab').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active'); btn.classList.add('active');
+      document.querySelectorAll('.script-content').forEach(el => el.classList.remove('active')); 
+      document.querySelectorAll('.script-tab').forEach(el => el.classList.remove('active')); 
+      
+      document.getElementById(tabId).classList.add('active'); 
+      btn.classList.add('active'); 
+      
       document.getElementById('form-overlay').style.display = (tabId === 'ws-voicemail' || tabId === 'ws-email') ? 'flex' : 'none';
     }
 
     function openEmailTemplate(type) {
-      const poc = document.getElementById('ws-poc').value || '', client = document.getElementById('ws-client-display').value || '', firstName = poc.split(' ')[0] || '[First Name]';
-      let subj = "We'd love your feedback on Mindmatrix Bridge - " + client, body = "";
+      const poc = document.getElementById('ws-poc').value || '';
+      const client = document.getElementById('ws-client-display').value || '';
+      const firstName = poc.split(' ')[0] || '[First Name]';
+      
+      let subj = "We'd love your feedback on Mindmatrix Bridge - " + client;
+      let body = "";
 
-      if (type === 'notime') {
-        body = "Hi " + firstName + ",\n\nThank you for taking a moment to speak with us earlier. We are sharing the feedback form link below so you can fill it out at your convenience:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nYour feedback is valuable and helps us improve your experience with the Mindmatrix Bridge platform.\n\nIf you would like to schedule a call later, please let us know your preferred time, and we'll be happy to arrange it.\n\nThank you for your time and cooperation. We appreciate your partnership.\n\nBest regards,";
-      } else if (type === 'voicemail') {
-        body = "Hi " + firstName + ",\n\nI hope this message finds you well. We tried giving you a call earlier to gather your feedback on your experience with Mindmatrix Bridge, but the call went to voicemail.\n\nWe'd be happy to schedule a brief call at a time that works best for you. Please let us know your preferred slot.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nYour input helps us make sure Mindmatrix continues to deliver the best possible support for your channel ecosystem.\n\nThank you for your time and partnership. We look forward to hearing from you.\n\nBest regards,";
-      } else if (type === 'unreachable') {
-        subj = "Request for a Quick Portal Feedback Call - " + client;
-        body = "Hi " + firstName + ",\n\nI hope you're doing well.\n\nWe are beginning our periodic survey calls to better understand how your team is using the portal and to identify opportunities to improve your overall experience. This will include a short series of questions regarding portal usage, challenges, and any enhancements you'd like to see.\n\nCould you please share your availability for a quick call (20 - 30 minutes) sometime this week or next week? We'll schedule it at a time convenient for you.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nLooking forward to your response.";
+      if (type === 'notime') { 
+          body = "Hi " + firstName + ",\n\nThank you for taking a moment to speak with us earlier. We are sharing the feedback form link below so you can fill it out at your convenience:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nYour feedback is valuable and helps us improve your experience with the Mindmatrix Bridge platform.\n\nIf you would like to schedule a call later, please let us know your preferred time, and we'll be happy to arrange it.\n\nThank you for your time and cooperation. We appreciate your partnership.\n\nBest regards,"; 
+      } else if (type === 'voicemail') { 
+          body = "Hi " + firstName + ",\n\nI hope this message finds you well. We tried giving you a call earlier to gather your feedback on your experience with Mindmatrix Bridge, but the call went to voicemail.\n\nWe'd be happy to schedule a brief call at a time that works best for you. Please let us know your preferred slot.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nYour input helps us make sure Mindmatrix continues to deliver the best possible support for your channel ecosystem.\n\nThank you for your time and partnership. We look forward to hearing from you.\n\nBest regards,"; 
+      } else if (type === 'unreachable') { 
+          subj = "Request for a Quick Portal Feedback Call - " + client; 
+          body = "Hi " + firstName + ",\n\nI hope you're doing well.\n\nWe are beginning our periodic survey calls to better understand how your team is using the portal and to identify opportunities to improve your overall experience. This will include a short series of questions regarding portal usage, challenges, and any enhancements you'd like to see.\n\nCould you please share your availability for a quick call (20 - 30 minutes) sometime this week or next week? We'll schedule it at a time convenient for you.\n\nAlternatively, if you prefer, you may provide your feedback using the following form:\nhttps://forms.gle/356zkS5cQ987Kjte8\n\nLooking forward to your response."; 
       }
-      document.getElementById('email-subject-val').value = subj; document.getElementById('email-body-val').value = body; openModal('emailModal');
+      
+      document.getElementById('email-subject-val').value = subj; 
+      document.getElementById('email-body-val').value = body; 
+      openModal('emailModal');
     }
 
-    function toggleEntryMode(mode) {
-       window.entryMode = mode;
-       document.getElementById('tabSingleEntry').classList.toggle('active', mode === 'single');
-       document.getElementById('tabBulkEntry').classList.toggle('active', mode === 'bulk');
-       document.getElementById('singleEntryForm').style.display = mode === 'single' ? 'block' : 'none';
-       document.getElementById('bulkEntryForm').style.display = mode === 'bulk' ? 'block' : 'none';
+    function toggleEntryMode(mode) { 
+        window.entryMode = mode; 
+        document.getElementById('tabSingleEntry').classList.toggle('active', mode === 'single'); 
+        document.getElementById('tabBulkEntry').classList.toggle('active', mode === 'bulk'); 
+        document.getElementById('singleEntryForm').style.display = mode === 'single' ? 'block' : 'none'; 
+        document.getElementById('bulkEntryForm').style.display = mode === 'bulk' ? 'block' : 'none'; 
     }
-
-    function openFocusMode(sourceEl, title) { focusTargetElement = sourceEl; document.getElementById('focus-title').innerText = title; const focusTextarea = document.getElementById('focus-textarea'); focusTextarea.value = sourceEl.value; focusTextarea.oninput = function() { focusTargetElement.value = this.value; }; openModal('focusModal'); setTimeout(() => focusTextarea.focus(), 100); }
-    function selectAttempt(btn) { document.querySelectorAll('.attempt-btn').forEach(el => el.classList.remove('active')); btn.classList.add('active'); document.getElementById('postCallAttemptVal').value = btn.getAttribute('data-val'); }
+    
+    function openFocusMode(sourceEl, title) { 
+        focusTargetElement = sourceEl; 
+        document.getElementById('focus-title').innerText = title; 
+        const focusTextarea = document.getElementById('focus-textarea'); 
+        focusTextarea.value = sourceEl.value; 
+        focusTextarea.oninput = function() { focusTargetElement.value = this.value; }; 
+        openModal('focusModal'); 
+        setTimeout(() => focusTextarea.focus(), 100); 
+    }
+    
+    function selectAttempt(btn) { 
+        document.querySelectorAll('.attempt-btn').forEach(el => el.classList.remove('active')); 
+        btn.classList.add('active'); 
+        document.getElementById('postCallAttemptVal').value = btn.getAttribute('data-val'); 
+    }
 
     function submitPostCallLog() {
-        const attempt = document.getElementById('postCallAttemptVal').value, outcome = document.getElementById('postCallOutcomeVal').value, notes = document.getElementById('postCallNotes').value;
-        if (!outcome || outcome === "Select Outcome...") { showToast("Please select a call outcome.", "warning"); return; }
-        document.getElementById('ws-call-attempt-val').value = attempt; document.getElementById('ws-call-status-val').value = outcome; document.getElementById('ws-internal-notes').value = notes;
-        closeModal('postCallModal'); submitWorkspace();
+        const attempt = document.getElementById('postCallAttemptVal').value;
+        const outcome = document.getElementById('postCallOutcomeVal').value;
+        const notes = document.getElementById('postCallNotes').value;
+        
+        if (!outcome || outcome === "Select Outcome...") { 
+            showToast("Please select a call outcome.", "warning"); 
+            return; 
+        }
+        
+        document.getElementById('ws-call-attempt-val').value = attempt; 
+        document.getElementById('ws-call-status-val').value = outcome; 
+        document.getElementById('ws-internal-notes').value = notes;
+        
+        closeModal('postCallModal'); 
+        
+        // Pass true to skip the right-side form validation
+        submitWorkspace(true);
     }
 
-    function submitWorkspace() {
-      const btn = document.getElementById('ws-submit-btn'); btn.innerText = "Submitting..."; btn.disabled = true;
-      const rowId = document.getElementById('ws-row-id').value, status = document.getElementById('ws-call-status-val').value, internalNotes = document.getElementById('ws-internal-notes').value, attempt = document.getElementById('ws-call-attempt-val').value;
+    function submitWorkspace(skipForm = false) {
+      const btn = document.getElementById('ws-submit-btn'); 
+      btn.innerText = "Submitting..."; 
+      btn.disabled = true;
+      
+      const rowId = document.getElementById('ws-row-id').value;
+      const status = document.getElementById('ws-call-status-val').value;
+      const internalNotes = document.getElementById('ws-internal-notes').value;
+      const attempt = document.getElementById('ws-call-attempt-val').value;
 
-      if (!status || status === "Select Outcome...") { showToast("Please select a call outcome.", "warning"); btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; return; }
+      if (!status || status === "Select Outcome...") { 
+          showToast("Please select a call outcome.", "warning"); 
+          btn.innerText = "Submit Survey & Save Log"; 
+          btn.disabled = false; 
+          return; 
+      }
 
       const skipSurveyStatuses = ['Called / Left Voicemail', 'Email Sent', 'Unsuccessful', 'Inactive / On Hold', 'Invalid / Disconnected Number', 'Declined / Not Interested'];
 
-      if (!skipSurveyStatuses.includes(status)) {
+      if (!skipForm && !skipSurveyStatuses.includes(status)) {
         const formData = new FormData();
         document.querySelectorAll('#survey-form-container input[name], #survey-form-container textarea[name]').forEach(input => {
-          if (input.type === 'radio' || input.type === 'checkbox') { if (input.checked) formData.append(input.name, input.value); } 
-          else { if (input.name === 'entry.2102672062.other_option_response') { const oc = document.getElementById('feature-other-check'); if (oc && oc.checked && input.value) formData.append(input.name, input.value); } else { formData.append(input.name, input.value); } }
+          if (input.type === 'radio' || input.type === 'checkbox') { 
+              if (input.checked) formData.append(input.name, input.value); 
+          } else { 
+              if (input.name === 'entry.2102672062.other_option_response') { 
+                  const oc = document.getElementById('feature-other-check'); 
+                  if (oc && oc.checked && input.value) formData.append(input.name, input.value); 
+              } else { 
+                  formData.append(input.name, input.value); 
+              } 
+          }
         });
-        formData.append("pageHistory", "0"); formData.append("entry.944856988", document.getElementById('ws-client').value); formData.append("entry.1071857762", document.getElementById('ws-exec').value); formData.append("entry.2115264353", document.getElementById('ws-poc').value); formData.append("emailAddress", document.getElementById('ws-email-val').value);
-        fetch("https://docs.google.com/forms/d/e/1FAIpQLSdRXESvabIvUqN7U4ijPNe00NZTvzGXNAg4226qsOroV-hR1Q/formResponse", { method: 'POST', mode: 'no-cors', body: formData }).catch(err => { addLog(`Form Error: ${err}`); });
+        
+        formData.append("pageHistory", "0"); 
+        formData.append("entry.944856988", document.getElementById('ws-client').value); 
+        formData.append("entry.1071857762", document.getElementById('ws-exec').value); 
+        formData.append("entry.2115264353", document.getElementById('ws-poc').value); 
+        formData.append("emailAddress", document.getElementById('ws-email-val').value);
+        
+        fetch("https://docs.google.com/forms/d/e/1FAIpQLSdRXESvabIvUqN7U4ijPNe00NZTvzGXNAg4226qsOroV-hR1Q/formResponse", { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: formData 
+        }).catch(err => { 
+            addLog(`Form Error: ${err}`); 
+        });
       }
 
       callGoogleAPI('logCallAction', { rowId, status, notes: internalNotes, attempt })
         .then(data => {
-          btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast('Log successfully saved to sheet!', 'success');
+          btn.innerText = "Submit Survey & Save Log"; 
+          btn.disabled = false; 
+          showToast('Log successfully saved to sheet!', 'success');
+          
           rawData = data.rows || []; 
-          localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-          currentPaginationLimit = 50; filterData();
+          localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData)); 
+          currentPaginationLimit = 50; 
+          filterData(); 
           document.getElementById('ws-internal-notes').value = '';
-        }).catch(err => { btn.innerText = "Submit Survey & Save Log"; btn.disabled = false; showToast("Network Error: " + err.message, 'danger'); });
+          
+        }).catch(err => { 
+            btn.innerText = "Submit Survey & Save Log"; 
+            btn.disabled = false; 
+            showToast("Network Error: " + err.message, 'danger'); 
+        });
     }
 
     // ==========================================
@@ -2100,26 +2250,39 @@
     }
 
     function toggleTheme() {
-      let currentTheme = document.documentElement.getAttribute('data-theme'); let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
+      let currentTheme = document.documentElement.getAttribute('data-theme'); 
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme); 
       document.getElementById('themeBtn').innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
     }
 
     function populateExecFilter() {
        const execs = [...new Set(rawData.map(r => r.executive).filter(e => e && typeof e === 'string' && e.trim() !== ''))].sort();
-       const selVal = document.getElementById('execFilterVal'); const currentVal = selVal.value;
+       const selVal = document.getElementById('execFilterVal'); 
+       const currentVal = selVal.value;
        const optsDiv = document.getElementById('exec-dropdown-opts');
+       
        optsDiv.innerHTML = `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', 'ALL', 'All Executives')">All Executives</div>`;
-       execs.forEach(ex => { optsDiv.innerHTML += `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', '${ex}', '${ex}')">${ex}</div>`; });
+       
+       execs.forEach(ex => { 
+           optsDiv.innerHTML += `<div class="select-option" onclick="selectDropdownVal('exec-dropdown', 'execFilterVal', 'exec-display', '${ex}', '${ex}')">${ex}</div>`; 
+       });
+       
        setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
     // Instant load from Cache, followed by silent background revalidation
     async function fetchDataAsync() {
       const cachedData = localStorage.getItem("mm_contacts_cache");
+      const cachedSyncTime = localStorage.getItem("mm_crm_sync_time");
+
       if (cachedData && rawData.length === 0) {
           try {
               rawData = JSON.parse(cachedData);
+              if (cachedSyncTime) {
+                  document.getElementById('crmSyncTimeDisplay').innerText = "CRM Synced: " + cachedSyncTime;
+                  document.getElementById('crmSyncTimeDisplay').style.display = "inline";
+              }
               document.getElementById('loader').style.display = 'none'; 
               document.getElementById('kpi-container').style.display = 'flex'; 
               document.getElementById('source-tabs').style.display = 'flex'; 
@@ -2141,6 +2304,12 @@
           const data = await callGoogleAPI('getSurveyData');
           rawData = data.rows || []; 
           localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
+
+          if (data.lastCrmSync) {
+              document.getElementById('crmSyncTimeDisplay').innerText = "CRM Synced: " + data.lastCrmSync;
+              document.getElementById('crmSyncTimeDisplay').style.display = "inline";
+              localStorage.setItem("mm_crm_sync_time", data.lastCrmSync);
+          }
           
           if(refreshIcon) refreshIcon.classList.remove('icon-spin');
           document.getElementById('loader').style.display = 'none'; 
@@ -2170,38 +2339,82 @@
     }
 
     function submitZohoSync() {
-      const pin = document.getElementById('syncPinInput').value; if(!pin) return; closeModal('pinModal'); 
-      document.getElementById('table-container').style.display = 'none'; document.getElementById('loader').style.display = 'flex'; document.getElementById('loaderText').textContent = 'Syncing Zoho CRM...';
+      const pin = document.getElementById('syncPinInput').value; 
+      if(!pin) return; 
+      closeModal('pinModal'); 
+      
+      document.getElementById('table-container').style.display = 'none'; 
+      document.getElementById('loader').style.display = 'flex'; 
+      document.getElementById('loaderText').textContent = 'Syncing Zoho CRM...';
       
       callGoogleAPI('secureZohoSync', { pin }).then(response => {
            rawData = response.data || []; 
            localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-           document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
-           populateExecFilter(); currentPaginationLimit = 50; filterData(); 
+           document.getElementById('loader').style.display = 'none'; 
+           document.getElementById('table-container').style.display = 'block';
+           
+           if(response.lastCrmSync) {
+               document.getElementById('crmSyncTimeDisplay').innerText = "CRM Synced: " + response.lastCrmSync;
+               document.getElementById('crmSyncTimeDisplay').style.display = "inline";
+               localStorage.setItem("mm_crm_sync_time", response.lastCrmSync);
+           }
+
+           populateExecFilter(); 
+           currentPaginationLimit = 50; 
+           filterData(); 
            document.getElementById('syncResultMsg').innerHTML = `Successfully added <strong>${response.added}</strong> new contacts and updated <strong>${response.updated}</strong> existing contacts.`; 
            openModal('syncResultModal');
+           
         }).catch(err => {
-           document.getElementById('loader').style.display = 'none'; document.getElementById('table-container').style.display = 'block';
-           openPinModal(); document.getElementById('pinErrorText').textContent = err.message; document.getElementById('pinErrorText').style.display = 'block';
+           document.getElementById('loader').style.display = 'none'; 
+           document.getElementById('table-container').style.display = 'block';
+           openPinModal(); 
+           document.getElementById('pinErrorText').textContent = err.message; 
+           document.getElementById('pinErrorText').style.display = 'block';
         });
     }
 
     function submitAddEntry() {
-       const btn = document.getElementById('saveEntryBtn'); btn.innerText = "Processing..."; btn.disabled = true;
+       const btn = document.getElementById('saveEntryBtn'); 
+       btn.innerText = "Processing..."; 
+       btn.disabled = true;
 
        if (window.entryMode === 'single') {
-           const client = document.getElementById('addClientInput').value, exec = document.getElementById('addExecInput').value, poc = document.getElementById('addPocInput').value, email = document.getElementById('addEmailInput').value, phone = document.getElementById('addPhoneInput').value, mobile = document.getElementById('addMobileInput').value;
-           if (!client.trim() || !poc.trim() || !email.trim()) { document.getElementById('addErrorText').innerText = 'Client, POC, and Email are required.'; document.getElementById('addErrorText').style.display = 'block'; btn.innerText = "Add Contact"; btn.disabled = false; return; }
+           const client = document.getElementById('addClientInput').value;
+           const exec = document.getElementById('addExecInput').value;
+           const poc = document.getElementById('addPocInput').value;
+           const email = document.getElementById('addEmailInput').value;
+           const phone = document.getElementById('addPhoneInput').value;
+           const mobile = document.getElementById('addMobileInput').value;
+           
+           if (!client.trim() || !poc.trim() || !email.trim()) { 
+               document.getElementById('addErrorText').innerText = 'Client, POC, and Email are required.'; 
+               document.getElementById('addErrorText').style.display = 'block'; 
+               btn.innerText = "Add Contact"; 
+               btn.disabled = false; 
+               return; 
+           }
            
            callGoogleAPI('addManualEntry', { client, exec, poc, email, phone, mobile }).then(data => {
-               btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
+               btn.innerText = "Add Contact(s)"; 
+               btn.disabled = false; 
+               closeModal('addEntryModal');
+               
                rawData = data.rows || []; 
                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-               populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast('Manual entry added.', 'success');
-           }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+               populateExecFilter(); 
+               currentPaginationLimit = 50; 
+               filterData(); 
+               showToast('Manual entry added.', 'success');
+           }).catch(err => { 
+               btn.innerText = "Add Contact(s)"; 
+               btn.disabled = false; 
+               showToast("API Error: " + err.message, "danger"); 
+           });
        } else {
            const lines = document.getElementById('bulkEntryInput').value.split('\n');
            const entries = [];
+           
            for (let line of lines) {
                if(!line.trim()) continue;
                const parts = line.split(',');
@@ -2216,14 +2429,31 @@
                    });
                }
            }
-           if (entries.length === 0) { document.getElementById('addErrorText').innerText = 'Invalid format. Ensure fields are comma-separated.'; document.getElementById('addErrorText').style.display = 'block'; btn.innerText = "Add Contact(s)"; btn.disabled = false; return; }
+           
+           if (entries.length === 0) { 
+               document.getElementById('addErrorText').innerText = 'Invalid format. Ensure fields are comma-separated.'; 
+               document.getElementById('addErrorText').style.display = 'block'; 
+               btn.innerText = "Add Contact(s)"; 
+               btn.disabled = false; 
+               return; 
+           }
            
            callGoogleAPI('addBulkEntries', { entries: entries }).then(data => {
-               btn.innerText = "Add Contact(s)"; btn.disabled = false; closeModal('addEntryModal');
+               btn.innerText = "Add Contact(s)"; 
+               btn.disabled = false; 
+               closeModal('addEntryModal');
+               
                rawData = data.rows || []; 
                localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
-               populateExecFilter(); currentPaginationLimit = 50; filterData(); showToast(entries.length + ' contacts added in bulk.', 'success');
-           }).catch(err => { btn.innerText = "Add Contact(s)"; btn.disabled = false; showToast("API Error: " + err.message, "danger"); });
+               populateExecFilter(); 
+               currentPaginationLimit = 50; 
+               filterData(); 
+               showToast(entries.length + ' contacts added in bulk.', 'success');
+           }).catch(err => { 
+               btn.innerText = "Add Contact(s)"; 
+               btn.disabled = false; 
+               showToast("API Error: " + err.message, "danger"); 
+           });
        }
     }
 
@@ -2240,33 +2470,76 @@
         filterData(); 
     }
     
-    function setSort(column) { if (currentSortColumn === column) currentSortAsc = !currentSortAsc; else { currentSortColumn = column; currentSortAsc = true; } filterData(); }
+    function setSort(column) { 
+        if (currentSortColumn === column) {
+            currentSortAsc = !currentSortAsc; 
+        } else { 
+            currentSortColumn = column; 
+            currentSortAsc = true; 
+        } 
+        filterData(); 
+    }
 
     function toggleKpiFilter(status) {
        activeKpiFilter = (activeKpiFilter === status) ? null : status;
        document.querySelectorAll('.kpi-card').forEach(el => el.classList.remove('active-completed', 'active-attempted', 'active-pending'));
+       
        if(activeKpiFilter) {
           if(activeKpiFilter === 'Completed') document.getElementById('kpi-card-completed').classList.add('active-completed');
           if(activeKpiFilter === 'Attempted') document.getElementById('kpi-card-attempted').classList.add('active-attempted');
           if(activeKpiFilter === 'Pending') document.getElementById('kpi-card-pending').classList.add('active-pending');
        }
-       currentPaginationLimit = 50; filterData();
+       
+       currentPaginationLimit = 50; 
+       filterData();
     }
 
     function updateSortIcons() {
-      ['client', 'contact', 'date', 'status'].forEach(col => { const icon = document.getElementById('sort-icon-' + col); if(icon) icon.innerHTML = ''; });
-      const activeIcon = document.getElementById('sort-icon-' + currentSortColumn); if(activeIcon) activeIcon.innerHTML = currentSortAsc ? SVG_SORT_UP : SVG_SORT_DOWN;
+      ['client', 'contact', 'date', 'status'].forEach(col => { 
+          const icon = document.getElementById('sort-icon-' + col); 
+          if(icon) icon.innerHTML = ''; 
+      });
+      const activeIcon = document.getElementById('sort-icon-' + currentSortColumn); 
+      if(activeIcon) activeIcon.innerHTML = currentSortAsc ? SVG_SORT_UP : SVG_SORT_DOWN;
     }
 
-    function switchSourceTab(source) { currentSourceTab = source; document.querySelectorAll('.source-tab').forEach(btn => { if (btn.getAttribute('data-source') === source) btn.classList.add('active'); else btn.classList.remove('active'); }); currentPaginationLimit = 50; filterData(); }
-    function handleSearchInput() { const val = document.getElementById('searchInput').value; document.getElementById('searchClear').style.display = val.length > 0 ? 'flex' : 'none'; currentPaginationLimit = 50; filterData(); }
-    function clearSearch() { document.getElementById('searchInput').value = ''; document.getElementById('searchClear').style.display = 'none'; currentPaginationLimit = 50; filterData(); }
+    function switchSourceTab(source) { 
+        currentSourceTab = source; 
+        document.querySelectorAll('.source-tab').forEach(btn => { 
+            if (btn.getAttribute('data-source') === source) btn.classList.add('active'); 
+            else btn.classList.remove('active'); 
+        }); 
+        currentPaginationLimit = 50; 
+        filterData(); 
+    }
     
-    function loadMoreData() { currentPaginationLimit += 50; filterData(); }
+    function handleSearchInput() { 
+        const val = document.getElementById('searchInput').value; 
+        document.getElementById('searchClear').style.display = val.length > 0 ? 'flex' : 'none'; 
+        currentPaginationLimit = 50; 
+        filterData(); 
+    }
+    
+    function clearSearch() { 
+        document.getElementById('searchInput').value = ''; 
+        document.getElementById('searchClear').style.display = 'none'; 
+        currentPaginationLimit = 50; 
+        filterData(); 
+    }
+    
+    function loadMoreData() { 
+        currentPaginationLimit += 50; 
+        filterData(); 
+    }
 
     function filterData() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim(), execQuery = document.getElementById('execFilterVal') ? document.getElementById('execFilterVal').value : 'ALL', tbody = document.getElementById('table-body');
-      tbody.innerHTML = ''; document.getElementById('bulkToggleIcon').innerHTML = window.collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; updateSortIcons();
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const execQuery = document.getElementById('execFilterVal') ? document.getElementById('execFilterVal').value : 'ALL';
+      const tbody = document.getElementById('table-body');
+      
+      tbody.innerHTML = ''; 
+      document.getElementById('bulkToggleIcon').innerHTML = window.collapsedClients.size > 0 ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN; 
+      updateSortIcons();
 
       let sourceFiltered = currentSourceTab !== 'ALL' ? rawData.filter(row => row.source === currentSourceTab) : rawData;
       
@@ -2280,8 +2553,15 @@
         if (!window.showHidden && row.hidden) return false;
           
         if (execQuery !== 'ALL' && row.executive !== execQuery) return false;
-        const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase(), cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
-        const match = (row.client || "").toLowerCase().includes(query) || (row.poc || "").toLowerCase().includes(query) || (row.email || "").toLowerCase().includes(query) || cleanPhoneSearch.includes(query) || cleanMobileSearch.includes(query);
+        
+        const cleanPhoneSearch = (row.phone || "").toString().replace(/^'/, '').toLowerCase();
+        const cleanMobileSearch = (row.mobile || "").toString().replace(/^'/, '').toLowerCase();
+        const match = (row.client || "").toLowerCase().includes(query) || 
+                      (row.poc || "").toLowerCase().includes(query) || 
+                      (row.email || "").toLowerCase().includes(query) || 
+                      cleanPhoneSearch.includes(query) || 
+                      cleanMobileSearch.includes(query);
+                      
         if (match) { 
            if (completedStatuses.includes(row.status)) { completed++; completedClients.add(row.client); }
            else if (pendingStatuses.includes(row.status)) { pending++; pendingClients.add(row.client); }
@@ -2310,12 +2590,25 @@
           });
       }
 
-      const groupedData = {}; finalFiltered.forEach(row => { if(!groupedData[row.client]) groupedData[row.client] = []; groupedData[row.client].push(row); });
-      let groupsArray = Object.keys(groupedData).map(clientName => ({ clientName: clientName, pocs: groupedData[clientName] }));
+      const groupedData = {}; 
+      finalFiltered.forEach(row => { 
+          if(!groupedData[row.client]) groupedData[row.client] = []; 
+          groupedData[row.client].push(row); 
+      });
+      
+      let groupsArray = Object.keys(groupedData).map(clientName => ({ 
+          clientName: clientName, 
+          pocs: groupedData[clientName] 
+      }));
 
       function getLatestAttemptDate(row) {
           let latest = "", latestDate = 0;
-          [row.att1, row.att2, row.att3].forEach(dStr => { if (dStr && dStr !== "-") { let d = new Date(dStr).getTime(); if (d > latestDate) { latestDate = d; latest = dStr; } } });
+          [row.att1, row.att2, row.att3].forEach(dStr => { 
+              if (dStr && dStr !== "-") { 
+                  let d = new Date(dStr).getTime(); 
+                  if (d > latestDate) { latestDate = d; latest = dStr; } 
+              } 
+          });
           return latest || "-";
       }
 
@@ -2326,17 +2619,39 @@
         if (col === 'status') return (row.status || "").toLowerCase(); return "";
       }
 
-      groupsArray.forEach(group => { group.pocs.sort((a, b) => { let valA = getSortValue(a, currentSortColumn), valB = getSortValue(b, currentSortColumn); if (valA < valB) return currentSortAsc ? -1 : 1; if (valA > valB) return currentSortAsc ? 1 : -1; return 0; }); });
-      groupsArray.sort((a, b) => { let valA = currentSortColumn === 'client' ? a.clientName.toLowerCase() : getSortValue(a.pocs[0], currentSortColumn); let valB = currentSortColumn === 'client' ? b.clientName.toLowerCase() : getSortValue(b.pocs[0], currentSortColumn); if (valA < valB) return currentSortAsc ? -1 : 1; if (valA > valB) return currentSortAsc ? 1 : -1; return 0; });
+      groupsArray.forEach(group => { 
+          group.pocs.sort((a, b) => { 
+              let valA = getSortValue(a, currentSortColumn);
+              let valB = getSortValue(b, currentSortColumn); 
+              if (valA < valB) return currentSortAsc ? -1 : 1; 
+              if (valA > valB) return currentSortAsc ? 1 : -1; 
+              return 0; 
+          }); 
+      });
+      
+      groupsArray.sort((a, b) => { 
+          let valA = currentSortColumn === 'client' ? a.clientName.toLowerCase() : getSortValue(a.pocs[0], currentSortColumn); 
+          let valB = currentSortColumn === 'client' ? b.clientName.toLowerCase() : getSortValue(b.pocs[0], currentSortColumn); 
+          if (valA < valB) return currentSortAsc ? -1 : 1; 
+          if (valA > valB) return currentSortAsc ? 1 : -1; 
+          return 0; 
+      });
 
       const totalGroups = groupsArray.length;
       const paginatedGroups = groupsArray.slice(0, currentPaginationLimit);
       document.getElementById('paginationControls').style.display = totalGroups > currentPaginationLimit ? 'block' : 'none';
 
       paginatedGroups.forEach(group => {
-        const clientName = group.clientName, pocs = group.pocs, isCollapsed = window.collapsedClients.has(clientName);
+        const clientName = group.clientName;
+        const pocs = group.pocs;
+        const isCollapsed = window.collapsedClients.has(clientName);
         const sourceBadge = pocs[0].source === 'Zoho CRM' ? '<span class="badge-crm">CRM</span>' : '';
-        const headerTr = document.createElement('tr'); headerTr.style.background = 'var(--glass-highlight)'; headerTr.style.cursor = 'pointer'; headerTr.onclick = () => toggleClient(clientName);
+        const headerTr = document.createElement('tr'); 
+        
+        headerTr.style.background = 'var(--glass-highlight)'; 
+        headerTr.style.cursor = 'pointer'; 
+        headerTr.onclick = () => toggleClient(clientName);
+        
         headerTr.innerHTML = `<td colspan="5" style="padding: 0.8rem 1rem;"><span style="display:inline-block; width:24px; text-align:center; margin-right:8px; color:var(--text-muted);">${isCollapsed ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN}</span><strong style="font-size: 1.1rem; color: var(--text-main); text-transform: capitalize; letter-spacing: 0.5px;">${clientName}</strong>${sourceBadge}<span style="float: right; font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 3px;">${pocs.length} POC${pocs.length > 1 ? 's' : ''}</span></td>`;
         tbody.appendChild(headerTr);
 
@@ -2347,14 +2662,19 @@
             else if (pendingStatuses.includes(row.status)) badgeClass = 'badge-pending';
             else badgeClass = 'badge-warning';
 
-            const cleanPhone = (row.phone || "").toString().replace(/^'/, ''), cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
-            const isLast = index === pocs.length - 1, branchHeight = isLast ? '50%' : '100%';
+            const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
+            const cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
+            const isLast = index === pocs.length - 1;
+            const branchHeight = isLast ? '50%' : '100%';
             const tr = document.createElement('tr');
+            
             const tagHtml = row.tags ? row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); font-size:0.65rem; padding:0.2rem 0.5rem; border-radius:6px;">${t.trim()}</span>`).join('') : '';
             const noteIcon = row.customNote ? `<span class="badge-note" data-tooltip-top="${row.customNote.replace(/"/g, '&quot;')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>Note</span>` : '';
             
             let latestAttemptTag = '';
-            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`; else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`; else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
+            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`; 
+            else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`; 
+            else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
             
             const checkboxHtml = window.isAdmin ? `<input type="checkbox" class="admin-hide-cb" value="${row.id}" onchange="updateBulkBar()">` : '';
 
@@ -2378,8 +2698,15 @@
               <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td>
               <td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell"></td>
             `;
-            const btn = document.createElement('button'); btn.className = "btn-primary"; btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;"; btn.innerText = "🚀 Open Workspace"; btn.onclick = () => triggerWorkspaceByData(row);
-            tr.querySelector('.action-cell').appendChild(btn); tbody.appendChild(tr);
+            
+            const btn = document.createElement('button'); 
+            btn.className = "btn-primary"; 
+            btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;"; 
+            btn.innerText = "🚀 Open Workspace"; 
+            btn.onclick = () => triggerWorkspaceByData(row);
+            
+            tr.querySelector('.action-cell').appendChild(btn); 
+            tbody.appendChild(tr);
           });
         }
       });
@@ -2388,7 +2715,8 @@
     }
 
     function loadDashboard(email) {
-        document.getElementById('mm-login-screen').style.opacity = '0'; document.getElementById('loggedInUser').innerText = email;
+        document.getElementById('mm-login-screen').style.opacity = '0'; 
+        document.getElementById('loggedInUser').innerText = email;
         
         window.isAdmin = (email === 'hariharan.iyer@mindmatrix.net');
         if (window.isAdmin) {
@@ -2413,7 +2741,10 @@
             
             presenceInterval = setInterval(() => {
                 const activeRow = document.getElementById('actionWorkspace').classList.contains('active') ? document.getElementById('ws-row-id').value : null;
-                callGoogleAPI('heartbeat', { activeRowId: activeRow }).then(res => { activePresence = res; renderPresence(); }).catch(e=>{});
+                callGoogleAPI('heartbeat', { activeRowId: activeRow }).then(res => { 
+                    activePresence = res; 
+                    renderPresence(); 
+                }).catch(e=>{});
             }, 15000);
         }, 400);
     }
@@ -2439,9 +2770,16 @@
         if (storedSession) {
             try {
                 const sessionData = JSON.parse(storedSession), now = new Date().getTime();
-                if (sessionData.expiry && now < sessionData.expiry && sessionData.token && sessionData.email) { loadDashboard(sessionData.email); return; } 
-                else localStorage.removeItem("mm_cx_portal_session");
-            } catch(e) { localStorage.removeItem("mm_cx_portal_session"); }
+                if (sessionData.expiry && now < sessionData.expiry && sessionData.token && sessionData.email) { 
+                    loadDashboard(sessionData.email); 
+                    return; 
+                } 
+                else {
+                    localStorage.removeItem("mm_cx_portal_session");
+                }
+            } catch(e) { 
+                localStorage.removeItem("mm_cx_portal_session"); 
+            }
         }
 
         setTimeout(function() {
@@ -2449,7 +2787,10 @@
                 google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
                 google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
                 setTimeout(() => document.getElementById("googleBtnContainer").style.opacity = "1", 300);
-            } else { document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; document.getElementById('mm-error-msg').style.display = 'block'; }
+            } else { 
+                document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; 
+                document.getElementById('mm-error-msg').style.display = 'block'; 
+            }
         }, 800); 
     };
   </script>
