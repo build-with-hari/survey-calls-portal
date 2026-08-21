@@ -1808,24 +1808,15 @@
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
                         
-                        // Clean, properly framed Google Drive Player without hacky CSS cropping
-                        audioBtn = `
-                        <div style="margin-top: 15px; border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                            <div style="background: var(--glass-bg); padding: 8px 12px; font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border);">
-                                <span style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                                    🎙️ Drive Audio Player
-                                </span>
-                                <a href="${ev.audio}" target="_blank" style="color: var(--accent-primary); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    Pop out <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                </a>
-                            </div>
-                            <iframe src="${previewUrl}" width="100%" height="150" allow="autoplay" style="border:none; display: block; background: #0b0f19;"></iframe>
-                        </div>`;
+                        // FIX: Minified HTML placed OUTSIDE the pre-wrap text container to prevent layout breakage
+                        audioBtn = `<div style="margin-top: 8px; border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); background: #111;"><div style="background: var(--glass-bg); padding: 8px 12px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border);"><span style="font-weight: 600; color: var(--text-main);">🎙️ Call Recording</span><a href="${ev.audio}" target="_blank" style="color: var(--accent-primary); text-decoration: none; font-weight: 600;">Pop out ↗</a></div><iframe src="${previewUrl}" width="100%" height="140" allow="autoplay" style="border:none; display: block;"></iframe></div>`;
                     } else {
-                        audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
+                        audioBtn = `<div style="margin-top: 8px;"><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a></div>`;
                     }
                 }
-                timelineHTML += `<div class="timeline-item"><div class="tl-content">${ev.content}${audioBtn}</div></div>`; 
+                
+                // FIX: Separated the text content and the audio button
+                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr || "Note"}</div><div class="tl-content">${ev.content}</div>${audioBtn}</div>`; 
             }
         });
         
