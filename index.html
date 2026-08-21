@@ -1808,10 +1808,10 @@
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
                         
-                        // PERFECTED CLIP: Anchored to the bottom, 54px height wrapper framing the controls.
+                        // REFINED CSS TRICK: Hides the top 65px (Google Header), exposes the bottom 65px (Controls)
                         audioBtn = `
-                        <div style="width: 100%; height: 54px; overflow: hidden; position: relative; border-radius: 12px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: #000;">
-                            <iframe src="${previewUrl}" allow="autoplay" style="position: absolute; bottom: 0px; left: -2px; width: calc(100% + 4px); height: 250px; border: none; background: transparent;"></iframe>
+                        <div style="width: 100%; height: 65px; overflow: hidden; border-radius: 8px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #111;">
+                            <iframe src="${previewUrl}" width="100%" height="130" allow="autoplay" style="border: none; margin-top: -65px;"></iframe>
                         </div>`;
                     } else {
                         audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
