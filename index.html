@@ -1750,41 +1750,57 @@
             return; 
         }
         
-        let timelineHTML = ""; 
-        const atts = [];
+        let allEvents = [];
+        let baseTs = Date.now();
         
-        if(pocData.att1 && pocData.att1 !== "-") atts.push({ label: 'Attempt 1 Registered', date: pocData.att1 }); 
-        if(pocData.att2 && pocData.att2 !== "-") atts.push({ label: 'Attempt 2 Registered', date: pocData.att2 }); 
-        if(pocData.att3 && pocData.att3 !== "-") atts.push({ label: 'Attempt 3 Registered', date: pocData.att3 });
+        // 1. Gather all Attempts with their timestamps
+        if(pocData.att1 && pocData.att1 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 1 Registered', dateStr: pocData.att1, ts: new Date(pocData.att1).getTime() || (baseTs - 10000) }); 
+        if(pocData.att2 && pocData.att2 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 2 Registered', dateStr: pocData.att2, ts: new Date(pocData.att2).getTime() || (baseTs - 5000) }); 
+        if(pocData.att3 && pocData.att3 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 3 Registered', dateStr: pocData.att3, ts: new Date(pocData.att3).getTime() || baseTs });
         
-        let notesArr = [];
+        // 2. Gather all AI Summaries/Notes with their timestamps
         if (pocData.notes) {
             const blocks = pocData.notes.split("--- [Log Separator] ---");
-            blocks.forEach(block => { 
+            blocks.forEach((block, index) => { 
                 const b = block.trim(); 
                 if(b) { 
                     let recLink = ""; 
                     const linkMatch = b.match(/🔗 Audio Recording: (https:\/\/[^\s]+)/); 
                     if (linkMatch) recLink = linkMatch[1]; 
                     let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim(); 
-                    notesArr.push({ type: 'note', content: cleanNote, audio: recLink }); 
+                    
+                    let noteTs = 0;
+                    // Look for dates like "Aug 21, 2026" inside the AI summary block to unify sorting
+                    const dateMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
+                    if (dateMatch) {
+                        noteTs = new Date(dateMatch[0]).getTime() + index; // extract date and slightly stagger by index so order stays strict
+                    } else {
+                        // If it's a legacy note with no date, assume it's the newest event so it sits at the top.
+                        let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
+                        noteTs = maxAttTs + 1000 + index; 
+                    }
+                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs }); 
                 } 
             });
         }
         
-        if(atts.length === 0 && notesArr.length === 0) { 
+        if(allEvents.length === 0) { 
             container.innerHTML = "<p style='color:var(--text-muted)'>No history logged yet.</p>"; 
             openModal('timelineModal'); 
             return; 
         }
+
+        // 3. Global Descending Sort (Newest -> Oldest)
+        allEvents.sort((a, b) => b.ts - a.ts);
         
-        atts.forEach(a => { 
-            timelineHTML += `<div class="timeline-item"><div class="tl-date">${a.date}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${a.label}</div></div>`; 
-        });
-        
-        notesArr.reverse().forEach(n => { 
-            let audioBtn = n.audio ? `<br><a href="${n.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : ""; 
-            timelineHTML += `<div class="timeline-item"><div class="tl-content">${n.content}${audioBtn}</div></div>`; 
+        let timelineHTML = ""; 
+        allEvents.forEach(ev => { 
+            if (ev.type === 'attempt') {
+                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${ev.label}</div></div>`; 
+            } else {
+                let audioBtn = ev.audio ? `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : ""; 
+                timelineHTML += `<div class="timeline-item"><div class="tl-content">${ev.content}${audioBtn}</div></div>`; 
+            }
         });
         
         container.innerHTML = timelineHTML; 
