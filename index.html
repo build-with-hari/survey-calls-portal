@@ -759,7 +759,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
           <div>
               <h2 style="font-size:1.5rem; font-weight:700; margin:0;">Edit POC Details</h2>
@@ -1700,7 +1700,7 @@
 
     async function startAutoRecording() {
       try {
-        // FIX 1: Wait 1.5 seconds for Telnyx to fully map the remote stream
+        // Wait 1.5 seconds for Telnyx to fully map the remote stream
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         // Use the globally authorized context
@@ -1852,14 +1852,26 @@
                     let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim(); 
                     
                     let noteTs = 0;
-                    const dateMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
-                    if (dateMatch) {
-                        noteTs = new Date(dateMatch[0]).getTime() + index; 
+                    let dateStr = "Note"; // Fallback label
+                    
+                    // Improved regex to capture exact Attempt + Date format: "🤖 AI Summary (Attempt X | Aug 21, 2026):"
+                    const advancedDateMatch = cleanNote.match(/\(([^|]+)\s*\|\s*([^)]+)\)/);
+                    if (advancedDateMatch) {
+                        dateStr = advancedDateMatch[2] + " (" + advancedDateMatch[1].trim() + ")"; // "Aug 21, 2026 (Attempt 1)"
+                        noteTs = new Date(advancedDateMatch[2]).getTime() + index;
                     } else {
-                        let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
-                        noteTs = maxAttTs + 1000 + index; 
+                        // Legacy fallback
+                        const dateMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
+                        if (dateMatch) {
+                            dateStr = dateMatch[0];
+                            noteTs = new Date(dateMatch[0]).getTime() + index; 
+                        } else {
+                            let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
+                            noteTs = maxAttTs + 1000 + index; 
+                        }
                     }
-                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs }); 
+                    
+                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs, dateStr: dateStr }); 
                 } 
             });
         }
@@ -1898,7 +1910,7 @@
                         audioBtn = `<div style="margin-top: 8px;"><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a></div>`;
                     }
                 }
-                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr || "Note"}</div><div class="tl-content">${ev.content}</div>${audioBtn}</div>`; 
+                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr}</div><div class="tl-content">${ev.content}</div>${audioBtn}</div>`; 
             }
         });
         
@@ -2297,6 +2309,7 @@
         
         closeModal('postCallModal'); 
         
+        // Pass true to skip the right-side form validation
         submitWorkspace(true);
     }
 
