@@ -1770,12 +1770,10 @@
                     let cleanNote = b.replace(/🔗 Audio Recording: https:\/\/[^\s]+/, '').trim(); 
                     
                     let noteTs = 0;
-                    // Look for dates like "Aug 21, 2026" inside the AI summary block to unify sorting
                     const dateMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
                     if (dateMatch) {
-                        noteTs = new Date(dateMatch[0]).getTime() + index; // extract date and slightly stagger by index so order stays strict
+                        noteTs = new Date(dateMatch[0]).getTime() + index; 
                     } else {
-                        // If it's a legacy note with no date, assume it's the newest event so it sits at the top.
                         let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
                         noteTs = maxAttTs + 1000 + index; 
                     }
@@ -1789,6 +1787,33 @@
             openModal('timelineModal'); 
             return; 
         }
+
+        // 3. Global Descending Sort (Newest -> Oldest)
+        allEvents.sort((a, b) => b.ts - a.ts);
+        
+        let timelineHTML = ""; 
+        allEvents.forEach(ev => { 
+            if (ev.type === 'attempt') {
+                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${ev.label}</div></div>`; 
+            } else {
+                let audioBtn = ""; 
+                if (ev.audio) {
+                    // Extract Drive File ID and use Google's native iframe preview player
+                    const fileIdMatch = ev.audio.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (fileIdMatch && fileIdMatch[1]) {
+                        const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+                        audioBtn = `<br><iframe src="${previewUrl}" width="100%" height="80" allow="autoplay" style="border:none; border-radius: 8px; margin-top: 10px; background: #f9fafb;"></iframe>`;
+                    } else {
+                        audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
+                    }
+                }
+                timelineHTML += `<div class="timeline-item"><div class="tl-content">${ev.content}${audioBtn}</div></div>`; 
+            }
+        });
+        
+        container.innerHTML = timelineHTML; 
+        openModal('timelineModal');
+    }
 
         // 3. Global Descending Sort (Newest -> Oldest)
         allEvents.sort((a, b) => b.ts - a.ts);
