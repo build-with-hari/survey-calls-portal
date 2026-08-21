@@ -1759,10 +1759,12 @@
         let allEvents = [];
         let baseTs = Date.now();
         
+        // 1. Gather all Attempts with their timestamps
         if(pocData.att1 && pocData.att1 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 1 Registered', dateStr: pocData.att1, ts: new Date(pocData.att1).getTime() || (baseTs - 10000) }); 
         if(pocData.att2 && pocData.att2 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 2 Registered', dateStr: pocData.att2, ts: new Date(pocData.att2).getTime() || (baseTs - 5000) }); 
         if(pocData.att3 && pocData.att3 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 3 Registered', dateStr: pocData.att3, ts: new Date(pocData.att3).getTime() || baseTs });
         
+        // 2. Gather all AI Summaries/Notes with their timestamps
         if (pocData.notes) {
             const blocks = pocData.notes.split("--- [Log Separator] ---");
             blocks.forEach((block, index) => { 
@@ -1792,6 +1794,7 @@
             return; 
         }
 
+        // 3. Global Descending Sort (Newest -> Oldest)
         allEvents.sort((a, b) => b.ts - a.ts);
         
         let timelineHTML = ""; 
@@ -1804,7 +1807,12 @@
                     const fileIdMatch = ev.audio.match(/\/d\/([a-zA-Z0-9-_]+)/);
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
-                        audioBtn = `<br><iframe src="${previewUrl}" width="100%" height="80" allow="autoplay" style="border:none; border-radius: 8px; margin-top: 10px; background: #f9fafb;"></iframe>`;
+                        
+                        // CSS Clipping Trick to hide Google Drive's bulky black player borders
+                        audioBtn = `
+                        <div style="width: 100%; height: 56px; overflow: hidden; border-radius: 8px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #111;">
+                            <iframe src="${previewUrl}" width="100%" height="100" allow="autoplay" style="border:none; margin-top: -22px; width: calc(100% + 4px); margin-left: -2px;"></iframe>
+                        </div>`;
                     } else {
                         audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
                     }
