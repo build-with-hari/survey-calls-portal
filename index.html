@@ -1867,29 +1867,38 @@
                     let noteTs = 0;
                     let dateStr = "Note"; // Fallback label
                     
-                    // Match the precise EST timestamp we just set in Code.gs
+                    // Match the precise EST timestamp we set in Code.gs
                     const aiMatch = cleanNote.match(/🤖 AI Summary \(([^|]+)\s*\|\s*([^)]+)\):?/);
                     
                     if (aiMatch) {
-                        dateStr = aiMatch[2].trim() + " (" + aiMatch[1].trim() + ")"; // "Aug 21, 2026 - 11:24 PM EST (Attempt 1)"
-                        noteTs = new Date(aiMatch[2].replace('EST','').trim()).getTime() + index;
+                        dateStr = aiMatch[2].trim() + " (" + aiMatch[1].trim() + ")"; 
+                        
+                        // FIX: JavaScript's "new Date()" returns NaN if there is a dash in a time string.
+                        // We must strip the dash "-" and "EST" so it parses chronologically correctly.
+                        let safeDateStr = aiMatch[2].replace(/-/g, '').replace('EST', '').trim();
+                        let parsedTs = new Date(safeDateStr).getTime();
+                        
+                        noteTs = isNaN(parsedTs) ? (baseTs + index) : parsedTs + index;
                         cleanNote = cleanNote.replace(aiMatch[0], '🤖 AI Summary:').trim();
                     } else {
                         // Legacy fallback for older logs
                         const legacyMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
                         if (legacyMatch) {
                             dateStr = legacyMatch[0];
-                            noteTs = new Date(legacyMatch[0]).getTime() + index; 
+                            let parsedTs = new Date(legacyMatch[0]).getTime();
+                            noteTs = isNaN(parsedTs) ? (baseTs + index) : parsedTs + index; 
                         } else {
                             let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
                             noteTs = maxAttTs + 1000 + index; 
                         }
                     }
                     
-                    if (!cleanNote || cleanNote.trim() === "") {
+                    // Prevent empty note block UI bug (if AI summary wasn't available yet)
+                    if (!cleanNote || cleanNote === '🤖 AI Summary:') {
                         cleanNote = "<i style='color:var(--text-muted);'>No AI summary available for this call. Audio only.</i>";
                     }
-                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs, dateStr: dateStr });
+                    
+                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs, dateStr: dateStr }); 
                 } 
             });
         }
