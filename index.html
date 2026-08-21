@@ -1679,45 +1679,66 @@
     }
 
     async function startAutoRecording() {
-      let audioCtx;
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext; 
-        audioCtx = new AudioContextClass(); 
-        window.activeAudioCtx = audioCtx; 
+        window.activeAudioCtx = new AudioContextClass(); 
+        window.audioDest = window.activeAudioCtx.createMediaStreamDestination();
         
-        const dest = audioCtx.createMediaStreamDestination();
-        
-        // Grab a secondary mic feed just for the recording. Telnyx keeps the primary feed untouched.
-        const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const localSource = audioCtx.createMediaStreamSource(localStream); 
-        localSource.connect(dest);
+        let localStream = new MediaStream();
+        let remoteStream = new MediaStream();
 
-        try {
-            const remoteAudioEl = document.getElementById('remoteMedia');
-            let remoteStream = remoteAudioEl.srcObject;
-            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
-            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
-            
-            if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
-                const remoteSource = audioCtx.createMediaStreamSource(remoteStream); 
-                remoteSource.connect(dest); 
-            }
-        } catch (remoteErr) { 
-            addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
+        // 1. EXTRACTION FIX: Pull the local microphone directly from Telnyx instead of asking the browser twice.
+        // This completely prevents Chrome from muting your live call.
+        if (activeCall && activeCall.peerConnection) {
+            activeCall.peerConnection.getSenders().forEach(sender => {
+                if (sender.track && sender.track.kind === 'audio') localStream.addTrack(sender.track);
+            });
+            activeCall.peerConnection.getReceivers().forEach(receiver => {
+                if (receiver.track && receiver.track.kind === 'audio') remoteStream.addTrack(receiver.track);
+            });
         }
 
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        // Fallback for local mic ONLY if WebRTC extraction fails
+        if (localStream.getAudioTracks().length === 0) {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            window.localStreamToStop = localStream; // Flag to stop only if it's a fresh stream
+        } else {
+            window.localStreamToStop = null; // Do not kill the WebRTC track later
+        }
+
+        if (localStream.getAudioTracks().length > 0) {
+            window.localAudioSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
+            window.localAudioSource.connect(window.audioDest);
+        }
+
+        // Fallback for remote audio
+        if (remoteStream.getAudioTracks().length === 0) {
+            try {
+                const remoteAudioEl = document.getElementById('remoteMedia');
+                remoteStream = remoteAudioEl.srcObject;
+                if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
+                if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
+            } catch (remoteErr) { 
+                addLog(`Remote audio fallback skipped: ${remoteErr.message}`); 
+            }
+        }
+
+        if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
+            window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
+            window.remoteAudioSource.connect(window.audioDest); 
+        }
+
+        if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
         
         audioChunks = []; 
-        mediaRecorder = new MediaRecorder(dest.stream); 
-        mediaRecorder.localStreamToStop = localStream;
+        mediaRecorder = new MediaRecorder(window.audioDest.stream); 
         
         mediaRecorder.ondataavailable = event => { 
             if (event.data.size > 0) audioChunks.push(event.data); 
         }; 
         mediaRecorder.onstop = uploadRecordingToDrive; 
         
-        // Push data every 1 second to absolutely prevent browser garbage collection
+        // Push data every 1 second to absolutely prevent browser garbage collection blanking the file
         mediaRecorder.start(1000); 
         
         recSeconds = 0; 
@@ -1732,16 +1753,17 @@
            document.getElementById('recTimerText').innerText = `RECORDING ${mins}:${secs}`;
         }, 1000);
         
-        addLog("Two-way call recording started.");
+        addLog("Two-way call recording started flawlessly.");
       } catch (err) { 
-          addLog(`Microphone access error: ${err.message}`); 
+          addLog(`Recording Initialization Error: ${err.message}`); 
       }
     }
 
     function stopRecordingAndUpload() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-         if (mediaRecorder.localStreamToStop) {
-             mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
+         // Only stop the tracks if we spawned a secondary clone. If we used Telnyx's track, let Telnyx manage it.
+         if (window.localStreamToStop) {
+             window.localStreamToStop.getTracks().forEach(track => track.stop());
          }
          mediaRecorder.stop(); 
          clearInterval(recTimerInterval);
