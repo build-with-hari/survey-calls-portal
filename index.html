@@ -1798,7 +1798,18 @@
             if (ev.type === 'attempt') {
                 timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${ev.label}</div></div>`; 
             } else {
-                let audioBtn = ev.audio ? `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>` : ""; 
+                let audioBtn = ""; 
+                if (ev.audio) {
+                    // Extract Drive File ID to create a playable stream link
+                    const fileIdMatch = ev.audio.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (fileIdMatch && fileIdMatch[1]) {
+                        const streamUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+                        audioBtn = `<br><audio controls preload="none" src="${streamUrl}" style="height: 36px; width: 100%; margin-top: 10px; border-radius: 8px; outline: none;"></audio>`;
+                    } else {
+                        // Fallback if URL format is unexpected
+                        audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
+                    }
+                }
                 timelineHTML += `<div class="timeline-item"><div class="tl-content">${ev.content}${audioBtn}</div></div>`; 
             }
         });
