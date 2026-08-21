@@ -313,8 +313,24 @@
           <h2 id="mmLoginTitle" style="color: var(--text-main); font-size: 26px; margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px;">CX Survey Calls Portal</h2>
           <p id="mmLoginSub" style="color: var(--text-muted); margin: 0 0 35px 0; font-size: 16px; line-height: 1.5;">Sign in with your verified <br><strong style="color:var(--accent-primary);">@mindmatrix.net</strong> account to continue.</p>
           
-          <!-- Cleaned up container (JS handles the initialization safely) -->
-          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px;"></div>
+          <!-- Native Google SSO Elements -->
+          <div id="g_id_onload"
+               data-client_id="992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com"
+               data-context="signin"
+               data-ux_mode="popup"
+               data-callback="handleSSOResponse"
+               data-auto_prompt="false">
+          </div>
+          <div style="display: flex; justify-content: center; min-height: 44px; padding-bottom: 10px;">
+              <div class="g_id_signin"
+                   data-type="standard"
+                   data-shape="pill"
+                   data-theme="outline"
+                   data-text="signin_with"
+                   data-size="large"
+                   data-logo_alignment="left">
+              </div>
+          </div>
           
           <p id="mm-error-msg" style="color: var(--danger-color); display: none; margin: 24px 0 0 0; font-weight: 600; font-size: 14px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"></p>
       </div>
@@ -743,7 +759,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
+    <div class="modal-content" style="max-width: 500px; text-align: left;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
           <div>
               <h2 style="font-size:1.5rem; font-weight:700; margin:0;">Edit POC Details</h2>
@@ -964,6 +980,13 @@
     window.unlistedPhoneNum = ""; 
     window.lastFilteredData = [];
     window.entryMode = 'single';
+
+    // Global variables to prevent garbage collection of audio streams
+    window.activeAudioCtx = null;
+    window.audioDest = null;
+    window.localAudioSource = null;
+    window.remoteAudioSource = null;
+    window.localStreamToStop = null;
 
     document.addEventListener('keydown', function(e) {
         if (e.shiftKey && (e.key === 'L' || e.key === 'l')) { 
@@ -1427,6 +1450,21 @@
         stopCallTimer(); 
     }
 
+    // NEW: Initialize Audio Context on User Click to bypass browser silence blocks
+    function initGlobalAudioContext() {
+        try {
+            if (!window.activeAudioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                window.activeAudioCtx = new AudioContextClass();
+            }
+            if (window.activeAudioCtx.state === 'suspended') {
+                window.activeAudioCtx.resume();
+            }
+        } catch(e) { 
+            console.log("Audio Init Warning:", e); 
+        }
+    }
+
     function initTelnyx() {
       addLog('Authenticating with Telnyx via Google API...'); 
       document.getElementById('phoneStatusToast').style.display = 'flex';
@@ -1563,6 +1601,8 @@
     }
 
     function handleCallNowClick() {
+      initGlobalAudioContext(); // Authorize audio processing
+
       if (activeCall) { 
           activeCall.hangup(); 
           document.getElementById('callActionBtn').innerHTML = '📞 Call Now'; 
@@ -1596,7 +1636,9 @@
     }
 
     function executeDial(type) {
+      initGlobalAudioContext(); // Authorize audio processing
       closeModal('selectPhoneModal');
+
       const targetNum = type === 'work' ? document.getElementById('ws-phone-work').value : document.getElementById('ws-phone-mobile').value;
       const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
       const client = document.getElementById('ws-client-display').value;
@@ -1621,6 +1663,8 @@
     }
 
     function startUnlistedCall() {
+      initGlobalAudioContext(); // Authorize audio processing
+
       const targetNum = document.getElementById('unlistedPhoneInput').value;
       const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
       
@@ -1656,34 +1700,36 @@
 
     async function startAutoRecording() {
       try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext; 
-        window.activeAudioCtx = new AudioContextClass(); 
+        // FIX 1: Wait 1.5 seconds for Telnyx to fully map the remote stream
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Use the globally authorized context
+        if (!window.activeAudioCtx) initGlobalAudioContext();
+        if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
+        
         window.audioDest = window.activeAudioCtx.createMediaStreamDestination();
         
+        // Capture Local Mic
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        // FIX: Attach streams to the global 'window' object to prevent aggressive browser garbage collection (which caused the blank audio)
         window.localAudioSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
         window.localAudioSource.connect(window.audioDest);
         
+        // Capture Remote Voice
         try { 
             const remoteAudioEl = document.getElementById('remoteMedia'); 
-            let remoteStream = remoteAudioEl.srcObject; 
-            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream(); 
-            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream(); 
+            let remoteStream = remoteAudioEl.srcObject || (remoteAudioEl.captureStream ? remoteAudioEl.captureStream() : null) || (remoteAudioEl.mozCaptureStream ? remoteAudioEl.mozCaptureStream() : null); 
             
             if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
                 window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
                 window.remoteAudioSource.connect(window.audioDest); 
-            } 
+            } else {
+                addLog(`Warning: Remote stream not found. Recording may only contain local audio.`);
+            }
         } catch (remoteErr) { 
             addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
         }
         
-        if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
-        
         audioChunks = []; 
-        // FIX: Record from the global destination stream
         mediaRecorder = new MediaRecorder(window.audioDest.stream); 
         window.localStreamToStop = localStream; 
         
@@ -1708,7 +1754,7 @@
         
         addLog("Two-way call recording started.");
       } catch (err) { 
-          addLog(`Microphone access error: ${err.message}`); 
+          addLog(`Recording Initialization Error: ${err.message}`); 
       }
     }
 
@@ -1722,11 +1768,8 @@
             document.getElementById('recIndicator').classList.remove('active'); 
             document.getElementById('recTimerText').innerText = "Saving Audio..."; 
         } 
-        if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') {
-            window.activeAudioCtx.close(); 
-        }
         
-        // Clean up memory
+        // Prevent memory leaks
         window.localAudioSource = null;
         window.remoteAudioSource = null;
         window.audioDest = null;
@@ -2254,7 +2297,6 @@
         
         closeModal('postCallModal'); 
         
-        // Pass true to skip the right-side form validation
         submitWorkspace(true);
     }
 
