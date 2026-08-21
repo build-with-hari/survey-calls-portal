@@ -48,10 +48,10 @@
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(5%, 10%) scale(1.1); } 66% { transform: translate(-5%, -5%) scale(0.9); } }
 
     [data-tooltip-bottom], [data-tooltip-top] { position: relative; cursor: pointer; }
-    [data-tooltip-bottom]::after, [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
-    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); top: calc(100% + 8px); transform: translateX(-50%) translateY(-5px); }
-    [data-tooltip-top]::after { bottom: calc(100% + 8px); }
-    [data-tooltip-bottom]:hover::after, [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    [data-tooltip-bottom]::after { content: attr(data-tooltip-bottom); position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(-5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
+    [data-tooltip-top]::after { content: attr(data-tooltip-top); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(5px); background: #1e293b; color: #fff; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none; }
+    [data-tooltip-bottom]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    [data-tooltip-top]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
     .liquid-glass { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight); border-left: 1px solid var(--glass-highlight); border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); padding: 1.5rem 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease; }
     .header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
@@ -131,9 +131,29 @@
     
     .badge-attempt { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.7rem; margin-left: 6px; padding: 0.2rem 0.5rem; border-radius: 6px; vertical-align: middle;}
 
-    .admin-hide-cb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; min-width: 18px; min-height: 18px; border: 2px solid var(--glass-border); border-radius: 4px; background: transparent; cursor: pointer; opacity: 0; pointer-events: none; transition: all 0.2s ease; margin: 0; position: relative; box-sizing: border-box; }
-    .admin-hide-cb:checked { background: var(--danger-color); border-color: var(--danger-color); opacity: 1; pointer-events: auto; }
-    .admin-hide-cb:checked::after { content: ''; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); position: absolute; top: 1px; left: 4px; }
+    .admin-hide-cb { 
+      appearance: none; -webkit-appearance: none; 
+      width: 18px; height: 18px; min-width: 18px; min-height: 18px;
+      border: 2px solid var(--glass-border); 
+      border-radius: 4px; 
+      background: transparent; 
+      cursor: pointer; 
+      opacity: 0; pointer-events: none; transition: all 0.2s ease; 
+      margin: 0; position: relative; box-sizing: border-box;
+    }
+    .admin-hide-cb:checked { 
+      background: var(--danger-color); 
+      border-color: var(--danger-color); 
+      opacity: 1; pointer-events: auto; 
+    }
+    .admin-hide-cb:checked::after { 
+      content: ''; 
+      width: 4px; height: 8px; 
+      border: solid white; 
+      border-width: 0 2px 2px 0; 
+      transform: rotate(45deg); 
+      position: absolute; top: 1px; left: 4px;
+    }
     tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; border-color: var(--text-muted); }
     tr:hover .admin-hide-cb:checked { border-color: var(--danger-color); }
 
@@ -147,7 +167,7 @@
     .nav-arrow { width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.2s; font-size: 1.2rem; }
     .nav-arrow:hover { background: var(--accent-primary); color: white; border-color: var(--accent-primary); transform: scale(1.05); }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100000; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.active { display: flex; opacity: 1; }
     .modal-content { max-height: 90vh; overflow-y: auto; overflow-x: hidden; max-width: 480px; width: 92%; text-align: center; background: var(--modal-bg); border: 1px solid var(--modal-border); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35); border-radius: 20px; padding: 2rem; color: var(--text-main); transform: scale(0.95); transition: transform 0.3s ease; }
     .modal-overlay.active .modal-content { transform: scale(1); }
@@ -268,14 +288,14 @@
     </div>
     
     <!-- Recording Controls inside Dialer -->
-    <div id="callRecordingBar" style="display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); border-radius: 8px; padding: 8px 12px; margin-top: 5px; border: 1px solid var(--glass-border);">
+    <div id="callRecordingBar" style="display: flex; align-items: center; justify-content: space-between; background: rgba(239, 68, 68, 0.05); border-radius: 12px; padding: 10px 14px; margin-top: 10px; border: 1px solid rgba(239, 68, 68, 0.2);">
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="rec-indicator" id="recIndicator"></div>
-          <span id="recTimerText" style="font-size: 0.75rem; font-weight: 600; font-family: monospace; color: var(--text-main);">Recording Standby</span>
+          <span id="recTimerText" style="font-size: 0.8rem; font-weight: 600; font-family: monospace; color: var(--danger-color); letter-spacing: 0.5px;">Recording Standby</span>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn-outline" id="recToggleBtn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; min-width: 60px; justify-content: center;" onclick="toggleRecordingPause()">⏸️ Pause</button>
-          <button class="btn-outline" id="recStopBtn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; border-color: var(--danger-color); color: var(--danger-color); min-width: 60px; justify-content: center;" onclick="stopRecordingAndUpload()">🛑 Stop</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-outline" id="recToggleBtn" style="padding: 4px 12px; font-size: 0.75rem; border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger-color); background: transparent; font-weight: 600;" onclick="toggleRecordingPause()">⏸️ Pause</button>
+          <button class="btn-primary" id="recStopBtn" style="padding: 4px 12px; font-size: 0.75rem; border-radius: 20px; background: var(--danger-color); color: white; border: none; font-weight: 600; box-shadow: 0 2px 8px rgba(239,68,68,0.3);" onclick="stopRecordingAndUpload()">🛑 Stop</button>
         </div>
     </div>
 
@@ -702,7 +722,6 @@
               <h2 style="font-size:1.5rem; font-weight:700; margin:0;">Call Ended</h2>
               <p style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Log the outcome of your call with <span id="postCallPocName" style="font-weight:bold; color:var(--accent-primary);"></span>.</p>
           </div>
-          <button class="btn-icon" onclick="closeModal('postCallModal')" style="padding:0; margin:-5px -10px 0 0; width:30px; height:30px; font-size:1.5rem; color: var(--text-muted);">&times;</button>
       </div>
       <label class="input-label">Which attempt was this?</label>
       <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
@@ -1648,7 +1667,7 @@
         
         recSeconds = 0; 
         document.getElementById('recIndicator').classList.add('active'); 
-        document.getElementById('recTimerText').innerText = "REC 00:00"; 
+        document.getElementById('recTimerText').innerText = "Recording Standby"; 
         
         if (recTimerInterval) clearInterval(recTimerInterval); 
         
@@ -1656,7 +1675,7 @@
             recSeconds++; 
             const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
             const secs = String(recSeconds % 60).padStart(2, '0'); 
-            document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`; 
+            document.getElementById('recTimerText').innerText = `Recording: ${mins}:${secs}`; 
         }, 1000); 
         
         addLog("Two-way call recording started.");
@@ -1681,7 +1700,7 @@
               recSeconds++; 
               const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
               const secs = String(recSeconds % 60).padStart(2, '0'); 
-              document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`; 
+              document.getElementById('recTimerText').innerText = `Recording: ${mins}:${secs}`; 
           }, 1000); 
           btn.innerText = "⏸️ Pause"; 
           document.getElementById('recIndicator').classList.add('active'); 
@@ -1695,7 +1714,7 @@
             mediaRecorder.stop(); 
             clearInterval(recTimerInterval); 
             document.getElementById('recIndicator').classList.remove('active'); 
-            document.getElementById('recTimerText').innerText = "Analyzing Audio & Uploading..."; 
+            document.getElementById('recTimerText').innerText = "Saving Audio..."; 
         } 
         if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') window.activeAudioCtx.close(); 
     }
@@ -2174,7 +2193,6 @@
         
         closeModal('postCallModal'); 
         
-        // Pass true to skip the right-side form validation
         submitWorkspace(true);
     }
 
@@ -2339,7 +2357,6 @@
        setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
-    // Instant load from Cache, followed by silent background revalidation
     async function fetchDataAsync() {
       const cachedData = localStorage.getItem("mm_contacts_cache");
       const cachedSyncTime = localStorage.getItem("mm_crm_sync_time");
