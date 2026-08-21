@@ -1808,10 +1808,10 @@
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
                         
-                        // CSS Clipping Trick to hide Google Drive's bulky black player borders
+                        // PERFECTLY CALIBRATED CSS CLIPPING TRICK
                         audioBtn = `
-                        <div style="width: 100%; height: 56px; overflow: hidden; border-radius: 8px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #111;">
-                            <iframe src="${previewUrl}" width="100%" height="100" allow="autoplay" style="border:none; margin-top: -22px; width: calc(100% + 4px); margin-left: -2px;"></iframe>
+                        <div style="width: 100%; height: 75px; overflow: hidden; position: relative; border-radius: 8px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #000;">
+                            <iframe src="${previewUrl}" allow="autoplay" style="position: absolute; top: -55px; left: -5px; width: calc(100% + 10px); height: 140px; border: none; background: transparent;"></iframe>
                         </div>`;
                     } else {
                         audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
