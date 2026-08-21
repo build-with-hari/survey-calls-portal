@@ -1658,19 +1658,23 @@
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext; 
         window.activeAudioCtx = new AudioContextClass(); 
-        const dest = window.activeAudioCtx.createMediaStreamDestination();
+        window.audioDest = window.activeAudioCtx.createMediaStreamDestination();
+        
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const localSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
-        localSource.connect(dest);
+        
+        // FIX: Attach streams to the global 'window' object to prevent aggressive browser garbage collection (which caused the blank audio)
+        window.localAudioSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
+        window.localAudioSource.connect(window.audioDest);
         
         try { 
             const remoteAudioEl = document.getElementById('remoteMedia'); 
             let remoteStream = remoteAudioEl.srcObject; 
             if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream(); 
             if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream(); 
+            
             if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
-                const remoteSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
-                remoteSource.connect(dest); 
+                window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
+                window.remoteAudioSource.connect(window.audioDest); 
             } 
         } catch (remoteErr) { 
             addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
@@ -1679,8 +1683,10 @@
         if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
         
         audioChunks = []; 
-        mediaRecorder = new MediaRecorder(dest.stream); 
-        mediaRecorder.localStreamToStop = localStream; 
+        // FIX: Record from the global destination stream
+        mediaRecorder = new MediaRecorder(window.audioDest.stream); 
+        window.localStreamToStop = localStream; 
+        
         mediaRecorder.ondataavailable = event => { 
             if (event.data.size > 0) audioChunks.push(event.data); 
         }; 
@@ -1708,13 +1714,22 @@
 
     function stopRecordingAndUpload() { 
         if (mediaRecorder && mediaRecorder.state !== "inactive") { 
-            if (mediaRecorder.localStreamToStop) mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop()); 
+            if (window.localStreamToStop) {
+                window.localStreamToStop.getTracks().forEach(track => track.stop());
+            }
             mediaRecorder.stop(); 
             clearInterval(recTimerInterval); 
             document.getElementById('recIndicator').classList.remove('active'); 
             document.getElementById('recTimerText').innerText = "Saving Audio..."; 
         } 
-        if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') window.activeAudioCtx.close(); 
+        if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') {
+            window.activeAudioCtx.close(); 
+        }
+        
+        // Clean up memory
+        window.localAudioSource = null;
+        window.remoteAudioSource = null;
+        window.audioDest = null;
     }
 
     function uploadRecordingToDrive() {
