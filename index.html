@@ -1619,6 +1619,18 @@
     }
 
     function executeDial(type) {
+      if (activeCall) {
+          showToast("A call is already in progress.", "warning");
+          return;
+      }
+      
+      // Lock buttons to prevent double-click ghost calls
+      const btnW = document.getElementById('btnDialWork');
+      const btnM = document.getElementById('btnDialMobile');
+      if(btnW) btnW.disabled = true;
+      if(btnM) btnM.disabled = true;
+      setTimeout(() => { if(btnW) btnW.disabled = false; if(btnM) btnM.disabled = false; }, 2000);
+
       closeModal('selectPhoneModal');
 
       const targetNum = type === 'work' ? document.getElementById('ws-phone-work').value : document.getElementById('ws-phone-mobile').value;
@@ -1874,7 +1886,10 @@
                         }
                     }
                     
-                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs, dateStr: dateStr }); 
+                    if (!cleanNote || cleanNote.trim() === "") {
+                        cleanNote = "<i style='color:var(--text-muted);'>No AI summary available for this call. Audio only.</i>";
+                    }
+                    allEvents.push({ type: 'note', content: cleanNote, audio: recLink, ts: noteTs, dateStr: dateStr });
                 } 
             });
         }
