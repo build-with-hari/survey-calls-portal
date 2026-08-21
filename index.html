@@ -1450,21 +1450,6 @@
         stopCallTimer(); 
     }
 
-    // NEW: Initialize Audio Context on User Click to bypass browser silence blocks
-    function initGlobalAudioContext() {
-        try {
-            if (!window.activeAudioCtx) {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                window.activeAudioCtx = new AudioContextClass();
-            }
-            if (window.activeAudioCtx.state === 'suspended') {
-                window.activeAudioCtx.resume();
-            }
-        } catch(e) { 
-            console.log("Audio Init Warning:", e); 
-        }
-    }
-
     function initTelnyx() {
       addLog('Authenticating with Telnyx via Google API...'); 
       document.getElementById('phoneStatusToast').style.display = 'flex';
@@ -1601,8 +1586,6 @@
     }
 
     function handleCallNowClick() {
-      initGlobalAudioContext(); // Authorize audio processing
-
       if (activeCall) { 
           activeCall.hangup(); 
           document.getElementById('callActionBtn').innerHTML = '📞 Call Now'; 
@@ -1636,7 +1619,6 @@
     }
 
     function executeDial(type) {
-      initGlobalAudioContext(); // Authorize audio processing
       closeModal('selectPhoneModal');
 
       const targetNum = type === 'work' ? document.getElementById('ws-phone-work').value : document.getElementById('ws-phone-mobile').value;
@@ -1663,8 +1645,6 @@
     }
 
     function startUnlistedCall() {
-      initGlobalAudioContext(); // Authorize audio processing
-
       const targetNum = document.getElementById('unlistedPhoneInput').value;
       const cleanPhone = targetNum.replace(/[^0-9+]/g, '');
       
@@ -1699,83 +1679,77 @@
     }
 
     async function startAutoRecording() {
+      let audioCtx;
       try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext; 
+        audioCtx = new AudioContextClass(); 
+        window.activeAudioCtx = audioCtx; 
         
-        if (!window.activeAudioCtx) initGlobalAudioContext();
-        if (window.activeAudioCtx.state === 'suspended') await window.activeAudioCtx.resume();
+        const dest = audioCtx.createMediaStreamDestination();
         
-        window.audioDest = window.activeAudioCtx.createMediaStreamDestination();
-        
-        // THE FIX: We completely remove the local mic extraction here.
-        // Feeding the local mic into Web Audio API actively strips it from Telnyx.
-        // By omitting it, your voice remains on the live call perfectly.
-        
-        // Capture Remote Voice ONLY
-        try { 
-            const remoteAudioEl = document.getElementById('remoteMedia'); 
-            let remoteStream = remoteAudioEl.srcObject || (remoteAudioEl.captureStream ? remoteAudioEl.captureStream() : null) || (remoteAudioEl.mozCaptureStream ? remoteAudioEl.mozCaptureStream() : null); 
-            
-            // Backup extraction from peerConnection
-            if (!remoteStream && activeCall && activeCall.peerConnection) {
-                const receivers = activeCall.peerConnection.getReceivers();
-                const audioReceiver = receivers.find(r => r.track && r.track.kind === 'audio');
-                if (audioReceiver && audioReceiver.track) {
-                     remoteStream = new MediaStream([audioReceiver.track]);
-                }
-            }
+        // Grab a secondary mic feed just for the recording. Telnyx keeps the primary feed untouched.
+        const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const localSource = audioCtx.createMediaStreamSource(localStream); 
+        localSource.connect(dest);
 
+        try {
+            const remoteAudioEl = document.getElementById('remoteMedia');
+            let remoteStream = remoteAudioEl.srcObject;
+            if (!remoteStream && remoteAudioEl.captureStream) remoteStream = remoteAudioEl.captureStream();
+            if (!remoteStream && remoteAudioEl.mozCaptureStream) remoteStream = remoteAudioEl.mozCaptureStream();
+            
             if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
-                window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
-                window.remoteAudioSource.connect(window.audioDest); 
-            } else {
-                addLog("Warning: Remote stream not found. Remote voice may be blank.");
+                const remoteSource = audioCtx.createMediaStreamSource(remoteStream); 
+                remoteSource.connect(dest); 
             }
         } catch (remoteErr) { 
             addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
         }
+
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
         
         audioChunks = []; 
-        mediaRecorder = new MediaRecorder(window.audioDest.stream); 
+        mediaRecorder = new MediaRecorder(dest.stream); 
+        mediaRecorder.localStreamToStop = localStream;
         
         mediaRecorder.ondataavailable = event => { 
             if (event.data.size > 0) audioChunks.push(event.data); 
         }; 
         mediaRecorder.onstop = uploadRecordingToDrive; 
-        
-        // Push data every 1 second to absolutely prevent GC sweeps
-        mediaRecorder.start(1000); 
+        mediaRecorder.start();
         
         recSeconds = 0; 
         document.getElementById('recIndicator').classList.add('active'); 
-        document.getElementById('recTimerText').innerText = "RECORDING 00:00"; 
+        document.getElementById('recTimerText').innerText = "RECORDING 00:00";
         
-        if (recTimerInterval) clearInterval(recTimerInterval); 
+        if (recTimerInterval) clearInterval(recTimerInterval);
+        recTimerInterval = setInterval(() => {
+           recSeconds++;
+           const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+           const secs = String(recSeconds % 60).padStart(2, '0');
+           document.getElementById('recTimerText').innerText = `RECORDING ${mins}:${secs}`;
+        }, 1000);
         
-        recTimerInterval = setInterval(() => { 
-            recSeconds++; 
-            const mins = String(Math.floor(recSeconds / 60)).padStart(2, '0');
-            const secs = String(recSeconds % 60).padStart(2, '0'); 
-            document.getElementById('recTimerText').innerText = `RECORDING ${mins}:${secs}`; 
-        }, 1000); 
-        
-        addLog("Call recording started (Remote audio only).");
+        addLog("Two-way call recording started.");
       } catch (err) { 
-          addLog(`Recording Initialization Error: ${err.message}`); 
+          addLog(`Microphone access error: ${err.message}`); 
       }
     }
 
-    function stopRecordingAndUpload() { 
-        if (mediaRecorder && mediaRecorder.state !== "inactive") { 
-            mediaRecorder.stop(); 
-            clearInterval(recTimerInterval); 
-            document.getElementById('recIndicator').classList.remove('active'); 
-            document.getElementById('recTimerText').innerText = "Saving Audio..."; 
-        } 
-        
-        if (window.remoteAudioSource) window.remoteAudioSource.disconnect();
-        window.remoteAudioSource = null;
-        window.audioDest = null;
+    function stopRecordingAndUpload() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+         if (mediaRecorder.localStreamToStop) {
+             mediaRecorder.localStreamToStop.getTracks().forEach(track => track.stop());
+         }
+         mediaRecorder.stop(); 
+         clearInterval(recTimerInterval);
+         document.getElementById('recIndicator').classList.remove('active'); 
+         document.getElementById('recTimerText').innerText = "Saving Audio...";
+      }
+      
+      if (window.activeAudioCtx && window.activeAudioCtx.state !== 'closed') {
+          window.activeAudioCtx.close();
+      }
     }
 
     function uploadRecordingToDrive() {
