@@ -1707,42 +1707,32 @@
         
         window.audioDest = window.activeAudioCtx.createMediaStreamDestination();
         
-        // 1. EXTRACT AND CLONE LOCAL AUDIO
-        let localStream = new MediaStream();
-        if (activeCall && activeCall.peerConnection) {
-            activeCall.peerConnection.getSenders().forEach(s => {
-                // THE FIX: .clone() prevents the browser from stealing/muting the live track
-                if (s.track && s.track.kind === 'audio') localStream.addTrack(s.track.clone());
-            });
-        }
-        if (localStream.getAudioTracks().length > 0) {
-            window.localAudioSource = window.activeAudioCtx.createMediaStreamSource(localStream); 
-            window.localAudioSource.connect(window.audioDest);
-        } else {
-            addLog("Warning: Could not grab local mic from Telnyx. Local voice may be blank.");
-        }
+        // THE FIX: We completely remove the local mic extraction here.
+        // Feeding the local mic into Web Audio API actively strips it from Telnyx.
+        // By omitting it, your voice remains on the live call perfectly.
         
-        // 2. EXTRACT AND CLONE REMOTE AUDIO
-        let remoteStream = new MediaStream();
-        if (activeCall && activeCall.peerConnection) {
-            activeCall.peerConnection.getReceivers().forEach(r => {
-                // THE FIX: .clone() prevents audio dropouts
-                if (r.track && r.track.kind === 'audio') remoteStream.addTrack(r.track.clone());
-            });
-        }
-        if (remoteStream.getAudioTracks().length === 0) {
+        // Capture Remote Voice ONLY
+        try { 
             const remoteAudioEl = document.getElementById('remoteMedia'); 
-            let elStream = remoteAudioEl.srcObject || (remoteAudioEl.captureStream ? remoteAudioEl.captureStream() : null) || (remoteAudioEl.mozCaptureStream ? remoteAudioEl.mozCaptureStream() : null); 
-            if(elStream) {
-                elStream.getAudioTracks().forEach(t => remoteStream.addTrack(t.clone()));
+            let remoteStream = remoteAudioEl.srcObject || (remoteAudioEl.captureStream ? remoteAudioEl.captureStream() : null) || (remoteAudioEl.mozCaptureStream ? remoteAudioEl.mozCaptureStream() : null); 
+            
+            // Backup extraction from peerConnection
+            if (!remoteStream && activeCall && activeCall.peerConnection) {
+                const receivers = activeCall.peerConnection.getReceivers();
+                const audioReceiver = receivers.find(r => r.track && r.track.kind === 'audio');
+                if (audioReceiver && audioReceiver.track) {
+                     remoteStream = new MediaStream([audioReceiver.track]);
+                }
             }
-        }
 
-        if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
-            window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
-            window.remoteAudioSource.connect(window.audioDest); 
-        } else {
-            addLog("Warning: Remote stream not found. Remote voice may be blank.");
+            if (remoteStream && remoteStream.getAudioTracks().length > 0) { 
+                window.remoteAudioSource = window.activeAudioCtx.createMediaStreamSource(remoteStream); 
+                window.remoteAudioSource.connect(window.audioDest); 
+            } else {
+                addLog("Warning: Remote stream not found. Remote voice may be blank.");
+            }
+        } catch (remoteErr) { 
+            addLog(`Remote audio merge skipped: ${remoteErr.message}`); 
         }
         
         audioChunks = []; 
@@ -1769,7 +1759,7 @@
             document.getElementById('recTimerText').innerText = `RECORDING ${mins}:${secs}`; 
         }, 1000); 
         
-        addLog("Two-way call recording started.");
+        addLog("Call recording started (Remote audio only).");
       } catch (err) { 
           addLog(`Recording Initialization Error: ${err.message}`); 
       }
@@ -1783,17 +1773,7 @@
             document.getElementById('recTimerText').innerText = "Saving Audio..."; 
         } 
         
-        // THE FIX: Explicitly kill the cloned tracks to prevent the red "Recording" dot from lingering on the tab
-        if (window.localAudioSource) {
-            window.localAudioSource.mediaStream.getTracks().forEach(t => t.stop());
-            window.localAudioSource.disconnect();
-        }
-        if (window.remoteAudioSource) {
-            window.remoteAudioSource.mediaStream.getTracks().forEach(t => t.stop());
-            window.remoteAudioSource.disconnect();
-        }
-        
-        window.localAudioSource = null;
+        if (window.remoteAudioSource) window.remoteAudioSource.disconnect();
         window.remoteAudioSource = null;
         window.audioDest = null;
     }
