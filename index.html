@@ -743,7 +743,7 @@
   </div>
 
   <div class="modal-overlay" id="editPocModal" onclick="closeOnBackgroundClick(event, 'editPocModal')">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
+    <div class="modal-content" style="max-width: 500px; text-align: left; overflow: visible;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
           <div>
               <h2 style="font-size:1.5rem; font-weight:700; margin:0;">Edit POC Details</h2>
@@ -1051,7 +1051,6 @@
             const base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             
-            // FIX: Add padding so the string length is a multiple of 4 (prevents atob crash)
             while (base64.length % 4) {
                 base64 += '=';
             }
@@ -1760,12 +1759,10 @@
         let allEvents = [];
         let baseTs = Date.now();
         
-        // 1. Gather all Attempts with their timestamps
         if(pocData.att1 && pocData.att1 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 1 Registered', dateStr: pocData.att1, ts: new Date(pocData.att1).getTime() || (baseTs - 10000) }); 
         if(pocData.att2 && pocData.att2 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 2 Registered', dateStr: pocData.att2, ts: new Date(pocData.att2).getTime() || (baseTs - 5000) }); 
         if(pocData.att3 && pocData.att3 !== "-") allEvents.push({ type: 'attempt', label: 'Attempt 3 Registered', dateStr: pocData.att3, ts: new Date(pocData.att3).getTime() || baseTs });
         
-        // 2. Gather all AI Summaries/Notes with their timestamps
         if (pocData.notes) {
             const blocks = pocData.notes.split("--- [Log Separator] ---");
             blocks.forEach((block, index) => { 
@@ -1795,7 +1792,6 @@
             return; 
         }
 
-        // 3. Global Descending Sort (Newest -> Oldest)
         allEvents.sort((a, b) => b.ts - a.ts);
         
         let timelineHTML = ""; 
@@ -1805,40 +1801,11 @@
             } else {
                 let audioBtn = ""; 
                 if (ev.audio) {
-                    // Extract Drive File ID and use Google's native iframe preview player
                     const fileIdMatch = ev.audio.match(/\/d\/([a-zA-Z0-9-_]+)/);
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
                         audioBtn = `<br><iframe src="${previewUrl}" width="100%" height="80" allow="autoplay" style="border:none; border-radius: 8px; margin-top: 10px; background: #f9fafb;"></iframe>`;
                     } else {
-                        audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
-                    }
-                }
-                timelineHTML += `<div class="timeline-item"><div class="tl-content">${ev.content}${audioBtn}</div></div>`; 
-            }
-        });
-        
-        container.innerHTML = timelineHTML; 
-        openModal('timelineModal');
-    }
-
-        // 3. Global Descending Sort (Newest -> Oldest)
-        allEvents.sort((a, b) => b.ts - a.ts);
-        
-        let timelineHTML = ""; 
-        allEvents.forEach(ev => { 
-            if (ev.type === 'attempt') {
-                timelineHTML += `<div class="timeline-item"><div class="tl-date">${ev.dateStr}</div><div class="tl-content" style="background:var(--glass-highlight); padding:0.5rem 1rem;">${ev.label}</div></div>`; 
-            } else {
-                let audioBtn = ""; 
-                if (ev.audio) {
-                    // Extract Drive File ID to create a playable stream link
-                    const fileIdMatch = ev.audio.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                    if (fileIdMatch && fileIdMatch[1]) {
-                        const streamUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
-                        audioBtn = `<br><audio controls preload="none" src="${streamUrl}" style="height: 36px; width: 100%; margin-top: 10px; border-radius: 8px; outline: none;"></audio>`;
-                    } else {
-                        // Fallback if URL format is unexpected
                         audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
                     }
                 }
@@ -2226,6 +2193,7 @@
         
         closeModal('postCallModal'); 
         
+        // Pass true to skip the right-side form validation
         submitWorkspace(true);
     }
 
@@ -2297,6 +2265,9 @@
         });
     }
 
+    // ==========================================
+    // VISUAL ANALYTICS & EXPORT
+    // ==========================================
     function openAnalytics() {
         const counts = { Completed: 0, Attempted: 0, Pending: 0 };
         const completedStatuses = ['Completed', 'Meeting Scheduled', 'Exploring / Learning'];
@@ -2387,7 +2358,8 @@
        setDropdownValueSafe('exec-dropdown', 'execFilterVal', 'exec-display', execs.includes(currentVal) ? currentVal : 'ALL');
     }
 
-    async function fetchDataAsync() {
+    // Instant load from Cache, followed by silent background revalidation
+    function fetchDataAsync() {
       const cachedData = localStorage.getItem("mm_contacts_cache");
       const cachedSyncTime = localStorage.getItem("mm_crm_sync_time");
 
@@ -2415,8 +2387,8 @@
       const refreshIcon = document.getElementById('refreshIcon'); 
       if(refreshIcon) refreshIcon.classList.add('icon-spin');
       
-      try {
-          const data = await callGoogleAPI('getSurveyData');
+      // Fire the API call immediately without an await to prevent blocking the rest of the script
+      callGoogleAPI('getSurveyData').then(data => {
           rawData = data.rows || []; 
           localStorage.setItem("mm_contacts_cache", JSON.stringify(rawData));
 
@@ -2437,7 +2409,7 @@
           populateExecFilter(); 
           currentPaginationLimit = 50; 
           filterData();
-      } catch (err) {
+      }).catch (err => {
           if (refreshIcon) refreshIcon.classList.remove('icon-spin'); 
           if (rawData.length === 0) {
               document.getElementById('loaderText').innerHTML = `Error loading contacts: ${err.message} <br><br><button class="btn-outline" onclick="fetchData()">Retry Now</button>`;
@@ -2446,7 +2418,7 @@
           } else {
               showToast("Sync paused: " + err.message, "warning");
           }
-      }
+      });
     }
 
     function fetchData() {
@@ -2905,7 +2877,7 @@
                 document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; 
                 document.getElementById('mm-error-msg').style.display = 'block'; 
             }
-        }, 800);
+        }, 800); 
     };
   </script>
 </body>
