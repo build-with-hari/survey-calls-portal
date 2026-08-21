@@ -157,7 +157,7 @@
     tr:hover .admin-hide-cb { opacity: 1; pointer-events: auto; border-color: var(--text-muted); }
     tr:hover .admin-hide-cb:checked { border-color: var(--danger-color); }
 
-    .pulse-live { display: inline-block; width: 8px; height: 8px; background-color: var(--safe-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 1.5s infinite; margin-left: 5px; vertical-align: middle; }
+    .pulse-live { display: inline-block; width: 8px; height: 8px; background: var(--safe-color); border-radius: 50%; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 1.5s infinite; margin-left: 5px; vertical-align: middle; }
     
     .loader-container { text-align: center; padding: 4rem 0; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
     .spinner { width: 40px; height: 40px; border: 4px solid var(--glass-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s infinite linear; }
@@ -1716,7 +1716,9 @@
             if (event.data.size > 0) audioChunks.push(event.data); 
         }; 
         mediaRecorder.onstop = uploadRecordingToDrive; 
-        mediaRecorder.start();
+        
+        // Push data every 1 second to absolutely prevent browser garbage collection
+        mediaRecorder.start(1000); 
         
         recSeconds = 0; 
         document.getElementById('recIndicator').classList.add('active'); 
@@ -1831,17 +1833,19 @@
                     let noteTs = 0;
                     let dateStr = "Note"; // Fallback label
                     
-                    // Improved regex to capture exact Attempt + Date format: "🤖 AI Summary (Attempt X | Aug 21, 2026 - 02:30 PM EST):"
-                    const advancedDateMatch = cleanNote.match(/\(([^|]+)\s*\|\s*([^)]+)\)/);
-                    if (advancedDateMatch) {
-                        dateStr = advancedDateMatch[2] + " (" + advancedDateMatch[1].trim() + ")"; // "Aug 21, 2026 (Attempt 1)"
-                        noteTs = new Date(advancedDateMatch[2].replace('EST','').trim()).getTime() + index;
+                    // Match the precise EST timestamp we just set in Code.gs
+                    const aiMatch = cleanNote.match(/🤖 AI Summary \(([^|]+)\s*\|\s*([^)]+)\):?/);
+                    
+                    if (aiMatch) {
+                        dateStr = aiMatch[2].trim() + " (" + aiMatch[1].trim() + ")"; // "Aug 21, 2026 - 11:24 PM EST (Attempt 1)"
+                        noteTs = new Date(aiMatch[2].replace('EST','').trim()).getTime() + index;
+                        cleanNote = cleanNote.replace(aiMatch[0], '🤖 AI Summary:').trim();
                     } else {
-                        // Legacy fallback
-                        const dateMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
-                        if (dateMatch) {
-                            dateStr = dateMatch[0];
-                            noteTs = new Date(dateMatch[0]).getTime() + index; 
+                        // Legacy fallback for older logs
+                        const legacyMatch = cleanNote.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}/);
+                        if (legacyMatch) {
+                            dateStr = legacyMatch[0];
+                            noteTs = new Date(legacyMatch[0]).getTime() + index; 
                         } else {
                             let maxAttTs = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.ts)) : baseTs;
                             noteTs = maxAttTs + 1000 + index; 
@@ -2816,162 +2820,3 @@
           if (valA > valB) return currentSortAsc ? 1 : -1; 
           return 0; 
       });
-
-      const totalGroups = groupsArray.length;
-      const paginatedGroups = groupsArray.slice(0, currentPaginationLimit);
-      document.getElementById('paginationControls').style.display = totalGroups > currentPaginationLimit ? 'block' : 'none';
-
-      paginatedGroups.forEach(group => {
-        const clientName = group.clientName;
-        const pocs = group.pocs;
-        const isCollapsed = window.collapsedClients.has(clientName);
-        const sourceBadge = pocs[0].source === 'Zoho CRM' ? '<span class="badge-crm">CRM</span>' : '';
-        const headerTr = document.createElement('tr'); 
-        
-        headerTr.style.background = 'var(--glass-highlight)'; 
-        headerTr.style.cursor = 'pointer'; 
-        headerTr.onclick = () => toggleClient(clientName);
-        
-        headerTr.innerHTML = `<td colspan="5" style="padding: 0.8rem 1rem;"><span style="display:inline-block; width:24px; text-align:center; margin-right:8px; color:var(--text-muted);">${isCollapsed ? SVG_CHEVRON_RIGHT : SVG_CHEVRON_DOWN}</span><strong style="font-size: 1.1rem; color: var(--text-main); text-transform: capitalize; letter-spacing: 0.5px;">${clientName}</strong>${sourceBadge}<span style="float: right; font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 3px;">${pocs.length} POC${pocs.length > 1 ? 's' : ''}</span></td>`;
-        tbody.appendChild(headerTr);
-
-        if (!isCollapsed) {
-          pocs.forEach((row, index) => {
-            let badgeClass = 'badge-pending';
-            if (completedStatuses.includes(row.status)) badgeClass = 'badge-safe';
-            else if (pendingStatuses.includes(row.status)) badgeClass = 'badge-pending';
-            else badgeClass = 'badge-warning';
-
-            const cleanPhone = (row.phone || "").toString().replace(/^'/, '');
-            const cleanMobile = (row.mobile || "").toString().replace(/^'/, '');
-            const isLast = index === pocs.length - 1;
-            const branchHeight = isLast ? '50%' : '100%';
-            const tr = document.createElement('tr');
-            
-            const tagHtml = row.tags ? row.tags.split(',').map(t => `<span class="badge" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); font-size:0.65rem; padding:0.2rem 0.5rem; border-radius:6px;">${t.trim()}</span>`).join('') : '';
-            const noteIcon = row.customNote ? `<span class="badge-note" data-tooltip-top="${row.customNote.replace(/"/g, '&quot;')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>Note</span>` : '';
-            
-            let latestAttemptTag = '';
-            if (row.att3 && row.att3 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 3</span>`; 
-            else if (row.att2 && row.att2 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 2</span>`; 
-            else if (row.att1 && row.att1 !== "-") latestAttemptTag = `<span class="badge badge-attempt">Att 1</span>`;
-            
-            const checkboxHtml = window.isAdmin ? `<input type="checkbox" class="admin-hide-cb" value="${row.id}" onchange="updateBulkBar()">` : '';
-
-            tr.innerHTML = `
-              <td style="padding-left: 2.5rem; position: relative; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">
-                <div style="position: absolute; left: 1rem; top: 0; bottom: 0; height: ${branchHeight}; width: 2px; background: var(--glass-border);"></div>
-                <div style="position: absolute; left: 1rem; top: 50%; width: 1rem; height: 2px; background: var(--glass-border);"></div>
-                
-                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                  ${checkboxHtml ? `<div style="padding-top: 3px;">${checkboxHtml}</div>` : ''}
-                  <div>
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">
-                      <span style="font-size:1.05rem; font-weight:600; text-decoration:${row.hidden ? 'line-through' : 'none'};">${row.poc}</span>${latestAttemptTag}${tagHtml}${noteIcon}
-                    </div>
-                    <span style="font-size:0.8rem; color:var(--text-muted);">Exec: <strong style="color:var(--text-main);">${row.executive || 'Unassigned'}</strong></span>
-                  </div>
-                </div>
-              </td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><div style="font-size:0.85rem; margin-bottom:3px;">🏢 ${cleanPhone}</div><div style="font-size:0.85rem; margin-bottom:5px;">📱 ${cleanMobile}</div><div style="font-size:0.8rem; color:var(--text-muted);">✉️ ${row.email}</div></td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};">${getLatestAttemptDate(row)}</td>
-              <td style="border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};"><span class="badge ${badgeClass}">${row.status}</span></td>
-              <td style="text-align: center; white-space: nowrap; border-bottom: ${isLast ? '1px solid var(--glass-border)' : 'none'};" class="action-cell"></td>
-            `;
-            
-            const btn = document.createElement('button'); 
-            btn.className = "btn-primary"; 
-            btn.style.cssText = "font-size: 0.85rem; padding: 0.4rem 0.8rem;"; 
-            btn.innerText = "🚀 Open Workspace"; 
-            btn.onclick = () => triggerWorkspaceByData(row);
-            
-            tr.querySelector('.action-cell').appendChild(btn); 
-            tbody.appendChild(tr);
-          });
-        }
-      });
-      
-      renderPresence();
-    }
-
-    function loadDashboard(email) {
-        document.getElementById('mm-login-screen').style.opacity = '0'; 
-        document.getElementById('loggedInUser').innerText = email;
-        
-        window.isAdmin = (email === 'hariharan.iyer@mindmatrix.net');
-        if (window.isAdmin) {
-            document.getElementById('btnRollover').style.display = 'flex';
-            document.getElementById('btnSyncCRM').style.display = 'flex';
-        } else {
-            document.getElementById('btnRollover').style.display = 'none';
-            document.getElementById('btnSyncCRM').style.display = 'none';
-        }
-        
-        setTimeout(() => {
-            document.getElementById('mm-login-screen').style.display = 'none'; 
-            document.getElementById('app-components').style.display = 'block';
-            populateOutcomeDropdowns(); 
-            
-            fetchDataAsync(); 
-            
-            if (!window.telnyxInitStarted) {
-                window.telnyxInitStarted = true;
-                initTelnyx();
-            }
-            
-            presenceInterval = setInterval(() => {
-                const activeRow = document.getElementById('actionWorkspace').classList.contains('active') ? document.getElementById('ws-row-id').value : null;
-                callGoogleAPI('heartbeat', { activeRowId: activeRow }).then(res => { 
-                    activePresence = res; 
-                    renderPresence(); 
-                }).catch(e=>{});
-            }, 15000);
-        }, 400);
-    }
-
-    function logout() {
-        localStorage.removeItem("mm_cx_portal_session");
-        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        
-        try {
-            if (window.google && google.accounts && google.accounts.id) {
-                google.accounts.id.cancel();
-            }
-        } catch(e) {}
-        
-        window.location.reload();
-    }
-
-    window.onload = function() {
-        initRatings();
-        flatpickr(".date-picker", { dateFormat: "M d, Y", allowInput: true });
-
-        const storedSession = localStorage.getItem("mm_cx_portal_session");
-        if (storedSession) {
-            try {
-                const sessionData = JSON.parse(storedSession), now = new Date().getTime();
-                if (sessionData.expiry && now < sessionData.expiry && sessionData.token && sessionData.email) { 
-                    loadDashboard(sessionData.email); 
-                    return; 
-                } 
-                else {
-                    localStorage.removeItem("mm_cx_portal_session");
-                }
-            } catch(e) { 
-                localStorage.removeItem("mm_cx_portal_session"); 
-            }
-        }
-
-        setTimeout(function() {
-            if (window.google && google.accounts) {
-                google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
-                google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
-            } else { 
-                document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; 
-                document.getElementById('mm-error-msg').style.display = 'block'; 
-            }
-        }, 800); 
-    };
-  </script>
-</body>
-</html>
