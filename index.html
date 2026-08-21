@@ -313,8 +313,8 @@
           <h2 id="mmLoginTitle" style="color: var(--text-main); font-size: 26px; margin: 0 0 10px 0; font-weight: 700; letter-spacing: -0.5px;">CX Survey Calls Portal</h2>
           <p id="mmLoginSub" style="color: var(--text-muted); margin: 0 0 35px 0; font-size: 16px; line-height: 1.5;">Sign in with your verified <br><strong style="color:var(--accent-primary);">@mindmatrix.net</strong> account to continue.</p>
           
-          <div id="g_id_onload" data-client_id="992801995818-qpj2t94ou9d48qt3mk1a485ckvuo121i.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleSSOResponse" data-auto_prompt="false"></div>
-          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div></div>
+          <!-- Cleaned up container (JS handles the initialization safely) -->
+          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px; opacity: 0; transition: opacity 0.3s ease;"></div>
           
           <p id="mm-error-msg" style="color: var(--danger-color); display: none; margin: 24px 0 0 0; font-weight: 600; font-size: 14px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"></p>
       </div>
@@ -1049,12 +1049,19 @@
     function parseJwt(token) {
         try {
             const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            
+            // FIX: Add padding so the string length is a multiple of 4 (prevents atob crash)
+            while (base64.length % 4) {
+                base64 += '=';
+            }
+            
             const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { 
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); 
             }).join(''));
             return JSON.parse(jsonPayload);
         } catch(e) { 
+            console.error("JWT Parsing Error: ", e);
             return null; 
         }
     }
