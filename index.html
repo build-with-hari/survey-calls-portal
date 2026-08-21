@@ -1808,10 +1808,18 @@
                     if (fileIdMatch && fileIdMatch[1]) {
                         const previewUrl = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
                         
-                        // REFINED CSS TRICK: Hides the top 65px (Google Header), exposes the bottom 65px (Controls)
+                        // Clean, properly framed Google Drive Player without hacky CSS cropping
                         audioBtn = `
-                        <div style="width: 100%; height: 65px; overflow: hidden; border-radius: 8px; margin-top: 12px; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #111;">
-                            <iframe src="${previewUrl}" width="100%" height="130" allow="autoplay" style="border: none; margin-top: -65px;"></iframe>
+                        <div style="margin-top: 15px; border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                            <div style="background: var(--glass-bg); padding: 8px 12px; font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border);">
+                                <span style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                                    🎙️ Drive Audio Player
+                                </span>
+                                <a href="${ev.audio}" target="_blank" style="color: var(--accent-primary); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    Pop out <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                </a>
+                            </div>
+                            <iframe src="${previewUrl}" width="100%" height="150" allow="autoplay" style="border:none; display: block; background: #0b0f19;"></iframe>
                         </div>`;
                     } else {
                         audioBtn = `<br><a href="${ev.audio}" target="_blank" class="tl-audio-link">🔊 Listen to Recording</a>`;
