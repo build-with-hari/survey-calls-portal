@@ -314,7 +314,7 @@
           <p id="mmLoginSub" style="color: var(--text-muted); margin: 0 0 35px 0; font-size: 16px; line-height: 1.5;">Sign in with your verified <br><strong style="color:var(--accent-primary);">@mindmatrix.net</strong> account to continue.</p>
           
           <!-- Cleaned up container (JS handles the initialization safely) -->
-          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px; opacity: 0; transition: opacity 0.3s ease;"></div>
+          <div id="googleBtnContainer" style="display: flex; justify-content: center; align-items: center; min-height: 44px; padding-bottom: 10px;"></div>
           
           <p id="mm-error-msg" style="color: var(--danger-color); display: none; margin: 24px 0 0 0; font-weight: 600; font-size: 14px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"></p>
       </div>
@@ -2901,12 +2901,11 @@
             if (window.google && google.accounts) {
                 google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleSSOResponse });
                 google.accounts.id.renderButton(document.getElementById("googleBtnContainer"), { theme: "outline", size: "large", shape: "pill" });
-                setTimeout(() => document.getElementById("googleBtnContainer").style.opacity = "1", 300);
             } else { 
                 document.getElementById('mm-error-msg').textContent = "Failed to load Google Login. Please disable ad-blockers and refresh."; 
                 document.getElementById('mm-error-msg').style.display = 'block'; 
             }
-        }, 800); 
+        }, 800);
     };
   </script>
 </body>
